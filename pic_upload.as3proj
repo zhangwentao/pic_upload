@@ -4,7 +4,7 @@
   <output>
     <movie disabled="False" />
     <movie input="" />
-    <movie path="bin/pic_uploader.swf" />
+    <movie path="bin\pic_uploader.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
