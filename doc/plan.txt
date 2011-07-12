@@ -1,0 +1,38 @@
+[pic_uploader]
+
+*DBUploader:DataBlockUploader
+ 将图片文件的数据块和与其相关的参数上传至服务器。
+	upload(DB:DataBlock):void//上传
+
+*UploaderPool: consumer[目的，节省内存，看情况]
+ Uploader池，存放的Uploader。
+ 
+
+*DataBlock:数据块
+ 由图片文件数据块和与其相关的参数组成。	
+	size:	数据大小
+	index:	索引从0开始计数。
+	file:	对数据块所属文件的引用。
+	
+*DataBlockCache:待上传的数据切片缓冲区
+	maxSize:缓冲数据的最大数据量 
+	idleSize:空闲的数据量
+	
+	getData():DataBlock 取出一个数据块
+	
+*FileQueue
+ 
+	
+*File:图片文件
+ 图片文件的所有信息
+	status:	文件当前状态
+	fileReference:
+	
+ 
+ 
+ 
+---------------MEMO---------------
+一张图片的缩略图的显示时机:图片正在上传时再显示。
+目的，图片上传时，图片数据已被加载到内存，这时截取缩略图避免了为此单独加载图片数据的过程。
+
+
