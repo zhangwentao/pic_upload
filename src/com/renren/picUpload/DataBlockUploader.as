@@ -1,18 +1,23 @@
 package com.renren.picUpload 
 {
 	/**
-	 * ...
-	 * @author wentao.zhang
+	 * DataBlock 上传者
+	 * @author taowenzhang@gmail.com
 	 */
 	public class DataBlockUploader
 	{
-		static var dataBlockQueue:DataBlockQueue;//数据块队列
-		
 		public function DataBlockUploader() 
 		{
 			
 		}
 		
+		/**
+		 * 上传 dataBlock
+		 * @param	dataBlock 
+		 */
+		public function upload(dataBlock:DataBlock):void
+		{
+			
+		}
 	}
-
 }

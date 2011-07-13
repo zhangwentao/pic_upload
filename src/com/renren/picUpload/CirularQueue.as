@@ -2,7 +2,7 @@ package com.renren.picUpload
 {
 	/**
 	 * 循环队列
-	 * @author wentao.zhang
+	 * @author taowenzhang@gmail.com
 	 */
 	public class CirularQueue
 	{
@@ -36,12 +36,16 @@ package com.renren.picUpload
 		
 		public function enQueue(item:*):void
 		{
+			if (isFull())
+				return;
 			base[rear] = item;
 			rear = (rear + 1) % max_size;
 		}
 		
 		public function deQueue():*
 		{
+			if (isEmpty())
+				return null;
 			var resut = base[front];
 			front = (front +1) % max_size;
 			return resut;
