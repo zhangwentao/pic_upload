@@ -5,11 +5,11 @@ package com.renren.picUpload
 	 * 文件
 	 * @author taowenzhang@gmail.com 
 	 */
-	public class FileItem
+	public class File
 	{
 		var fileReference:FileReference;//对应的文件引用
 		
-		public function FileItem() 
+		public function File() 
 		{
 			
 		}
