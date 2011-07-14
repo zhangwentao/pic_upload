@@ -1,32 +1,19 @@
 package com.renren.picUpload 
 {
+	import com.renren.util.net.ByteArrayUploader;
 	/**
 	 * DataBlock 上传者
 	 * @author taowenzhang@gmail.com
 	 */
 	public class DBUploader
 	{
-		
-		public static const STATUS_IDLE:int = 0;//空闲
-		public static const STATUS_BUSY:int = 1;//忙
-		
-		[Event (name = "complete", type = "flash.events.Event")]
-		
-		
-		private var _status:int = 0; 
-		
+		private var uploader:ByteArrayUploader = new ByteArrayUploader();//二进制数据上传者
 		
 		public function DBUploader() 
 		{
 			
 		}
-		
-		
-		public function get status():int
-		{
-			return this._status;
-		}
-		
+				
 		/**
 		 * 上传dataBlock
 		 * @param	dataBlock 
@@ -35,6 +22,5 @@ package com.renren.picUpload
 		{
 			
 		}
-		
 	}
 }

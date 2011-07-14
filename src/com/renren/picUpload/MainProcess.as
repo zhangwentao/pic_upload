@@ -2,8 +2,11 @@ package com.renren.picUpload
 {
 	import com.renren.picUpload.events.DBUploaderEvent;
 	import com.renren.util.CirularQueue;
+	import com.renren.util.net.SimpleURLLoader;
 	import com.renren.util.ObjectPool;
 	import flash.events.Event;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	/**
 	 * 主上传处理
 	 * @author taowenzhang@gmail.com 
@@ -15,12 +18,13 @@ package com.renren.picUpload
 		private var fileQueue:CirularQueue;//用户选择的文件的File队列
 		private var DBqueue:CirularQueue;//DataBlock队列
 		private var uploaderPool:ObjectPool;//DataBlockUploader对象池
-		
-		private var lock:Boolean;
+		private var lock:Boolean;//加载本地文件到内存锁(目的:逐个加载本地文件)
+		private var UPMonitorTimer:Timer;//uploader对象池监控timer
+		private var DBQMonitorTimer:Timer;//DataBlock队列监控timer
 		
 		public function MainProcess() 
 		{
-			
+			init();
 		}
 		
 		/**
@@ -28,7 +32,19 @@ package com.renren.picUpload
 		 */
 		private function init():void
 		{
-			
+			DBQMonitorTimer = new Timer(100);
+			UPMonitorTimer = new Timer(100);
+			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
+			UPMonitorTimer.addEventListener(TimerEvent.TIMER, function() { uploaderPoolMonitor(); } );
+		}
+		
+		/**
+		 * 启动上传进程
+		 */
+		public function launch():void
+		{
+			DBQMonitorTimer.start();
+			UPMonitorTimer.start();
 		}
 		
 		/**
@@ -75,8 +91,6 @@ package com.renren.picUpload
 			file.fileReference.addEventListener(Event.COMPLETE, handleFileLoaded);
 			lock = true;
 			file.fileReference.load();
-			
-			
 		}
 		
 		/**
@@ -99,11 +113,13 @@ package com.renren.picUpload
 		/**
 		 * DBUploader成功上传数据完毕后执行:
 		 * TODO:1.把成功上传后的DBUploader对象放回DBUploader对象池。
+		 * TODO:2.
 		 * @param	evt	<DBUploaderEvent>
 		 */
 		private function handle_dataBlock_uploaded(evt:DBUploaderEvent):void
 		{
-			
+			var uploader:DBUploader = evt.target as DBUploader;
+			uploaderPool.put(uploader);
 		}
 	}
 
