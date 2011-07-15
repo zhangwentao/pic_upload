@@ -7,13 +7,7 @@ package com.renren.picUpload
 	 */
 	public class DataSlicer
 	{
-		public static var block_size_limit:uint;//数据切片大小上限Byte
-		
-		public function DataSlicer()
-		{
-			
-		}
-		
+		public static var block_size_limit:uint=102400;//数据切片大小上限Byte		
 		/**
 		 * 将data切割成DataBlock 
 		 * @param	data	<ByteArray>	被切割的数据
@@ -21,7 +15,13 @@ package com.renren.picUpload
 		 */
 		public function slice(data:ByteArray):Array
 		{
-			var dataArr:Array = new Array();
+			var dataArr:Array = new Array();//存放切割后的数据块
+			if (data.length <= block_size_limit)
+			{
+				dataArr.push(data);
+				return dataArr;
+			}
+				
 			data.position = 0;
 			while (data.bytesAvailable)
 			{

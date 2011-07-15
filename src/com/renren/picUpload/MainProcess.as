@@ -121,6 +121,9 @@ package com.renren.picUpload
 				
 			/**
 			 * 处理本地文件加载完毕。
+			 * TODO:1.压缩图片
+			 * TODO:2.生成缩略图
+			 * TODO:3.文件分块，放入DataBlock队列
 			 * @param	evt
 			 */
 			function handleFileLoaded(evt:Event):void
