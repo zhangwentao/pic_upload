@@ -1,6 +1,7 @@
 package com.renren.picUpload 
 {
 	import com.renren.util.net.ByteArrayUploader;
+	import flash.events.Event;
 	/**
 	 * DataBlock 上传者
 	 * @author taowenzhang@gmail.com
@@ -11,7 +12,8 @@ package com.renren.picUpload
 		
 		public function DBUploader() 
 		{
-			
+			uploader.url = "";//上传cgiurl
+			uploader.addEventListener(Event.COMPLETE, handle_upload_complete);
 		}
 				
 		/**
@@ -19,6 +21,13 @@ package com.renren.picUpload
 		 * @param	dataBlock 
 		 */
 		public function upload(dataBlock:DataBlock):void
+		{
+			var urlVar:Object = uploader.urlVariables;
+			
+			uploader.upLoad(dataBlock.data);
+		}
+		
+		private function handle_upload_complete(evt:Event):void
 		{
 			
 		}
