@@ -14,6 +14,9 @@ package com.renren.picUpload
 	public class MainProcess
 	{
 		private var dataBlockMaxAmount:uint;//DataBlock对象的数量上限值
+		private var uploaderPoolSize:uint;//DBUploader对象池容量
+		private var fileQueueSize:uint;//File队列容量
+		
 		
 		private var fileQueue:CirularQueue;//用户选择的文件的File队列
 		private var DBqueue:CirularQueue;//DataBlock队列
@@ -32,10 +35,24 @@ package com.renren.picUpload
 		 */
 		private function init():void
 		{
+			fileQueue = new CirularQueue(fileQueueSize);
 			DBQMonitorTimer = new Timer(100);
 			UPMonitorTimer = new Timer(100);
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
 			UPMonitorTimer.addEventListener(TimerEvent.TIMER, function() { uploaderPoolMonitor(); } );
+		}
+		
+		/**
+		 * 初始化uploader对象池
+		 * 1.创建对象池对象，并以 DBUploader对象填充
+		 */
+		private function initUploaderPoll():void
+		{
+			uploaderPool = new ObjectPool(uploaderPoolSize);
+			for (var i:int = 0; i < uploaderPool.size; i++)
+			{
+				uploaderPool.put(new DBUploader());
+			}
 		}
 		
 		/**
@@ -53,7 +70,15 @@ package com.renren.picUpload
 		 */
 		public function pushFiles(files:Array):void
 		{
-			
+			for (var i:int = 0; i < files.length; i++)
+			{
+				if (fileQueue.isFull)
+				{
+					trace("fileQueue is full");
+					return;
+				}
+				fileQueue.enQueue(files[i]);
+			}
 		}
 		
 		/**
@@ -88,26 +113,31 @@ package com.renren.picUpload
 			}
 			
 			var file:File = fileQueue.deQueue();
+			
 			file.fileReference.addEventListener(Event.COMPLETE, handleFileLoaded);
 			lock = true;
 			file.fileReference.load();
+			
+				
+			/**
+			 * 处理本地文件加载完毕。
+			 * @param	evt
+			 */
+			function handleFileLoaded(evt:Event):void
+			{
+				evt.target.removeEventListener(Event.COMPLETE, handleFileLoaded);
+				var fileSlicer:FileSlicer = new FileSlicer();
+				var dataArr:Array = fileSlicer.slice(evt.target.data);
+				for (var i:int = 0; i < dataArr.length; i++)
+				{
+					var dataBlock:DataBlock = new DataBlock(file, i, dataArr[i]);
+					DBqueue.enQueue(dataBlock);
+				}
+				lock = false;
+			}
 		}
 		
-		/**
-		 * 处理本地文件加载完毕。
-		 * @param	evt
-		 */
-		function handleFileLoaded(evt:Event):void
-		{
-			evt.target.removeEventListener(Event.COMPLETE, handleFileLoaded);
-			var fileSlicer:FileSlicer = new FileSlicer();
-			var DBArr:Array = fileSlicer.slice(evt.target.data);
-			for (var i:int = 0; i < DBArr.length; i++)
-			{
-				DBqueue.enQueue(DBArr[i]);
-			}
-			lock = false;
-		}
+		
 		
 		
 		/**

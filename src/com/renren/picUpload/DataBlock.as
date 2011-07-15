@@ -8,10 +8,10 @@ package com.renren.picUpload
 	public class DataBlock
 	{
 		public var file:File;//所属文件的引用
-		public var index:int;//编号
+		public var index:uint;//数据块编号
 		public var data:ByteArray;//数据对象
 		
-		public function DataBlock() 
+		public function DataBlock(file:File,index:uint,data:ByteArray) 
 		{
 			
 		}
@@ -19,7 +19,7 @@ package com.renren.picUpload
 		/**
 		 * 删除存储的数据释放内存
 		 */
-		public function clear():void
+		public function dispose():void
 		{
 			_data.clear();
 		}
