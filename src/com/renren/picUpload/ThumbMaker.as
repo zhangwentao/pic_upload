@@ -6,6 +6,7 @@ package com.renren.picUpload
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.utils.ByteArray;
+	
 	/**
 	 * 生成图片的缩略图
 	 * @author taowenzhang@gmail.com 
