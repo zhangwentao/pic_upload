@@ -16,8 +16,6 @@ package com.renren.picUpload
 		private var dataBlockMaxAmount:uint;//DataBlock对象的数量上限值
 		private var uploaderPoolSize:uint;//DBUploader对象池容量
 		private var fileQueueSize:uint;//File队列容量
-		
-		
 		private var fileQueue:CirularQueue;//用户选择的文件的File队列
 		private var DBqueue:CirularQueue;//DataBlock队列
 		private var uploaderPool:ObjectPool;//DataBlockUploader对象池
@@ -113,12 +111,10 @@ package com.renren.picUpload
 			}
 			
 			var file:File = fileQueue.deQueue();
-			
 			file.fileReference.addEventListener(Event.COMPLETE, handleFileLoaded);
 			lock = true;
 			file.fileReference.load();
 			
-				
 			/**
 			 * 处理本地文件加载完毕。
 			 * TODO:1.压缩图片
@@ -139,9 +135,6 @@ package com.renren.picUpload
 				lock = false;
 			}
 		}
-		
-		
-		
 		
 		/**
 		 * DBUploader成功上传数据完毕后执行:

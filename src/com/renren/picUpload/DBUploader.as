@@ -23,7 +23,6 @@ package com.renren.picUpload
 		public function upload(dataBlock:DataBlock):void
 		{
 			var urlVar:Object = uploader.urlVariables;
-			
 			uploader.upLoad(dataBlock.data);
 		}
 		

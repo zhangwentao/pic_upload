@@ -7,7 +7,7 @@ package com.renren.picUpload
 	 */
 	public class DataSlicer
 	{
-		public static var block_size_limit:uint=102400;//数据切片大小上限Byte		
+		public static var block_size_limit:uint=102400;//数据切片大小上限Byte 100K
 		/**
 		 * 将data切割成DataBlock 
 		 * @param	data	<ByteArray>	被切割的数据
