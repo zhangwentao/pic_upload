@@ -1,6 +1,7 @@
 package com.renren.picUpload 
 {
 	import flash.display.BitmapData;
+	import flash.display.Sprite;
 	import flash.net.FileReference;
 	/**
 	 * 文件
@@ -18,7 +19,7 @@ package com.renren.picUpload
 		var id:uint;//文件编号
 		var status:int;//文件状态
 		var fileReference:FileReference;//对应的文件引用
-		var thumb:BitmapData;//图片缩略图
+		var thumb:Sprite;//图片缩略图
 		
 		
 		public function File() 

@@ -14,8 +14,6 @@ package com.renren.picUpload
 	public class ThumbMaker extends EventDispatcher
 	{
 		private var thumbWidth:Number = 100;
-		private var width:Number;
-		private var height:Number;
 		private var _thumb:Sprite;
 		
 		public function ThumbMaker() 
@@ -43,13 +41,13 @@ package com.renren.picUpload
 			if (loader.width > loader.height)
 			{
 				aspectRatio = loader.height / loader.width;
-				loader.width = this.width;
+				loader.width = thumbWidth;
 				loader.height = loader.width * aspectRatio;
 			}
 			else
 			{
 				aspectRatio =  loader.width/loader.height;
-				loader.height = this.height;
+				loader.height = thumbWidth;
 				loader.width = loader.width * aspectRatio;
 			}
 			

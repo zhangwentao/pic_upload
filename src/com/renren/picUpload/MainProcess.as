@@ -1,11 +1,13 @@
 package com.renren.picUpload 
 {
 	import com.renren.picUpload.events.DBUploaderEvent;
+	import com.renren.util.byteArray.ByteArraySlicer;
 	import com.renren.util.CirularQueue;
 	import com.renren.util.net.SimpleURLLoader;
 	import com.renren.util.ObjectPool;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
+	import flash.utils.ByteArray;
 	import flash.utils.Timer;
 	/**
 	 * 主上传处理
@@ -114,26 +116,51 @@ package com.renren.picUpload
 			file.fileReference.addEventListener(Event.COMPLETE, handleFileLoaded);
 			lock = true;
 			file.fileReference.load();
+		}
+		
+		
+		/**
+		 * 处理本地文件加载完毕。
+		 * TODO:1.压缩图片
+		 * TODO:2.生成缩略图
+		 * TODO:3.文件分块，放入DataBlock队列
+		 * @param	evt
+		 */
+		function handleFileLoaded(evt:Event):void
+		{
+			evt.target.removeEventListener(Event.COMPLETE, handleFileLoaded);
 			
-			/**
-			 * 处理本地文件加载完毕。
-			 * TODO:1.压缩图片
-			 * TODO:2.生成缩略图
-			 * TODO:3.文件分块，放入DataBlock队列
-			 * @param	evt
-			 */
-			function handleFileLoaded(evt:Event):void
+			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
+			
+			var thumbMaker:ThumbMaker = new ThumbMaker();
+			thumbMaker.addEventListener(Event.COMPLETE, handle_thumb_maked);
+			thumbMaker.startMake(new ByteArray().readBytes(fileData, 0, fileData.length));
+			
+			var resizer:PicResizer = new PicResizer();
+			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
+			resizer.startResize(new ByteArray().readBytes(fileData, 0, fileData.length));
+			
+			fileData.clear();//释放内存
+		}
+		
+		private function handle_thumb_maked(evt:Event):void
+		{
+			
+		}
+
+		
+		private function handle_pic_resized(evt:Event):void
+		{
+			var picData:ByteArray = (evt.target as PicResizer).data;
+			var fileSlicer:DataSlicer = new DataSlicer();
+			var dataArr:Array = fileSlicer.slice(picData);
+			picData.clear();//释放内存
+			for (var i:int = 0; i < dataArr.length; i++)
 			{
-				evt.target.removeEventListener(Event.COMPLETE, handleFileLoaded);
-				var fileSlicer:FileSlicer = new FileSlicer();
-				var dataArr:Array = fileSlicer.slice(evt.target.data);
-				for (var i:int = 0; i < dataArr.length; i++)
-				{
-					var dataBlock:DataBlock = new DataBlock(file, i, dataArr[i]);
-					DBqueue.enQueue(dataBlock);
-				}
-				lock = false;
+				var dataBlock:DataBlock = new DataBlock(file, i, dataArr[i]);
+				DBqueue.enQueue(dataBlock);
 			}
+			lock = false;
 		}
 		
 		/**
