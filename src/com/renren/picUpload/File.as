@@ -20,7 +20,7 @@ package com.renren.picUpload
 		var status:int;//文件状态
 		var fileReference:FileReference;//对应的文件引用
 		var thumb:Sprite;//图片缩略图
-		
+		var block_amount:uint;//所分的块数
 		
 		public function File() 
 		{

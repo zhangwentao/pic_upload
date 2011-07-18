@@ -25,6 +25,8 @@ package com.renren.picUpload
 		private var UPMonitorTimer:Timer;//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;//DataBlock队列监控timer
 		
+		private var curProcessFile:File;
+		
 		public function MainProcess() 
 		{
 			init();
@@ -113,6 +115,7 @@ package com.renren.picUpload
 			}
 			
 			var file:File = fileQueue.deQueue();
+			curProcessFile = file;
 			file.fileReference.addEventListener(Event.COMPLETE, handleFileLoaded);
 			lock = true;
 			file.fileReference.load();
@@ -154,10 +157,11 @@ package com.renren.picUpload
 			var picData:ByteArray = (evt.target as PicResizer).data;
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
+			curProcessFile.block_amount = dataArr.length;
 			picData.clear();//释放内存
 			for (var i:int = 0; i < dataArr.length; i++)
 			{
-				var dataBlock:DataBlock = new DataBlock(file, i, dataArr[i]);
+				var dataBlock:DataBlock = new DataBlock(curProcessFile, i, dataArr[i]);
 				DBqueue.enQueue(dataBlock);
 			}
 			lock = false;
