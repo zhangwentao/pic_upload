@@ -83,7 +83,7 @@ package com.renren.picUpload
 		{
 			if (uploaderPool.isEmpty || DBqueue.isEmpty)
 			{
-				/*如果没有空闲的DBUploader对象，就什么都不做*/
+				/*如果没有空闲的DBUploader对象或者没有需要上传的数据块，就什么都不做*/
 				return;
 			}
 			
@@ -101,7 +101,7 @@ package com.renren.picUpload
 		{
 			if (DBqueue.length >= dataBlockMaxAmount || fileItemQueue.isEmpty || lock)
 			{
-				/*如果DBQueue中的DataBlock数量大于等于的上限，什么都不做*/
+				/*如果DBQueue中的DataBlock数量大于等于的上限或者。。就什么都不做*/
 				return;
 			}
 			
@@ -122,24 +122,21 @@ package com.renren.picUpload
 		function handle_fileData_loaded(evt:Event):void
 		{
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
-			
-			
-			
-			var resizer:PicResizer = new PicResizer();
-			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
-			resizer.startResize(new ByteArray().readBytes(fileData, 0, fileData.length));
-			
+			makeThumb(new ByteArray().readBytes(fileData, 0, fileData.length));
+			resizePic(new ByteArray().readBytes(fileData, 0, fileData.length));
 			fileData.clear();//释放内存
 		}
 		
-		
-
-		
-		private function resizePic(picData:ByteArray,file:FileItem):void
+		/**
+		 * 获取缩略图
+		 * @param	picData	<ByteArray>	
+		 * @param	file	<FileItem>
+		 */
+		private function makeThumb(picData:ByteArray,file:FileItem):void
 		{
 			var thumbMaker:ThumbMaker = new ThumbMaker();
 			thumbMaker.addEventListener(Event.COMPLETE, handle_thumb_maked);
-			thumbMaker.startMake(new ByteArray().readBytes(picData, 0, picData.length));
+			thumbMaker.startMake(picData);
 			
 			function handle_thumb_maked(evt:Event):void
 			{
@@ -147,6 +144,12 @@ package com.renren.picUpload
 			}
 		}
 		
+		private function resizePic(picData:ByteArray):void
+		{
+			var resizer:PicResizer = new PicResizer();
+			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
+			resizer.startResize(picData);
+		}
 		
 		private function handle_pic_resized(evt:Event):void
 		{
@@ -157,7 +160,7 @@ package com.renren.picUpload
 			picData.clear();//释放内存
 			for (var i:int = 0; i < dataArr.length; i++)
 			{
-				var dataBlock:DataBlock = new DataBlock(curProcessFile, i, dataArr[i]);
+				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr[i]);
 				DBqueue.enQueue(dataBlock);
 			}
 			lock = false;

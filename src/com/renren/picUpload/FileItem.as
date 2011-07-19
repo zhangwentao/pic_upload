@@ -1,7 +1,5 @@
 package com.renren.picUpload 
 {
-	import flash.display.BitmapData;
-	import flash.display.Sprite;
 	import flash.net.FileReference;
 	/**
 	 * 文件

@@ -35,7 +35,7 @@ package com.renren.picUpload
 		
 		private function handle_load_complete(evt:Event):void
 		{
-			var loader:Loader = evt.target as Loader;
+			var loader:Loader = evt.target.loader as Loader;
 			var aspectRatio:Number;
 
 			if (loader.width > loader.height)

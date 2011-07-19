@@ -15,7 +15,7 @@ package com.renren.picUpload
 			uploader.url = "";//上传cgiurl
 			uploader.addEventListener(Event.COMPLETE, handle_upload_complete);
 		}
-				
+			
 		/**
 		 * 上传dataBlock
 		 * @param	dataBlock 
@@ -24,7 +24,7 @@ package com.renren.picUpload
 		{
 			var urlVar:Object = uploader.urlVariables;
 			urlVar["block_index"] = dataBlock.index;
-			urlVar["block_count"] = 
+			urlVar["block_count"] = dataBlock.count;
 			uploader.upLoad(dataBlock.data);
 		}
 		
