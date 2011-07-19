@@ -17,15 +17,15 @@ package com.renren.picUpload
 	{
 		private var dataBlockMaxAmount:uint;//DataBlock对象的数量上限值
 		private var uploaderPoolSize:uint;//DBUploader对象池容量
-		private var fileQueueSize:uint;//File队列容量
-		private var fileQueue:CirularQueue;//用户选择的文件的File队列
+		private var fileItemQueueSize:uint;//File队列容量
+		private var fileItemQueue:CirularQueue;//用户选择的文件的File队列
 		private var DBqueue:CirularQueue;//DataBlock队列
 		private var uploaderPool:ObjectPool;//DataBlockUploader对象池
 		private var lock:Boolean;//加载本地文件到内存锁(目的:逐个加载本地文件)
 		private var UPMonitorTimer:Timer;//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;//DataBlock队列监控timer
 		
-		private var curProcessFile:File;
+		private var curProcessFile:FileItem;
 		
 		public function MainProcess() 
 		{
@@ -37,7 +37,7 @@ package com.renren.picUpload
 		 */
 		private function init():void
 		{
-			fileQueue = new CirularQueue(fileQueueSize);
+			fileItemQueue = new CirularQueue(fileItemQueueSize);
 			DBQMonitorTimer = new Timer(100);
 			UPMonitorTimer = new Timer(100);
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
@@ -67,20 +67,12 @@ package com.renren.picUpload
 		}
 		
 		/**
-		 * 添加File对象数组
-		 * @param	files	<File>	
+		 * 添加FileItem对象
+		 * @param	fileItem	<FileItem>	
 		 */
-		public function pushFiles(files:Array):void
+		public function addFileItem(fileItem:FileItem):void
 		{
-			for (var i:int = 0; i < files.length; i++)
-			{
-				if (fileQueue.isFull)
-				{
-					trace("fileQueue is full");
-					return;
-				}
-				fileQueue.enQueue(files[i]);
-			}
+			fileItemQueue.enQueue(fileItem);
 		}
 		
 		/**
@@ -103,22 +95,20 @@ package com.renren.picUpload
 		
 		/**
 		 * 监控DBQueue队列：
-		 * TODO:1.如果为上传的DataBlock对象数量小于上限，就去从用户选择的文件中加载文件，并分块。
-		 * 
+		 * TODO:1.如果为上传的DataBlock对象数量小于上限，就去从用户选择的文件中加载文件.
 		 */
 		private function DBQueueMonitor():void
 		{
-			if (DBqueue.length >= dataBlockMaxAmount || fileQueue.isEmpty || lock)
+			if (DBqueue.length >= dataBlockMaxAmount || fileItemQueue.isEmpty || lock)
 			{
 				/*如果DBQueue中的DataBlock数量大于等于的上限，什么都不做*/
 				return;
 			}
 			
-			var file:File = fileQueue.deQueue();
-			curProcessFile = file;
-			file.fileReference.addEventListener(Event.COMPLETE, handleFileLoaded);
-			lock = true;
-			file.fileReference.load();
+			curProcessFile = fileItemQueue.deQueue();
+			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
+			lock = true;//上锁
+			curProcessFile.fileReference.load();
 		}
 		
 		
@@ -129,15 +119,11 @@ package com.renren.picUpload
 		 * TODO:3.文件分块，放入DataBlock队列
 		 * @param	evt
 		 */
-		function handleFileLoaded(evt:Event):void
+		function handle_fileData_loaded(evt:Event):void
 		{
-			evt.target.removeEventListener(Event.COMPLETE, handleFileLoaded);
-			
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			
-			var thumbMaker:ThumbMaker = new ThumbMaker();
-			thumbMaker.addEventListener(Event.COMPLETE, handle_thumb_maked);
-			thumbMaker.startMake(new ByteArray().readBytes(fileData, 0, fileData.length));
+			
 			
 			var resizer:PicResizer = new PicResizer();
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
@@ -146,11 +132,21 @@ package com.renren.picUpload
 			fileData.clear();//释放内存
 		}
 		
-		private function handle_thumb_maked(evt:Event):void
-		{
-			
-		}
+		
 
+		
+		private function resizePic(picData:ByteArray,file:FileItem):void
+		{
+			var thumbMaker:ThumbMaker = new ThumbMaker();
+			thumbMaker.addEventListener(Event.COMPLETE, handle_thumb_maked);
+			thumbMaker.startMake(new ByteArray().readBytes(picData, 0, picData.length));
+			
+			function handle_thumb_maked(evt:Event):void
+			{
+				//TODO:调度事件，通知截图已经完成
+			}
+		}
+		
 		
 		private function handle_pic_resized(evt:Event):void
 		{
