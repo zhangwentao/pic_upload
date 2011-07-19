@@ -8,7 +8,9 @@ package com.renren.picUpload
 	 */
 	public class DBUploader
 	{
-		private var uploader:ByteArrayUploader = new ByteArrayUploader();//二进制数据上传者
+		private var uploader:ByteArrayUploader = new ByteArrayUploader();//用于上传二进制数据
+		
+		private var dataBlock:DataBlock;//上传的数据块
 		
 		public function DBUploader() 
 		{
@@ -22,15 +24,17 @@ package com.renren.picUpload
 		 */
 		public function upload(dataBlock:DataBlock):void
 		{
+			this.dataBlock = dataBlock;
 			var urlVar:Object = uploader.urlVariables;
 			urlVar["block_index"] = dataBlock.index;
 			urlVar["block_count"] = dataBlock.count;
+			urlVar["upload_id"] = dataBlock.file.id;
 			uploader.upLoad(dataBlock.data);
 		}
 		
 		private function handle_upload_complete(evt:Event):void
 		{
-			
+			dataBlock.dispose();//释放内存
 		}
 	}
 }

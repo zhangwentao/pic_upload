@@ -1,6 +1,7 @@
 package com.renren.picUpload 
 {
 	import flash.utils.ByteArray;
+	
 	/**
 	 * 数据块
 	 * @author taowenzhang@gmail.com
@@ -12,9 +13,12 @@ package com.renren.picUpload
 		public var count:uint;//所属文件被分成的总块数
 		public var data:ByteArray;//数据对象
 		
-		public function DataBlock(file:FileItem,index:uint,data:ByteArray) 
+		public function DataBlock(file:FileItem,index:uint,count:uint,data:ByteArray) 
 		{
-			
+			this.file = file;
+			this.index = index;
+			this.count = count;
+			this.data = data;
 		}
 		
 		/**
