@@ -26,7 +26,7 @@ package com.renren.picUpload
 		 */
 		public function dispose():void
 		{
-			_data.clear();
+			data.clear();
 		}
 	}
 }

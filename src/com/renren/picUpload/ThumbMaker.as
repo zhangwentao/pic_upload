@@ -31,7 +31,7 @@ package com.renren.picUpload
 		{
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handle_load_complete);
-			loader.load(pic_data);
+			loader.loadBytes(pic_data);
 		}
 		
 		private function handle_load_complete(evt:Event):void
@@ -66,7 +66,7 @@ package com.renren.picUpload
 				_thumb = result;
 			}
 			
-			dispatchEvent(new ThumbMakerEvent(ThumbMakerEvent.THUMB_MAKED,this._thumb);//制作缩略图完成.
+			dispatchEvent(new ThumbMakerEvent(ThumbMakerEvent.THUMB_MAKED,this._thumb));//制作缩略图完成.
 		}
 	}
 }

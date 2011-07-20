@@ -5,6 +5,7 @@ package com.renren.picUpload
 	import flash.utils.ByteArray;
 	import flash.display.Loader;
 	import flash.display.BitmapData;
+	import flash.events.Event;
 	
 	/**
 	 * 标准化图片尺寸
@@ -32,7 +33,7 @@ package com.renren.picUpload
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handle_load_complete);
 			_rawData = pic_data;
-			loader.load(pic_data);
+			loader.loadBytes(pic_data);
 		}
 		
 		public function get dataBeenStandaized():ByteArray

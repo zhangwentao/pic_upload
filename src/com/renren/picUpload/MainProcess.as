@@ -1,7 +1,7 @@
 package com.renren.picUpload 
 {
 	import com.renren.picUpload.events.DBUploaderEvent;
-	import com.renren.util.byteArray.ByteArraySlicer;
+	import com.renren.picUpload.DataSlicer;
 	import com.renren.util.CirularQueue;
 	import com.renren.util.net.SimpleURLLoader;
 	import com.renren.util.ObjectPool;
@@ -16,9 +16,9 @@ package com.renren.picUpload
 	 */
 	public class MainProcess extends EventDispatcher
 	{
-		private var dataBlockMaxAmount:uint;//DataBlock对象的数量上限值
-		private var uploaderPoolSize:uint;//DBUploader对象池容量
-		private var fileItemQueueSize:uint;//File队列容量
+		private var dataBlockMaxAmount:uint = 100;//DataBlock对象的数量上限值
+		private var uploaderPoolSize:uint = 20;//DBUploader对象池容量
+		private var fileItemQueueSize:uint= 100;//File队列容量
 		
 		private var fileItemQueue:CirularQueue;//用户选择的文件的File队列
 		private var DBqueue:CirularQueue;//DataBlock队列
@@ -41,10 +41,13 @@ package com.renren.picUpload
 		private function init():void
 		{
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
-			DBQMonitorTimer = new Timer(100);
-			UPMonitorTimer = new Timer(100);
+			DBqueue = new CirularQueue(dataBlockMaxAmount);
+			fileItemQueue = new CirularQueue(fileItemQueueSize);
+			DBQMonitorTimer = new Timer(500);
+			UPMonitorTimer = new Timer(500);
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
 			UPMonitorTimer.addEventListener(TimerEvent.TIMER, function() { uploaderPoolMonitor(); } );
+			initUploaderPoll();
 		}
 		
 		/**
@@ -85,12 +88,14 @@ package com.renren.picUpload
 		 */
 		private function uploaderPoolMonitor():void
 		{
+			trace("checkUploader");
+			trace(uploaderPool.isEmpty, DBqueue.isEmpty);
 			if (uploaderPool.isEmpty || DBqueue.isEmpty)
 			{
 				/*如果没有空闲的DBUploader对象或者没有需要上传的数据块，就什么都不做*/
 				return;
 			}
-			
+			trace("startUpload");
 			/*用一个uploader上传一个dataBlock*/
 			var uploader:DBUploader = uploaderPool.fetch() as DBUploader;
 			var dataBlock:DataBlock = DBqueue.deQueue() as DataBlock;
@@ -126,8 +131,14 @@ package com.renren.picUpload
 		function handle_fileData_loaded(evt:Event):void
 		{
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
-			makeThumb(new ByteArray().readBytes(fileData, 0, fileData.length));
-			resizePic(new ByteArray().readBytes(fileData, 0, fileData.length));
+			var temp:ByteArray = new ByteArray();
+			fileData.position = 0;
+			fileData.readBytes(temp, 0, fileData.length);
+			makeThumb(temp,curProcessFile);
+			temp = new ByteArray();
+			fileData.position = 0;
+			fileData.readBytes(temp, 0, fileData.length);
+			resizePic(temp);
 			fileData.clear();//释放内存
 		}
 		
@@ -140,7 +151,7 @@ package com.renren.picUpload
 		{
 			var thumbMaker:ThumbMaker = new ThumbMaker();
 			thumbMaker.addEventListener(Event.COMPLETE, handle_thumb_maked);
-			thumbMaker.startMake(picData);
+			thumbMaker.make(picData);
 			
 			function handle_thumb_maked(evt:Event):void
 			{
@@ -151,20 +162,23 @@ package com.renren.picUpload
 		
 		private function resizePic(picData:ByteArray):void
 		{
-			var resizer:PicResizer = new PicResizer();
+			trace("resize");
+			var resizer:PicStandardizer = new PicStandardizer();
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
-			resizer.startResize(picData);
+			resizer.standardize(picData);
 		}
 		
 		private function handle_pic_resized(evt:Event):void
 		{
-			var picData:ByteArray = (evt.target as PicResizer).data;
+			trace("handleResized");
+			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
-			curProcessFile.block_amount = dataArr.length;
+		
 			picData.clear();//释放内存
 			for (var i:int = 0; i < dataArr.length; i++)
 			{
+				trace("enqueue");
 				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr.length,dataArr[i]);
 				DBqueue.enQueue(dataBlock);
 			}

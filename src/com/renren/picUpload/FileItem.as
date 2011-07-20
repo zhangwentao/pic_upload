@@ -17,9 +17,10 @@ package com.renren.picUpload
 		var status:int;//状态
 		var fileReference:FileReference;//
 		
-		public function FileItem() 
+		public function FileItem(id:uint,fileRef:FileReference) 
 		{
-			
+			this.id = id;
+			this.fileReference = fileRef;
 		}
 	}
 }
