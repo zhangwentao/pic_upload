@@ -1,6 +1,8 @@
 package com.renren.picUpload 
 {
+	import com.adobe.protocols.dict.events.DisconnectedEvent;
 	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
 	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -13,10 +15,10 @@ package com.renren.picUpload
 	 */
 	public class ThumbMaker extends EventDispatcher
 	{
-		private var thumbWidth:Number = 100;
-		private var _thumb:Sprite;
+		private var _limit:Number;
+		private var _thumb:DisplayObject;
 		
-		public function ThumbMaker() 
+		public function ThumbMaker(limit = 100) 
 		{
 			
 		}
@@ -26,7 +28,7 @@ package com.renren.picUpload
 			return this._thumb;
 		}
 		
-		public function startMake(pic_data:ByteArray):void
+		public function make(pic_data:ByteArray):void
 		{
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handle_load_complete);
@@ -36,28 +38,34 @@ package com.renren.picUpload
 		private function handle_load_complete(evt:Event):void
 		{
 			var loader:Loader = evt.target.loader as Loader;
-			var aspectRatio:Number;
-
-			if (loader.width > loader.height)
+			var aspectRatio:Number = loader.width/loader.height;
+			
+			if (loader.width <= _limit && loader.height <= _limit)
 			{
-				aspectRatio = loader.height / loader.width;
-				loader.width = thumbWidth;
-				loader.height = loader.width * aspectRatio;
-			}
-			else
-			{
-				aspectRatio =  loader.width/loader.height;
-				loader.height = thumbWidth;
-				loader.width = loader.width * aspectRatio;
+				//如果图片的宽高均在上限值以下
+				_thumb = loader.content;
 			}
 			
-			var bitmapData:BitmapData = new BitmapData(loader.width, loader.height);
-			bitmapData.draw(loader, null, null, null, null, true);//最后一个参数允许平滑处理
-			_thumb = new Sprite();
-			_thumb.graphics.beginBitmapFill(bitmapData, null, false, false);
-			_thumb.graphics.drawRect(0, 0, loader.width, loader.height);
-			_thumb.graphics.endFill();
-			dispatchEvent(new Event(Event.COMPLETE));//制作缩略图完成，通知。
+			else
+			{
+				if (aspectRatio >= 1)//如果宽大于等于高
+				{
+					loader.width = _limit;
+					loader.height = loader.width / aspectRatio;
+				}
+				else//
+				{
+					loader.height = _limit;
+					loader.width = loader.height * aspectRatio;
+				}
+				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height);
+				bitmapData.draw(loader, null, null, null, null, true);//最后一个参数允许平滑处理
+				_thumb = new Sprite();
+				_thumb.graphics.beginBitmapFill(bitmapData, null, false, false);
+				_thumb.graphics.drawRect(0, 0, loader.width, loader.height);
+				_thumb.graphics.endFill();
+			}
+			dispatchEvent(new Event(Event.COMPLETE));//制作缩略图完成.
 		}
 	}
 }

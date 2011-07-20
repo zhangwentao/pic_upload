@@ -17,6 +17,7 @@ package com.renren.picUpload
 		private var _limit:Number;//上限值
 		private var _data:ByteArray;//尺寸标准化后的图片数据
 		private var _rawData:ByteArray;//原始数据
+		
 		/**
 		 * 构造函数
 		 * @param	limit	<Number>	图片宽度和高度的上限值
