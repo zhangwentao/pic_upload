@@ -12,7 +12,6 @@ package com.renren.picUpload
 		public static var FILE_STATUS_ERROR:int			= -3;
 		public static var FILE_STATUS_SUCCESS:int		= -4;
 		public static var FILE_STATUS_CANCELLED:int		= -5;
-		public static var FILE_STATUS_NEW:int 			= -6;
 		
 		var id:uint;//编号
 		var status:int;//状态

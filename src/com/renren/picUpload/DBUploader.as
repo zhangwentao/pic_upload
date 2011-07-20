@@ -25,6 +25,7 @@ package com.renren.picUpload
 		public function upload(dataBlock:DataBlock):void
 		{
 			this.dataBlock = dataBlock;
+			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
 			var urlVar:Object = uploader.urlVariables;
 			urlVar["block_index"] = dataBlock.index;
 			urlVar["block_count"] = dataBlock.count;

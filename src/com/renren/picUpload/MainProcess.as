@@ -6,6 +6,7 @@ package com.renren.picUpload
 	import com.renren.util.net.SimpleURLLoader;
 	import com.renren.util.ObjectPool;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
@@ -13,7 +14,7 @@ package com.renren.picUpload
 	 * 主上传处理
 	 * @author taowenzhang@gmail.com 
 	 */
-	public class MainProcess
+	public class MainProcess extends EventDispatcher
 	{
 		private var dataBlockMaxAmount:uint;//DataBlock对象的数量上限值
 		private var uploaderPoolSize:uint;//DBUploader对象池容量
@@ -23,7 +24,7 @@ package com.renren.picUpload
 		private var DBqueue:CirularQueue;//DataBlock队列
 		private var uploaderPool:ObjectPool;//DataBlockUploader对象池
 		
-		private var lock:Boolean;//加载本地文件到内存锁(目的:逐个加载本地文件)
+		private var lock:Boolean;//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
 		private var UPMonitorTimer:Timer;//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;//DataBlock队列监控timer
 		
@@ -144,6 +145,7 @@ package com.renren.picUpload
 			function handle_thumb_maked(evt:Event):void
 			{
 				//TODO:调度事件，通知截图已经完成
+				dispatchEvent(evt);
 			}
 		}
 		
@@ -163,7 +165,7 @@ package com.renren.picUpload
 			picData.clear();//释放内存
 			for (var i:int = 0; i < dataArr.length; i++)
 			{
-				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr[i]);
+				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr.length,dataArr[i]);
 				DBqueue.enQueue(dataBlock);
 			}
 			lock = false;
