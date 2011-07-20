@@ -18,9 +18,11 @@ package com.renren.picUpload
 		private var dataBlockMaxAmount:uint;//DataBlock对象的数量上限值
 		private var uploaderPoolSize:uint;//DBUploader对象池容量
 		private var fileItemQueueSize:uint;//File队列容量
+		
 		private var fileItemQueue:CirularQueue;//用户选择的文件的File队列
 		private var DBqueue:CirularQueue;//DataBlock队列
 		private var uploaderPool:ObjectPool;//DataBlockUploader对象池
+		
 		private var lock:Boolean;//加载本地文件到内存锁(目的:逐个加载本地文件)
 		private var UPMonitorTimer:Timer;//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;//DataBlock队列监控timer
@@ -74,6 +76,7 @@ package com.renren.picUpload
 		{
 			fileItemQueue.enQueue(fileItem);
 		}
+		
 		
 		/**
 		 * 监控DBuploader对象池:

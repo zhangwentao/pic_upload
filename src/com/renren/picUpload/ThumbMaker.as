@@ -1,6 +1,6 @@
 package com.renren.picUpload 
 {
-	import com.adobe.protocols.dict.events.DisconnectedEvent;
+	import com.renren.picUpload.events.ThumbMakerEvent;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
@@ -18,16 +18,15 @@ package com.renren.picUpload
 		private var _limit:Number;
 		private var _thumb:DisplayObject;
 		
-		public function ThumbMaker(limit = 100) 
+		/**
+		 * 构造函数
+		 * @param	limit	<Number>	长度和宽度的上限值
+		 */
+		public function ThumbMaker(limit:Number = 100) 
 		{
-			
+			this._limit = limit;
 		}
-		
-		public function get thumb():Sprite
-		{
-			return this._thumb;
-		}
-		
+				
 		public function make(pic_data:ByteArray):void
 		{
 			var loader:Loader = new Loader();
@@ -45,7 +44,6 @@ package com.renren.picUpload
 				//如果图片的宽高均在上限值以下
 				_thumb = loader.content;
 			}
-			
 			else
 			{
 				if (aspectRatio >= 1)//如果宽大于等于高
@@ -58,14 +56,17 @@ package com.renren.picUpload
 					loader.height = _limit;
 					loader.width = loader.height * aspectRatio;
 				}
+				
 				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height);
-				bitmapData.draw(loader, null, null, null, null, true);//最后一个参数允许平滑处理
-				_thumb = new Sprite();
-				_thumb.graphics.beginBitmapFill(bitmapData, null, false, false);
-				_thumb.graphics.drawRect(0, 0, loader.width, loader.height);
-				_thumb.graphics.endFill();
+				bitmapData.draw(loader);//最后一个参数允许平滑处理
+				var result = new Sprite(); 
+				result.graphics.beginBitmapFill(bitmapData, null, false, false);
+				result.graphics.drawRect(0, 0, loader.width, loader.height);
+				result.graphics.endFill();
+				_thumb = result;
 			}
-			dispatchEvent(new Event(Event.COMPLETE));//制作缩略图完成.
+			
+			dispatchEvent(new ThumbMakerEvent(ThumbMakerEvent.THUMB_MAKED,this._thumb);//制作缩略图完成.
 		}
 	}
 }
