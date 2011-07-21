@@ -48,20 +48,20 @@ package com.renren.picUpload
 			{
 				if (aspectRatio >= 1)//如果宽大于等于高
 				{
-					loader.width = _limit;
-					loader.height = loader.width / aspectRatio;
+					loader.content.width = _limit;
+					loader.content.height = loader.content.width / aspectRatio;
 				}
 				else//
 				{
-					loader.height = _limit;
-					loader.width = loader.height * aspectRatio;
+					loader.content.height = _limit;
+					loader.content.width = loader.content.height * aspectRatio;
 				}
 				
-				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height);
-				bitmapData.draw(loader);//最后一个参数允许平滑处理
+				var bitmapData:BitmapData = new BitmapData(loader.content.width, loader.content.height);
+				bitmapData.draw(loader);
 				var result = new Sprite(); 
 				result.graphics.beginBitmapFill(bitmapData, null, false, false);
-				result.graphics.drawRect(0, 0, loader.width, loader.height);
+				result.graphics.drawRect(0, 0, loader.content.width, loader.content.height);
 				result.graphics.endFill();
 				_thumb = result;
 			}
