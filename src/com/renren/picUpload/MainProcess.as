@@ -90,14 +90,14 @@ package com.renren.picUpload
 		 */
 		private function uploaderPoolMonitor():void
 		{
-			log("checkUploader");
-			log(uploaderPool.isEmpty, DBqueue.isEmpty);
+			
+			log("!!!是否有空闲uploader:"+uploaderPool.isEmpty,"***上传缓冲区是否为空:"+DBqueue.isEmpty);
 			if (uploaderPool.isEmpty || DBqueue.isEmpty)
 			{
 				/*如果没有空闲的DBUploader对象或者没有需要上传的数据块，就什么都不做*/
 				return;
 			}
-			log("startUpload");
+			
 			/*用一个uploader上传一个dataBlock*/
 			var uploader:DBUploader = uploaderPool.fetch() as DBUploader;
 			var dataBlock:DataBlock = DBqueue.deQueue() as DataBlock;
@@ -152,6 +152,7 @@ package com.renren.picUpload
 		 */
 		private function makeThumb(picData:ByteArray,file:FileItem):void
 		{
+			log("[" + curProcessFile.fileReference.name + "]开始缩略图制作");
 			var thumbMaker:ThumbMaker = new ThumbMaker();
 			thumbMaker.addEventListener(Event.COMPLETE, handle_thumb_maked);
 			thumbMaker.make(picData);
@@ -166,7 +167,7 @@ package com.renren.picUpload
 		
 		private function resizePic(picData:ByteArray):void
 		{
-			log("resize");
+			log("["+curProcessFile.fileReference.name+"]开始标准化");
 			var resizer:PicStandardizer = new PicStandardizer();
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
 			resizer.standardize(picData);
