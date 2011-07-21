@@ -45,7 +45,7 @@ package com.renren.picUpload
 			DBqueue = new CirularQueue(20);
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
 			DBQMonitorTimer = new Timer(500);
-			UPMonitorTimer = new Timer(500);
+			UPMonitorTimer = new Timer(100);
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
 			UPMonitorTimer.addEventListener(TimerEvent.TIMER, function() { uploaderPoolMonitor(); } );
 			initUploaderPoll();
