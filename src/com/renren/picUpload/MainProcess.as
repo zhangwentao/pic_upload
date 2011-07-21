@@ -10,6 +10,7 @@ package com.renren.picUpload
 	import flash.events.TimerEvent;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
+	import com.renren.picUpload.events.ThumbMakerEvent;
 	/**
 	 * 主上传处理
 	 * @author taowenzhang@gmail.com 
@@ -91,7 +92,7 @@ package com.renren.picUpload
 		private function uploaderPoolMonitor():void
 		{
 			
-			log("!!!是否有空闲uploader:"+uploaderPool.isEmpty,"***上传缓冲区是否为空:"+DBqueue.isEmpty);
+			log("!!!是否无空闲uploader:"+uploaderPool.isEmpty,"***上传缓冲区是否为空:"+DBqueue.isEmpty);
 			if (uploaderPool.isEmpty || DBqueue.isEmpty)
 			{
 				/*如果没有空闲的DBUploader对象或者没有需要上传的数据块，就什么都不做*/
@@ -154,14 +155,14 @@ package com.renren.picUpload
 		{
 			log("[" + curProcessFile.fileReference.name + "]开始缩略图制作");
 			var thumbMaker:ThumbMaker = new ThumbMaker();
-			thumbMaker.addEventListener(Event.COMPLETE, handle_thumb_maked);
+			thumbMaker.addEventListener(ThumbMakerEvent.THUMB_MAKED, handle_thumb_maked);
 			thumbMaker.make(picData);
 			
 			function handle_thumb_maked(evt:Event):void
 			{
+				dispatchEvent(evt);
 				log("[" + curProcessFile.fileReference.name + "]的缩略图制作完成");
 				//TODO:调度事件，通知截图已经完成
-				dispatchEvent(evt);
 			}
 		}
 		

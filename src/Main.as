@@ -7,19 +7,31 @@ package
 	import com.renren.picUpload.MainProcess;
 	import flash.events.MouseEvent;
 	import com.renren.picUpload.FileItem;
+	import com.renren.picUpload.events.ThumbMakerEvent;
+	import com.renren.picUpload.log;
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 
 	 */
 	public class Main extends Sprite
 	{
+		private var px:Number = 0;
 		private var mainP:MainProcess = new MainProcess();
 		private var fileList:FileReferenceList = new FileReferenceList();
 		
 		public function Main() 
 		{
+			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKED, huandle_thumb_maked);
 			stage.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
+		}
+		
+		
+		function huandle_thumb_maked(evt:ThumbMakerEvent):void
+		{
+			this.stage.addChild(evt.Thumb);
+			evt.Thumb.x = px;
+			px += 120;
 		}
 		
 		function handle_stage_clicked(evt:MouseEvent):void 
