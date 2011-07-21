@@ -41,6 +41,8 @@ package com.renren.picUpload
 				{
 					trace("上传完毕");
 					dispatchEvent(new DBUploaderEvent(DBUploaderEvent.COMPLETE));
+					dataBlock.dispose();
+					trace("释放空间");
 				}
 			//--------------------
 		}

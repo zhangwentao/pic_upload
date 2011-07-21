@@ -88,14 +88,14 @@ package com.renren.picUpload
 		 */
 		private function uploaderPoolMonitor():void
 		{
-			trace("checkUploader");
-			trace(uploaderPool.isEmpty, DBqueue.isEmpty);
+			log("checkUploader");
+			log(uploaderPool.isEmpty, DBqueue.isEmpty);
 			if (uploaderPool.isEmpty || DBqueue.isEmpty)
 			{
 				/*如果没有空闲的DBUploader对象或者没有需要上传的数据块，就什么都不做*/
 				return;
 			}
-			trace("startUpload");
+			log("startUpload");
 			/*用一个uploader上传一个dataBlock*/
 			var uploader:DBUploader = uploaderPool.fetch() as DBUploader;
 			var dataBlock:DataBlock = DBqueue.deQueue() as DataBlock;
@@ -162,7 +162,7 @@ package com.renren.picUpload
 		
 		private function resizePic(picData:ByteArray):void
 		{
-			trace("resize");
+			log("resize");
 			var resizer:PicStandardizer = new PicStandardizer();
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
 			resizer.standardize(picData);
@@ -170,15 +170,15 @@ package com.renren.picUpload
 		
 		private function handle_pic_resized(evt:Event):void
 		{
-			trace("handleResized");
+			log("handleResized");
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
-		
+		    log(curProcessFile.fileReference.name + "被分成了" + dataArr.length + "块");
 			picData.clear();//释放内存
 			for (var i:int = 0; i < dataArr.length; i++)
 			{
-				trace("enqueue");
+				log("enqueue");
 				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr.length,dataArr[i]);
 				DBqueue.enQueue(dataBlock);
 			}
