@@ -36,14 +36,15 @@ package com.renren.picUpload
 			//uploader.upLoad(dataBlock.data);
 			
 			//------test----------
-				log("["+dataBlock.file.fileReference.name+"]开始上传");
 				setTimeout(dispatch, 500);
 				function dispatch():void
 				{
 					
-					dispatchEvent(new DBUploaderEvent(DBUploaderEvent.COMPLETE));
+					var evt:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
+					evt.dataBlock = dataBlock;
+					dispatchEvent(evt);
 					dataBlock.dispose();
-					log("["+dataBlock.file.fileReference.name+"]上传完毕，释放空间");
+					
 					
 				}
 			//--------------------

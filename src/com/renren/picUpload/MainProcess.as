@@ -17,7 +17,7 @@ package com.renren.picUpload
 	 */
 	public class MainProcess extends EventDispatcher
 	{
-		private var dataBlockMaxAmount:uint = 3;//DataBlock对象的数量上限值
+		private var dataBlockMaxAmount:uint = 2;//DataBlock对象的数量上限值
 		private var uploaderPoolSize:uint = 20;//DBUploader对象池容量
 		private var fileItemQueueSize:uint= 100;//File队列容量
 		
@@ -42,7 +42,7 @@ package com.renren.picUpload
 		private function init():void
 		{
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
-			DBqueue = new CirularQueue(dataBlockMaxAmount);
+			DBqueue = new CirularQueue(10);
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
 			DBQMonitorTimer = new Timer(500);
 			UPMonitorTimer = new Timer(500);
@@ -92,7 +92,7 @@ package com.renren.picUpload
 		private function uploaderPoolMonitor():void
 		{
 			
-			log("!!!是否无空闲uploader:"+uploaderPool.isEmpty,"***上传缓冲区是否为空:"+DBqueue.isEmpty);
+			log("!!!Uploader空闲数量:"+uploaderPool.length,"***上传缓冲区长度:"+DBqueue.length);
 			if (uploaderPool.isEmpty || DBqueue.isEmpty)
 			{
 				/*如果没有空闲的DBUploader对象或者没有需要上传的数据块，就什么都不做*/
@@ -102,6 +102,8 @@ package com.renren.picUpload
 			/*用一个uploader上传一个dataBlock*/
 			var uploader:DBUploader = uploaderPool.fetch() as DBUploader;
 			var dataBlock:DataBlock = DBqueue.deQueue() as DataBlock;
+			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
+			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
 			uploader.upload(dataBlock);
 		}
 		
@@ -121,6 +123,7 @@ package com.renren.picUpload
 			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
 			lock = true;//上锁
 			curProcessFile.fileReference.load();
+			log("!!!上传缓冲区有空间,开始加载上传队列中的文件!!!DBQueue.length:"+DBqueue.length);
 		}
 		
 		
@@ -184,7 +187,7 @@ package com.renren.picUpload
 			picData.clear();//释放内存
 			for (var i:int = 0; i < dataArr.length; i++)
 			{
-				 log("["+curProcessFile.fileReference.name + "]的第"+i+"块被加入上传缓存区");
+				log("["+curProcessFile.fileReference.name + "]的第"+i+"块被加入上传缓存区");
 				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr.length,dataArr[i]);
 				DBqueue.enQueue(dataBlock);
 			}
@@ -199,6 +202,7 @@ package com.renren.picUpload
 		 */
 		private function handle_dataBlock_uploaded(evt:DBUploaderEvent):void
 		{
+			log("["+evt.dataBlock.file.fileReference.name+"]的第"+evt.dataBlock.index+"块上传完毕，释放空间");
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
 		}

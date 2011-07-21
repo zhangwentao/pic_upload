@@ -51,7 +51,7 @@ package com.renren.picUpload
 					loader.content.width = _limit;
 					loader.content.height = loader.content.width / aspectRatio;
 				}
-				else//
+				else
 				{
 					loader.content.height = _limit;
 					loader.content.width = loader.content.height * aspectRatio;
