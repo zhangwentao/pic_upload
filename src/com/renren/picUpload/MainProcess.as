@@ -16,7 +16,7 @@ package com.renren.picUpload
 	 */
 	public class MainProcess extends EventDispatcher
 	{
-		private var dataBlockMaxAmount:uint = 100;//DataBlock对象的数量上限值
+		private var dataBlockMaxAmount:uint = 3;//DataBlock对象的数量上限值
 		private var uploaderPoolSize:uint = 20;//DBUploader对象池容量
 		private var fileItemQueueSize:uint= 100;//File队列容量
 		
