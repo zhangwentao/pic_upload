@@ -17,7 +17,7 @@ package com.renren.picUpload
 	 */
 	public class MainProcess extends EventDispatcher
 	{
-		private var dataBlockMaxAmount:uint = 2;//DataBlock对象的数量上限值
+		private var dataBlockMaxAmount:uint = 5;//DataBlock对象的数量上限值
 		private var uploaderPoolSize:uint = 20;//DBUploader对象池容量
 		private var fileItemQueueSize:uint= 100;//File队列容量
 		
@@ -42,7 +42,7 @@ package com.renren.picUpload
 		private function init():void
 		{
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
-			DBqueue = new CirularQueue(10);
+			DBqueue = new CirularQueue(20);
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
 			DBQMonitorTimer = new Timer(500);
 			UPMonitorTimer = new Timer(500);

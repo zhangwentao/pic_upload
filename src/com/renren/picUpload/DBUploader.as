@@ -36,7 +36,7 @@ package com.renren.picUpload
 			//uploader.upLoad(dataBlock.data);
 			
 			//------test----------
-				setTimeout(dispatch, 500);
+				setTimeout(dispatch, 2000);
 				function dispatch():void
 				{
 					
