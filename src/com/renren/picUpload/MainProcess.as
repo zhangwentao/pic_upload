@@ -70,6 +70,7 @@ package com.renren.picUpload
 		{
 			DBQMonitorTimer.start();
 			UPMonitorTimer.start();
+			log("开启 mainProccessor");
 		}
 		
 		/**
@@ -79,6 +80,7 @@ package com.renren.picUpload
 		public function addFileItem(fileItem:FileItem):void
 		{
 			fileItemQueue.enQueue(fileItem);
+			log("[" + fileItem.fileReference.name + "]加入上传队列");
 		}
 		
 		
@@ -130,6 +132,7 @@ package com.renren.picUpload
 		 */
 		function handle_fileData_loaded(evt:Event):void
 		{
+			log("[" + curProcessFile.fileReference.name + "]加载到内存");
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
 			fileData.position = 0;
@@ -155,6 +158,7 @@ package com.renren.picUpload
 			
 			function handle_thumb_maked(evt:Event):void
 			{
+				log("[" + curProcessFile.fileReference.name + "]的缩略图制作完成");
 				//TODO:调度事件，通知截图已经完成
 				dispatchEvent(evt);
 			}
@@ -170,15 +174,15 @@ package com.renren.picUpload
 		
 		private function handle_pic_resized(evt:Event):void
 		{
-			log("handleResized");
+			log("["+curProcessFile.fileReference.name+"]标准化完毕");
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
-		    log(curProcessFile.fileReference.name + "被分成了" + dataArr.length + "块");
+		    log("["+curProcessFile.fileReference.name + "]被分成了" + dataArr.length + "块");
 			picData.clear();//释放内存
 			for (var i:int = 0; i < dataArr.length; i++)
 			{
-				log("enqueue");
+				 log("["+curProcessFile.fileReference.name + "]的第"+i+"块被加入上传缓存区");
 				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr.length,dataArr[i]);
 				DBqueue.enQueue(dataBlock);
 			}
