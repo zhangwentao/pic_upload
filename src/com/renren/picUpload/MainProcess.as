@@ -20,7 +20,7 @@ package com.renren.picUpload
 	{
 		private var dataBlockLimit:uint = 50;//DataBlock对象的数量上限值
 		private var uploaderPoolSize:uint = 20;//DBUploader对象池容量
-		private var fileItemQueueSize:uint = 100;//File队列容量
+		private var fileItemQueueSize:uint = 5;//File队列容量
 		
 		private var fileItemQueue:CirularQueue;//用户选择的文件的File队列
 		private var DBqueue:CirularQueue;//DataBlock队列
@@ -95,7 +95,7 @@ package com.renren.picUpload
 				fileItemQueue.enQueue(fileItem);
 				log("[" + fileItem.fileReference.name + "]加入上传队列");
 			}
-			log("fileQueuelength:"+fileItemQueue.length)
+			log("fileQueuelength:"+fileItemQueue.count)
 		}
 		
 		
@@ -106,7 +106,7 @@ package com.renren.picUpload
 		private function uploaderPoolMonitor():void
 		{
 			
-			log("!!!Uploader空闲数量:"+uploaderPool.length,"***上传缓冲区长度:"+DBqueue.length);
+			log("!!!Uploader空闲数量:"+uploaderPool.length,"***上传缓冲区长度:"+DBqueue.count);
 			if (uploaderPool.isEmpty || DBqueue.isEmpty)
 			{
 				/*如果没有空闲的DBUploader对象或者没有需要上传的数据块，就什么都不做*/
@@ -127,7 +127,7 @@ package com.renren.picUpload
 		 */
 		private function DBQueueMonitor():void
 		{
-			if (DBqueue.length >= dataBlockLimit || fileItemQueue.isEmpty || lock)
+			if (DBqueue.count >= dataBlockLimit || fileItemQueue.isEmpty || lock)
 			{
 				/*如果DBQueue中的DataBlock数量大于等于的上限或者。。就什么都不做*/
 				return;
@@ -137,7 +137,7 @@ package com.renren.picUpload
 			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
 			lock = true;//上锁
 			curProcessFile.fileReference.load();
-			log("!!!上传缓冲区有空间,开始加载上传队列中的文件!!!DBQueue.length:"+DBqueue.length);
+			log("!!!上传缓冲区有空间,开始加载上传队列中的文件!!!DBQueue.length:"+DBqueue.count);
 		}
 		
 		
