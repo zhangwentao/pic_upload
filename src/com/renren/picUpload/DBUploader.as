@@ -39,13 +39,10 @@ package com.renren.picUpload
 				setTimeout(dispatch, 5000);
 				function dispatch():void
 				{
-					
 					var evt:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
 					evt.dataBlock = dataBlock;
 					dispatchEvent(evt);
 					dataBlock.dispose();
-					
-					
 				}
 			//--------------------
 		}

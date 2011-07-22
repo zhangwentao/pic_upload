@@ -11,13 +11,14 @@ package com.renren.picUpload
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
 	import com.renren.picUpload.events.ThumbMakerEvent;
+	import com.renren.util.img.ExifInjector;
 	/**
 	 * 主上传处理
 	 * @author taowenzhang@gmail.com 
 	 */
 	public class MainProcess extends EventDispatcher
 	{
-		private var dataBlockMaxAmount:uint = 5;//DataBlock对象的数量上限值
+		private var dataBlockMaxAmount:uint = 10;//DataBlock对象的数量上限值
 		private var uploaderPoolSize:uint = 20;//DBUploader对象池容量
 		private var fileItemQueueSize:uint= 100;//File队列容量
 		
@@ -30,6 +31,7 @@ package com.renren.picUpload
 		private var DBQMonitorTimer:Timer;//DataBlock队列监控timer
 		
 		private var curProcessFile:FileItem;
+		private var curProcessFileExif:ByteArray;
 		
 		public function MainProcess() 
 		{
@@ -174,6 +176,8 @@ package com.renren.picUpload
 			log("["+curProcessFile.fileReference.name+"]开始标准化");
 			var resizer:PicStandardizer = new PicStandardizer();
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
+			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
+			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			resizer.standardize(picData);
 		}
 		
@@ -181,6 +185,8 @@ package com.renren.picUpload
 		{
 			log("["+curProcessFile.fileReference.name+"]标准化完毕");
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
+			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
+			log("[" + curProcessFile.fileReference.name + "]EXIF 装入完毕");
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
 		    log("["+curProcessFile.fileReference.name + "]被分成了" + dataArr.length + "块");
