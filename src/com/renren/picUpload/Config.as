@@ -8,6 +8,7 @@ package com.renren.picUpload
 	{
 		public static var maxUploadFileNum:int//一次最大可上传的文件数
 		public static var maxSingleFileSize:int//单个上传文件的最大长度
+		
 		public static function getAllparamsName():Array
 		{
 			var paramsArray:Array = new Array();
