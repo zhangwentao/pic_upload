@@ -22,14 +22,14 @@ package com.renren.picUpload
 		private var dataBlockSizeLimit:uint = 20480;    //文件切片大小的上限单位字节
 		private var uploaderPoolSize:uint = 20;	//DBUploader对象池容量(uploader总数量)
 		private var fileItemQueueSize:uint = 5;	//File队列大小
-		private var picUploadNumOnce:uint;     	//一次可以上传的照片数量
+		private var picUploadNumOnce:uint = 5;     	//一次可以上传的照片数量
 		private var fileItemQueue:CirularQueue;	//用户选择的文件的File队列
 		private var DBqueue:CirularQueue;		//DataBlock队列
 		private var uploaderPool:ObjectPool;	//DataBlockUploader对象池
 		private var lock:Boolean;				//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
 		private var UPMonitorTimer:Timer;		//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;		//DataBlock队列监控timer
-		
+		private var fileItemQueuedNum:uint = 0;     //已加入上传队列的FileItem数量
 		private var curProcessFile:FileItem;		//当前从本地加载的图片文件
 		private var curProcessFileExif:ByteArray;	//当前处理的文件的EXIF信息
 		
@@ -86,16 +86,15 @@ package com.renren.picUpload
 		 */
 		public function addFileItem(fileItem:FileItem):void
 		{
-			
-			if (fileItemQueue.isFull)
+			if(fileItemQueuedNum < picUploadNumOnce)
 			{
-				log("[fileItemQueue]已满");
-				return;
+				fileItemQueue.enQueue(fileItem);
+				fileItemQueuedNum++;
+				log("[" + fileItem.fileReference.name + "]加入上传队列");
 			}
 			else
 			{
-				fileItemQueue.enQueue(fileItem);
-				log("[" + fileItem.fileReference.name + "]加入上传队列");
+				log("超过了一次可上传的最大数量:"+picUploadNumOnce);
 			}
 			log("fileQueuelength:"+fileItemQueue.count)
 		}
