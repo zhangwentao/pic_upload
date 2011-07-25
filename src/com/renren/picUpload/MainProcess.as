@@ -43,7 +43,7 @@ package com.renren.picUpload
 		 */
 		private function init():void
 		{
-			DataSlicer.block_size_limit = dataBlockSizeLimit;//文件切片上限
+			DataSlicer.block_size_limit = dataBlockSizeLimit;//设置文件切片上限
 			DBqueue = new Array();//TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
 			
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
