@@ -27,24 +27,24 @@ package com.renren.picUpload
 		 */
 		public function upload(dataBlock:DataBlock):void
 		{
-			this.dataBlock = dataBlock;
-			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
-			var urlVar:Object = uploader.urlVariables;
-			urlVar["pagetype"] = "addflash";
-			urlVar["block_index"] = dataBlock.index;
-			urlVar["block_count"] = dataBlock.count;
-			urlVar["upload_id"] = dataBlock.file.id;
-			uploader.upLoad(dataBlock.data);
+			//this.dataBlock = dataBlock;
+			//dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
+			//var urlVar:Object = uploader.urlVariables;
+			//urlVar["pagetype"] = "addflash";
+			//urlVar["block_index"] = dataBlock.index;
+			//urlVar["block_count"] = dataBlock.count;
+			//urlVar["upload_id"] = dataBlock.file.id;
+			//uploader.upLoad(dataBlock.data);
 			
 			//------test----------
-				//setTimeout(dispatch, 5000);
-				//function dispatch():void
-				//{
-					//var evt:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
-					//evt.dataBlock = dataBlock;
-					//dispatchEvent(evt);
-					//dataBlock.dispose();
-				//}
+				setTimeout(dispatch, 5000);
+				function dispatch():void
+				{
+					var evt:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
+					evt.dataBlock = dataBlock;
+					dispatchEvent(evt);
+					dataBlock.dispose();
+				}
 			//--------------------
 		}
 		

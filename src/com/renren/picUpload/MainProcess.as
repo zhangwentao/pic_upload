@@ -24,7 +24,8 @@ package com.renren.picUpload
 		private var fileItemQueueSize:uint = 5;	//File队列大小
 		private var picUploadNumOnce:uint = 5;     	//一次可以上传的照片数量
 		private var fileItemQueue:CirularQueue;	//用户选择的文件的File队列
-		private var DBqueue:CirularQueue;		//DataBlock队列
+		//private var DBqueue:CirularQueue;		//DataBlock队列
+		private var DBqueue:Array;		//DataBlock队列
 		private var uploaderPool:ObjectPool;	//DataBlockUploader对象池
 		private var lock:Boolean;				//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
 		private var UPMonitorTimer:Timer;		//uploader对象池监控timer
@@ -45,7 +46,8 @@ package com.renren.picUpload
 		{
 			DataSlicer.block_size_limit = dataBlockSizeLimit;//文件切片上限
 			
-			DBqueue = new CirularQueue(200);//TODO:应该是一个不限长度的队列
+			//DBqueue = new CirularQueue(200);//TODO:应该是一个不限长度的队列
+			DBqueue = new Array();//TODO:应该是一个不限长度的队列
 			
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
 			
@@ -107,8 +109,8 @@ package com.renren.picUpload
 		private function uploaderPoolMonitor():void
 		{
 			
-			log("!!!Uploader空闲数量:"+uploaderPool.length,"***上传缓冲区长度:"+DBqueue.count);
-			if (uploaderPool.isEmpty || DBqueue.isEmpty)
+			log("!!!Uploader空闲数量:"+uploaderPool.length,"***上传缓冲区长度:"+DBqueue.length);
+			if (uploaderPool.isEmpty || !DBqueue.length)
 			{
 				/*如果没有空闲的DBUploader对象或者没有需要上传的数据块，就什么都不做*/
 				return;
@@ -116,7 +118,8 @@ package com.renren.picUpload
 			
 			/*用一个uploader上传一个dataBlock*/
 			var uploader:DBUploader = uploaderPool.fetch() as DBUploader;
-			var dataBlock:DataBlock = DBqueue.deQueue() as DataBlock;
+			var dataBlock:DataBlock = DBqueue.shift() as DataBlock;
+			log("***上传缓冲区长度:"+DBqueue.length);
 			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
 			uploader.upload(dataBlock);
@@ -128,7 +131,7 @@ package com.renren.picUpload
 		 */
 		private function DBQueueMonitor():void
 		{
-			if (DBqueue.count >= dataBlockNumLimit || fileItemQueue.isEmpty || lock)
+			if (DBqueue.length >= dataBlockNumLimit || fileItemQueue.isEmpty || lock)
 			{
 				/*如果DBQueue中的DataBlock数量大于等于的上限或者。。就什么都不做*/
 				return;
@@ -138,7 +141,7 @@ package com.renren.picUpload
 			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
 			lock = true;//上锁
 			curProcessFile.fileReference.load();
-			log("!!!上传缓冲区有空间,开始加载上传队列中的文件!!!DBQueue.length:"+DBqueue.count);
+			log("!!!上传缓冲区有空间,开始加载上传队列中的文件!!!DBQueue.length:"+DBqueue.length);
 		}
 		
 		
@@ -208,7 +211,7 @@ package com.renren.picUpload
 			{
 				log("["+curProcessFile.fileReference.name + "]的第"+i+"块被加入上传缓存区");
 				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr.length,dataArr[i]);
-				DBqueue.enQueue(dataBlock);
+				DBqueue.push(dataBlock);
 			}
 			lock = false;
 		}
