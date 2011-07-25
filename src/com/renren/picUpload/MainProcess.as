@@ -13,15 +13,15 @@ package com.renren.picUpload
 	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.util.img.ExifInjector;
 	/**
-	 * 主上传处理
+	 * 上传主程序
 	 * @author taowenzhang@gmail.com 
 	 */
 	public class MainProcess extends EventDispatcher
 	{
 		private var dataBlockLimit:uint = 50;//DataBlock对象的数量上限值
-		private var uploaderPoolSize:uint = 20;//DBUploader对象池容量
+		private var uploaderPoolSize:uint = 20;//DBUploader对象池容量(uploader数量)
 		private var fileItemQueueSize:uint = 5;//File队列容量
-		
+		private var picUploadNumOnce:uint;//一次可以上传的照片数量
 		private var fileItemQueue:CirularQueue;//用户选择的文件的File队列
 		private var DBqueue:CirularQueue;//DataBlock队列
 		private var uploaderPool:ObjectPool;//DataBlockUploader对象池
@@ -43,7 +43,7 @@ package com.renren.picUpload
 		 */
 		private function init():void
 		{
-			DataSlicer.block_size_limit = 102400;//文件切片上限为 100k 
+			DataSlicer.block_size_limit = 20480;//文件切片上限(B).
 			
 			DBqueue = new CirularQueue(200);
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
