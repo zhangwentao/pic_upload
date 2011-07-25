@@ -18,20 +18,20 @@ package com.renren.picUpload
 	 */
 	public class MainProcess extends EventDispatcher
 	{
-		private var dataBlockLimit:uint = 50;//DataBlock对象的数量上限值
-		private var uploaderPoolSize:uint = 20;//DBUploader对象池容量(uploader数量)
-		private var fileItemQueueSize:uint = 5;//File队列容量
-		private var picUploadNumOnce:uint;//一次可以上传的照片数量
-		private var fileItemQueue:CirularQueue;//用户选择的文件的File队列
-		private var DBqueue:CirularQueue;//DataBlock队列
-		private var uploaderPool:ObjectPool;//DataBlockUploader对象池
+		private var dataBlockNumLimit:uint = 50;//DataBlock对象的数量上限值.
+		private var dataBlockSizeLimit:uint = 20480;    //文件切片大小的上限单位字节
+		private var uploaderPoolSize:uint = 20;	//DBUploader对象池容量(uploader总数量)
+		private var fileItemQueueSize:uint = 5;	//File队列大小
+		private var picUploadNumOnce:uint;     	//一次可以上传的照片数量
+		private var fileItemQueue:CirularQueue;	//用户选择的文件的File队列
+		private var DBqueue:CirularQueue;		//DataBlock队列
+		private var uploaderPool:ObjectPool;	//DataBlockUploader对象池
+		private var lock:Boolean;				//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
+		private var UPMonitorTimer:Timer;		//uploader对象池监控timer
+		private var DBQMonitorTimer:Timer;		//DataBlock队列监控timer
 		
-		private var lock:Boolean;//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
-		private var UPMonitorTimer:Timer;//uploader对象池监控timer
-		private var DBQMonitorTimer:Timer;//DataBlock队列监控timer
-		
-		private var curProcessFile:FileItem;
-		private var curProcessFileExif:ByteArray;
+		private var curProcessFile:FileItem;		//当前从本地加载的图片文件
+		private var curProcessFileExif:ByteArray;	//当前处理的文件的EXIF信息
 		
 		public function MainProcess() 
 		{
@@ -43,13 +43,15 @@ package com.renren.picUpload
 		 */
 		private function init():void
 		{
-			DataSlicer.block_size_limit = 20480;//文件切片上限(B).
+			DataSlicer.block_size_limit = dataBlockSizeLimit;//文件切片上限
 			
-			DBqueue = new CirularQueue(200);
+			DBqueue = new CirularQueue(200);//TODO:应该是一个不限长度的队列
+			
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
 			
 			DBQMonitorTimer = new Timer(500);
 			UPMonitorTimer = new Timer(100);
+			
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
 			UPMonitorTimer.addEventListener(TimerEvent.TIMER, function() { uploaderPoolMonitor(); } );
 			initUploaderPoll();
@@ -127,7 +129,7 @@ package com.renren.picUpload
 		 */
 		private function DBQueueMonitor():void
 		{
-			if (DBqueue.count >= dataBlockLimit || fileItemQueue.isEmpty || lock)
+			if (DBqueue.count >= dataBlockNumLimit || fileItemQueue.isEmpty || lock)
 			{
 				/*如果DBQueue中的DataBlock数量大于等于的上限或者。。就什么都不做*/
 				return;
