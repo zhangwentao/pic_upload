@@ -24,7 +24,6 @@ package com.renren.picUpload
 		private var fileItemQueueSize:uint = 5;	//File队列大小
 		private var picUploadNumOnce:uint = 5;     	//一次可以上传的照片数量
 		private var fileItemQueue:CirularQueue;	//用户选择的文件的File队列
-		//private var DBqueue:CirularQueue;		//DataBlock队列
 		private var DBqueue:Array;		//DataBlock队列
 		private var uploaderPool:ObjectPool;	//DataBlockUploader对象池
 		private var lock:Boolean;				//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
@@ -45,9 +44,7 @@ package com.renren.picUpload
 		private function init():void
 		{
 			DataSlicer.block_size_limit = dataBlockSizeLimit;//文件切片上限
-			
-			//DBqueue = new CirularQueue(200);//TODO:应该是一个不限长度的队列
-			DBqueue = new Array();//TODO:应该是一个不限长度的队列
+			DBqueue = new Array();//TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
 			
 			fileItemQueue = new CirularQueue(fileItemQueueSize);
 			
