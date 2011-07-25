@@ -80,6 +80,16 @@ package com.renren.picUpload
 		}
 		
 		/**
+		 * 关闭上传进程
+		 */
+		public function shut():void
+		{
+			DBQMonitorTimer.stop();
+			UPMonitorTimer.stop();
+			log("关闭 mainProccessor");
+		}
+		
+		/**
 		 * 添加FileItem对象
 		 * @param	fileItem	<FileItem>	
 		 */
@@ -88,6 +98,7 @@ package com.renren.picUpload
 			if(fileItemQueuedNum < picUploadNumOnce)
 			{
 				fileItemQueue.enQueue(fileItem);
+				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态
 				fileItemQueuedNum++;
 				log("[" + fileItem.fileReference.name + "]加入上传队列");
 			}
@@ -149,7 +160,7 @@ package com.renren.picUpload
 		 * TODO:3.文件分块，放入DataBlock队列
 		 * @param	evt
 		 */
-		function handle_fileData_loaded(evt:Event):void
+		private function handle_fileData_loaded(evt:Event):void
 		{
 			log("[" + curProcessFile.fileReference.name + "]加载到内存");
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
