@@ -65,7 +65,6 @@ package com.renren.picUpload
 				result.graphics.endFill();
 				_thumb = result;
 			}
-			
 			dispatchEvent(new ThumbMakerEvent(ThumbMakerEvent.THUMB_MAKED,this._thumb));//制作缩略图完成.
 		}
 	}

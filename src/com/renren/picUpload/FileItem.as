@@ -13,9 +13,9 @@ package com.renren.picUpload
 		public static var FILE_STATUS_SUCCESS:int		= -4;
 		public static var FILE_STATUS_CANCELLED:int		= -5;
 		
-		var id:uint;//编号
-		var status:int;//状态
-		var fileReference:FileReference;//
+		public var id:uint;//编号
+		public var status:int;//状态
+		public var fileReference:FileReference;//
 		
 		public function FileItem(id:uint,fileRef:FileReference) 
 		{

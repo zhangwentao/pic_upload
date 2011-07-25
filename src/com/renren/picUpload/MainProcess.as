@@ -18,20 +18,20 @@ package com.renren.picUpload
 	 */
 	public class MainProcess extends EventDispatcher
 	{
-		private var dataBlockNumLimit:uint = 50;//DataBlock对象的数量上限值.
+		private var dataBlockNumLimit:uint = 50;		//DataBlock对象的数量上限值.
 		private var dataBlockSizeLimit:uint = 20480;    //文件切片大小的上限单位字节
-		private var uploaderPoolSize:uint = 20;	//DBUploader对象池容量(uploader总数量)
-		private var fileItemQueueSize:uint = 5;	//File队列大小
-		private var picUploadNumOnce:uint = 5;     	//一次可以上传的照片数量
-		private var fileItemQueue:CirularQueue;	//用户选择的文件的File队列
-		private var DBqueue:Array;		//DataBlock队列
-		private var uploaderPool:ObjectPool;	//DataBlockUploader对象池
-		private var lock:Boolean;				//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
-		private var UPMonitorTimer:Timer;		//uploader对象池监控timer
-		private var DBQMonitorTimer:Timer;		//DataBlock队列监控timer
-		private var fileItemQueuedNum:uint = 0;     //已加入上传队列的FileItem数量
-		private var curProcessFile:FileItem;		//当前从本地加载的图片文件
-		private var curProcessFileExif:ByteArray;	//当前处理的文件的EXIF信息
+		private var uploaderPoolSize:uint = 20;			//DBUploader对象池容量(uploader总数量)
+		private var fileItemQueueSize:uint = 5;			//File队列大小
+		private var picUploadNumOnce:uint = 5;     		//一次可以上传的照片数量
+		private var fileItemQueue:CirularQueue;			//用户选择的文件的File队列
+		private var DBqueue:Array;						//DataBlock队列
+		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
+		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
+		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
+		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
+		private var fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
+		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
+		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
 		
 		public function MainProcess() 
 		{
@@ -82,7 +82,7 @@ package com.renren.picUpload
 		/**
 		 * 关闭上传进程
 		 */
-		public function shut():void
+		public function shutdown():void
 		{
 			DBQMonitorTimer.stop();
 			UPMonitorTimer.stop();
