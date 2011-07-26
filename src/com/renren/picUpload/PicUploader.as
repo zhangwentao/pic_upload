@@ -12,6 +12,7 @@ package com.renren.picUpload
 	import flash.utils.Timer;
 	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.util.img.ExifInjector;
+	
 	/**
 	 * 上传主程序
 	 * @author taowenzhang@gmail.com 
