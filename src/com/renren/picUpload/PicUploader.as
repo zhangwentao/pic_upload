@@ -21,7 +21,7 @@ package com.renren.picUpload
 	{
 		private var dataBlockNumLimit:uint = 50;		//DataBlock对象的数量上限值.
 		private var dataBlockSizeLimit:uint = 2048000;  //文件切片大小的上限单位字节
-		private var uploaderPoolSize:uint = 20;			//DBUploader对象池容量(uploader总数量)
+		private var uploaderPoolSize:uint = 40;			//DBUploader对象池容量(uploader总数量)
 		private var fileItemQueueSize:uint = 100;		//File队列大小
 		private var picUploadNumOnce:uint = 100;     	//一次可以上传的照片数量
 		private var fileItemQueue:CirularQueue;			//用户选择的文件的File队列
@@ -77,7 +77,7 @@ package com.renren.picUpload
 		{
 			DBQMonitorTimer.start();
 			UPMonitorTimer.start();
-			log("开启 mainProccessor");
+			log("开启上传进程");
 		}
 		
 		/**
@@ -87,7 +87,7 @@ package com.renren.picUpload
 		{
 			DBQMonitorTimer.stop();
 			UPMonitorTimer.stop();
-			log("关闭 mainProccessor");
+			log("关闭上传进程");
 		}
 		
 		/**
@@ -165,6 +165,7 @@ package com.renren.picUpload
 			log("[" + curProcessFile.fileReference.name + "]加载到内存");
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
+			
 			fileData.position = 0;
 			fileData.readBytes(temp, 0, fileData.length);
 			makeThumb(temp,curProcessFile);
@@ -172,6 +173,21 @@ package com.renren.picUpload
 			fileData.position = 0;
 			fileData.readBytes(temp, 0, fileData.length);
 			resizePic(temp);
+			
+			//var fileSlicer:DataSlicer = new DataSlicer();
+			//var dataArr:Array = fileSlicer.slice(fileData);
+		    //log("["+curProcessFile.fileReference.name + "]被分成了" + dataArr.length + "块");
+			//
+			//for (var i:int = 0; i < dataArr.length; i++)
+			//{
+				//log("["+curProcessFile.fileReference.name + "]的第"+i+"块被加入上传缓存区");
+				//var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr.length,dataArr[i]);
+				//DBqueue.push(dataBlock);
+			//}
+			//lock = false;
+			
+			
+			
 			fileData.clear();//释放内存
 		}
 		

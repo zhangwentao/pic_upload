@@ -49,7 +49,7 @@ package
 				i++;
 			}
 			
-			mainP.launch();
+			mainP.start();
 			
 		}
 		
