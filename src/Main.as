@@ -4,7 +4,7 @@ package
 	import flash.events.Event;
 	import flash.net.FileReference;
 	import flash.net.FileReferenceList;
-	import com.renren.picUpload.MainProcess;
+	import com.renren.picUpload.PicUploader;
 	import flash.events.MouseEvent;
 	import com.renren.picUpload.FileItem;
 	import com.renren.picUpload.events.ThumbMakerEvent;
@@ -16,7 +16,7 @@ package
 	public class Main extends Sprite
 	{
 		private var px:Number = 0;
-		private var mainP:MainProcess = new MainProcess();
+		private var mainP:PicUploader = new PicUploader();
 		private var fileList:FileReferenceList = new FileReferenceList();
 		
 		public function Main() 
