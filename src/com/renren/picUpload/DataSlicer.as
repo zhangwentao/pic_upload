@@ -31,7 +31,6 @@ package com.renren.picUpload
 				{
 					data.readBytes(byteArr, 0, block_size_limit);
 				}
-				
 				dataArr.push(byteArr);
 			}
 			return dataArr;

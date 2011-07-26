@@ -73,7 +73,7 @@ package com.renren.picUpload
 		/**
 		 * 启动上传进程
 		 */
-		public function launch():void
+		public function start():void
 		{
 			DBQMonitorTimer.start();
 			UPMonitorTimer.start();
@@ -83,7 +83,7 @@ package com.renren.picUpload
 		/**
 		 * 关闭上传进程
 		 */
-		public function shutdown():void
+		public function stop():void
 		{
 			DBQMonitorTimer.stop();
 			UPMonitorTimer.stop();
