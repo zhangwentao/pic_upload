@@ -10,7 +10,6 @@ package com.renren.picUpload.events
 	public class ThumbMakerEvent extends Event 
 	{
 		public static const THUMB_MAKED:String = "thumbMaked";//缩略图制作完成
-		
 		private var _thumb:DisplayObject;
 		
 		public function ThumbMakerEvent(type:String,thumb:DisplayObject,bubbles:Boolean=false, cancelable:Boolean=false) 

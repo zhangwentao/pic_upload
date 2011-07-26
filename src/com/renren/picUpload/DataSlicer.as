@@ -8,10 +8,10 @@ package com.renren.picUpload
 	 */
 	public class DataSlicer
 	{
-		public static var block_size_limit:uint;//数据切片大小上限Byte
+		public static var block_size_limit:uint;//数据切片大小上限(单位B)
 		
 		/**
-		 * 将data切割成DataBlock 
+		 * 将data切割成DataBlock,不修改原始数据
 		 * @param	data	<ByteArray>	被切割的数据
 		 * @return	<Array>	DataBlock数组
 		 */

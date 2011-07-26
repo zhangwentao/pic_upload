@@ -21,8 +21,8 @@ package com.renren.picUpload
 		private var dataBlockNumLimit:uint = 50;		//DataBlock对象的数量上限值.
 		private var dataBlockSizeLimit:uint = 2048000;  //文件切片大小的上限单位字节
 		private var uploaderPoolSize:uint = 20;			//DBUploader对象池容量(uploader总数量)
-		private var fileItemQueueSize:uint = 5;			//File队列大小
-		private var picUploadNumOnce:uint = 5;     		//一次可以上传的照片数量
+		private var fileItemQueueSize:uint = 100;		//File队列大小
+		private var picUploadNumOnce:uint = 100;     	//一次可以上传的照片数量
 		private var fileItemQueue:CirularQueue;			//用户选择的文件的File队列
 		private var DBqueue:Array;						//DataBlock队列
 		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
@@ -108,8 +108,7 @@ package com.renren.picUpload
 			}
 			log("fileQueuelength:"+fileItemQueue.count)
 		}
-		
-		
+	
 		/**
 		 * 监控DBuploader对象池:
 		 * TODO:1.有空闲DBuploader时，从DataBlock对象队列中取对象上传。
