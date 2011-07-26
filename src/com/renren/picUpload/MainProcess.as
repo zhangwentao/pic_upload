@@ -19,7 +19,7 @@ package com.renren.picUpload
 	public class MainProcess extends EventDispatcher
 	{
 		private var dataBlockNumLimit:uint = 50;		//DataBlock对象的数量上限值.
-		private var dataBlockSizeLimit:uint = 20480;    //文件切片大小的上限单位字节
+		private var dataBlockSizeLimit:uint = 2048000;  //文件切片大小的上限单位字节
 		private var uploaderPoolSize:uint = 20;			//DBUploader对象池容量(uploader总数量)
 		private var fileItemQueueSize:uint = 5;			//File队列大小
 		private var picUploadNumOnce:uint = 5;     		//一次可以上传的照片数量

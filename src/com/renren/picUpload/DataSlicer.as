@@ -18,12 +18,6 @@ package com.renren.picUpload
 		public function slice(data:ByteArray):Array
 		{
 			var dataArr:Array = new Array();//存放切割后的数据块
-			if (data.length <= block_size_limit)//如果小于上限值就直接返回原数据
-			{
-				dataArr.push(data);
-				return dataArr;
-			}
-				
 			data.position = 0;
 			while (data.bytesAvailable)
 			{
