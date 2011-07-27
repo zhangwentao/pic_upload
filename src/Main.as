@@ -9,6 +9,7 @@ package
 	import com.renren.picUpload.FileItem;
 	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.picUpload.log;
+	
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 

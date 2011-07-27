@@ -36,7 +36,7 @@ package com.renren.picUpload
 		public var picUploadNumOnce:uint = 100;     	//一次可以上传的照片数量
 		public var DBQCheckInterval:Number = 500;		//dataBlock队列检查间隔
 		public var UPCheckInterval:Number = 100;		//uploader对象池检查间隔
-	
+		
 		private var fileItemQueue:CirularQueue;			//用户选择的文件的File队列
 		private var DBqueue:Array;						//DataBlock队列
 		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
