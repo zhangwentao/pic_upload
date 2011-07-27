@@ -55,7 +55,6 @@ package
 			}
 			
 			mainP.start();
-			
 		}
 		
 	}

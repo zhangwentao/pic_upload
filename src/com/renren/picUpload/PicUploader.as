@@ -23,7 +23,9 @@ package com.renren.picUpload
 		public var dataBlockSizeLimit:uint = 20480;  	//文件切片大小的上限单位字节
 		public var uploaderPoolSize:uint = 40;			//DBUploader对象池容量(uploader总数量)
 		public var picUploadNumOnce:uint = 100;     	//一次可以上传的照片数量
-		
+		public var DBQCheckInterval:Number = 500;		//dataBlock队列检查间隔
+		public var UPCheckInterval:Number = 100;		//uploader对象池检查间隔
+	
 		private var fileItemQueue:CirularQueue;			//用户选择的文件的File队列
 		private var DBqueue:Array;						//DataBlock队列
 		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
@@ -48,10 +50,9 @@ package com.renren.picUpload
 		{
 			DataSlicer.block_size_limit = dataBlockSizeLimit;//设置文件切片上限
 			DBqueue = new Array();//TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
-			
 			fileItemQueue = new CirularQueue(picUploadNumOnce);
-			DBQMonitorTimer = new Timer(500);
-			UPMonitorTimer = new Timer(100);
+			DBQMonitorTimer = new Timer(DBQCheckInterval);
+			UPMonitorTimer = new Timer(UPCheckInterval);
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
 			UPMonitorTimer.addEventListener(TimerEvent.TIMER, function() { uploaderPoolMonitor(); } );
 			initUploaderPoll();
