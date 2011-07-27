@@ -1,11 +1,12 @@
 package com.renren.picUpload 
 {
-	import com.adobe.images.JPGEncoder;
+	import com.renren.picUpload.events.EncodeCompleteEvent;
 	import flash.events.EventDispatcher;
 	import flash.utils.ByteArray;
 	import flash.display.Loader;
 	import flash.display.BitmapData;
 	import flash.events.Event;
+	
 	
 	/**
 	 * 标准化图片尺寸
@@ -18,6 +19,8 @@ package com.renren.picUpload
 		private var _limit:Number;//上限值
 		private var _data:ByteArray;//尺寸标准化后的图片数据
 		private var _rawData:ByteArray;//原始数据
+		
+		
 		
 		/**
 		 * 构造函数
@@ -50,6 +53,7 @@ package com.renren.picUpload
 			{
 				//如果图片的宽高均在上限值以下
 				_data = _rawData;
+				dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
 			}
 			else
 			{
@@ -66,11 +70,20 @@ package com.renren.picUpload
 				
 				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height);
 				bitmapData.draw(loader);
-				var jpgEncoder:JPGEncoder = new JPGEncoder(80);
-				_data = jpgEncoder.encode(bitmapData);
+				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50);
+				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
+				jpgEncoder.encode(bitmapData);
 			}
+			
+			
+			
+		}
+		private function handle_encode_com(evt:EncodeCompleteEvent):void
+		{
+			_data = evt.data;
 			dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
 		}
+		
 	}
 
 }

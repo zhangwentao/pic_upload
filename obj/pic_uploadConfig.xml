@@ -16,13 +16,14 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'2011/7/26'</value>
+      <value>'2011/7/27'</value>
     </define>
     <verbose-stacktraces>true</verbose-stacktraces>
     <source-path append="true">
       <path-element>D:\wwwroot\applications\pic_upload\src</path-element>
       <path-element>D:\wwwroot\applications\renrenCoreLib\src</path-element>
       <path-element>D:\wwwroot\project\as3corelib-.93\src</path-element>
+      <path-element>D:\deskTop\thirdParty</path-element>
       <path-element>D:\program\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
   </compiler>

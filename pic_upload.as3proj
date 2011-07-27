@@ -19,6 +19,7 @@
     <class path="src" />
     <class path="..\renrenCoreLib\src" />
     <class path="..\..\project\as3corelib-.93\src" />
+    <class path="..\..\..\deskTop\thirdParty" />
   </classpaths>
   <!-- Build options -->
   <build>
