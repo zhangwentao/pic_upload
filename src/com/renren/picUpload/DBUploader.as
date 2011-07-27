@@ -12,6 +12,7 @@ package com.renren.picUpload
 	 */
 	public class DBUploader extends EventDispatcher
 	{
+		public static const UPLOAD_URL:String = "http://upload.renren.com/upload.fcgi";
 		private var uploader:ByteArrayUploader;
 		private var dataBlock:DataBlock;//上传的数据块
 		
@@ -23,7 +24,7 @@ package com.renren.picUpload
 		private function init():void
 		{
 			uploader= new ByteArrayUploader();//用于上传二进制数据
-			uploader.url = "http://upload.renren.com/upload.fcgi";//上传cgiurl
+			uploader.url = UPLOAD_URL;//上传cgiurl
 			uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_ioError);
 			uploader.addEventListener(Event.COMPLETE, handle_upload_complete);
 		}

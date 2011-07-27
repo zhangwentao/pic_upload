@@ -24,6 +24,11 @@ package
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKED, huandle_thumb_maked);
 			stage.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
+			mainP.dataBlockNumLimit = 100;
+			mainP.dataBlockSizeLimit = 102400;
+			mainP.uploaderPoolSize = 30;
+			mainP.picUploadNumOnce = 5;
+			mainP.init();
 		}
 		
 		
