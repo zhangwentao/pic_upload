@@ -10,7 +10,7 @@ package com.renren.picUpload
 	 * 上传 DataBlock 至服务器
 	 * @author taowenzhang@gmail.com
 	 */
-	public class DBUploader extends EventDispatcher
+	class DBUploader extends EventDispatcher
 	{
 		public static const UPLOAD_URL:String = "http://upload.renren.com/upload.fcgi";
 		private var uploader:ByteArrayUploader;

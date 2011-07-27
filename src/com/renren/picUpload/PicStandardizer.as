@@ -14,7 +14,7 @@ package com.renren.picUpload
 	 * @author taowenzhang@gmail.com 
 	 */
 	
-	public class PicStandardizer extends EventDispatcher
+	class PicStandardizer extends EventDispatcher
 	{
 		private var _limit:Number;//上限值
 		private var _data:ByteArray;//尺寸标准化后的图片数据

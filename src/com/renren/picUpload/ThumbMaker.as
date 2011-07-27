@@ -13,9 +13,10 @@ package com.renren.picUpload
 	 * 生成图片的缩略图
 	 * @author taowenzhang@gmail.com 
 	 */
-	public class ThumbMaker extends EventDispatcher
+	class ThumbMaker extends EventDispatcher
 	{
 		private var _limit:Number;
+		private var _fileItem:FileItem;
 		private var _thumb:DisplayObject;
 		
 		/**
@@ -27,8 +28,9 @@ package com.renren.picUpload
 			this._limit = limit;
 		}
 				
-		public function make(pic_data:ByteArray):void
+		public function make(pic_data:ByteArray,fileItem:FileItem):void
 		{
+			this._fileItem = fileItem;
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handle_load_complete);
 			loader.loadBytes(pic_data);
@@ -65,7 +67,7 @@ package com.renren.picUpload
 				result.graphics.endFill();
 				_thumb = result;
 			}
-			dispatchEvent(new ThumbMakerEvent(ThumbMakerEvent.THUMB_MAKED,this._thumb));//制作缩略图完成.
+			dispatchEvent(new ThumbMakerEvent(ThumbMakerEvent.THUMB_MAKED,this._thumb,_fileItem));//制作缩略图完成.
 		}
 	}
 }

@@ -6,7 +6,7 @@ package com.renren.picUpload
 	 * 切割数据
 	 * @author taowenzhang@gmail.com 
 	 */
-	public class DataSlicer
+	class DataSlicer
 	{
 		public static var block_size_limit:uint;//数据切片大小上限(单位B)
 		

@@ -11,9 +11,8 @@ package com.renren.picUpload
 	import flash.utils.setTimeout;
 	
 	[Event(name=EncodeCompleteEvent.COMPLETE, type="EncodeCompleteEvent")]
-	[Event(name=EncodeProgressEvent.PROGRESS, type="EncodeProgressEvent")]
 	
-	public class AsyncJPEGEncoder extends EventDispatcher
+	class AsyncJPEGEncoder extends EventDispatcher
 	{
 		private var width:int;
 		private var height:int;

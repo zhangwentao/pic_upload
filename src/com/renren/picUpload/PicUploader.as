@@ -12,6 +12,17 @@ package com.renren.picUpload
 	import flash.utils.Timer;
 	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.util.img.ExifInjector;
+	import com.renren.picUpload.events.PicUploadEvent;
+	
+	/**
+	 * 缩略图绘制完毕事件
+	 */
+	[Event(name = ThumbMakerEvent.THUMB_MAKED, type = "ThumbMakerEvent")]
+	
+	/**
+	 * 图片上传成功事件
+	 */
+	[Event(name = PicUploadEvent.UPLOAD_SUCCESS, type = "PicUploadEvent")]
 	
 	/**
 	 * 上传主程序
@@ -100,7 +111,7 @@ package com.renren.picUpload
 			if(fileItemQueuedNum < picUploadNumOnce)
 			{
 				fileItemQueue.enQueue(fileItem);
-				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态
+				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
 				fileItemQueuedNum++;
 				log("[" + fileItem.fileReference.name + "]加入上传队列");
 			}
@@ -187,7 +198,7 @@ package com.renren.picUpload
 			log("[" + curProcessFile.fileReference.name + "]开始缩略图制作");
 			var thumbMaker:ThumbMaker = new ThumbMaker();
 			thumbMaker.addEventListener(ThumbMakerEvent.THUMB_MAKED, handle_thumb_maked);
-			thumbMaker.make(picData);
+			thumbMaker.make(picData,file);
 			
 			function handle_thumb_maked(evt:Event):void
 			{
