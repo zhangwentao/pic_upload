@@ -255,7 +255,7 @@ package com.renren.picUpload
 			
 			function handle_thumb_maked(evt:Event):void
 			{
-				
+				file.status = FileItem.FILE_STATUS_QUEUED;
 				dispatchEvent(evt);
 				log("[" + file.fileReference.name + "]的缩略图制作完成");
 				//TODO:调度事件，通知截图已经完成
