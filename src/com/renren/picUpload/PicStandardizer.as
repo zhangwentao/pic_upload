@@ -74,9 +74,6 @@ package com.renren.picUpload
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
 				jpgEncoder.encode(bitmapData);
 			}
-			
-			
-			
 		}
 		private function handle_encode_com(evt:EncodeCompleteEvent):void
 		{

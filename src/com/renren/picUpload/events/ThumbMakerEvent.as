@@ -2,6 +2,7 @@ package com.renren.picUpload.events
 {
 	import com.renren.picUpload.FileItem;
 	import flash.display.DisplayObject;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	
 	/**
@@ -11,11 +12,11 @@ package com.renren.picUpload.events
 	public class ThumbMakerEvent extends Event 
 	{
 		public static const THUMB_MAKED:String = "thumbMaked";//缩略图制作完成
-		private var _thumb:DisplayObject;
+		private var _thumb:Sprite;
 		private var _fileItem:FileItem;
 		
 		
-		public function ThumbMakerEvent(type:String,thumb:DisplayObject,fileItem:FileItem,bubbles:Boolean=false, cancelable:Boolean=false) 
+		public function ThumbMakerEvent(type:String,thumb:Sprite,fileItem:FileItem,bubbles:Boolean=false, cancelable:Boolean=false) 
 		{ 
 			this._thumb = thumb;
 			this._fileItem = fileItem;
@@ -25,7 +26,7 @@ package com.renren.picUpload.events
 		/**
 		 * 获取缩略图
 		 */
-		public function get Thumb():DisplayObject
+		public function get Thumb():Sprite
 		{
 			return this._thumb;
 		}

@@ -17,7 +17,7 @@ package com.renren.picUpload
 	{
 		private var _limit:Number;
 		private var _fileItem:FileItem;
-		private var _thumb:DisplayObject;
+		private var _thumb:Sprite;
 		
 		/**
 		 * 构造函数
@@ -44,7 +44,7 @@ package com.renren.picUpload
 			if (loader.width <= _limit && loader.height <= _limit)
 			{
 				//如果图片的宽高均在上限值以下
-				_thumb = loader.content;
+				_thumb = loader.content as Sprite;
 			}
 			else
 			{
