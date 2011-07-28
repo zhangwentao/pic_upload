@@ -1,4 +1,4 @@
-package com.renren.picUpload 
+package com.renren.picUpload
 {
 	import com.renren.picUpload.events.DBUploaderEvent;
 	import com.renren.picUpload.DataSlicer;
@@ -8,6 +8,7 @@ package com.renren.picUpload
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
+	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
 	import com.renren.picUpload.events.ThumbMakerEvent;
@@ -18,39 +19,40 @@ package com.renren.picUpload
 	 * 缩略图绘制完毕事件
 	 */
 	[Event(name = ThumbMakerEvent.THUMB_MAKED, type = "ThumbMakerEvent")]
-	
-	/**
-	 * 图片上传成功事件
-	 */
-	[Event(name = PicUploadEvent.UPLOAD_SUCCESS, type = "PicUploadEvent")]
+		
+		/**
+		 * 图片上传成功事件
+		 */[Event(name = PicUploadEvent.UPLOAD_SUCCESS, type = "PicUploadEvent")]
 	
 	/**
 	 * 上传主程序
-	 * @author taowenzhang@gmail.com 
+	 * @author taowenzhang@gmail.com
 	 */
 	public class PicUploader extends EventDispatcher
 	{
-		public var dataBlockNumLimit:uint = 50;			//DataBlock对象的数量上限值
-		public var dataBlockSizeLimit:uint = 20480;  	//文件切片大小的上限单位字节
-		public var uploaderPoolSize:uint = 40;			//DBUploader对象池容量(uploader总数量)
-		public var picUploadNumOnce:uint = 100;     	//一次可以上传的照片数量
-		public var DBQCheckInterval:Number = 500;		//dataBlock队列检查间隔
-		public var UPCheckInterval:Number = 100;		//uploader对象池检查间隔
+		public var dataBlockNumLimit:uint = 50; //DataBlock对象的数量上限值
+		public var dataBlockSizeLimit:uint = 20480; //文件切片大小的上限单位字节
+		public var uploaderPoolSize:uint = 40; //DBUploader对象池容量(uploader总数量)
+		public var picUploadNumOnce:uint = 100; //一次可以上传的照片数量
+		public var DBQCheckInterval:Number = 500; //dataBlock队列检查间隔
+		public var UPCheckInterval:Number = 100; //uploader对象池检查间隔
 		
-		private var fileItemQueue:CirularQueue;			//用户选择的文件的File队列
-		private var DBqueue:Array;						//DataBlock队列
-		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
-		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
-		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
-		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
-		private var fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
-		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
-		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
+		private var fileItemQueue:CirularQueue; //用户选择的文件的File队列
+		private var beMakeThumbQueue:CirularQueue; //用于生成图片缩略图
+		private var DBqueue:Array; //DataBlock队列
+		private var uploaderPool:ObjectPool; //DataBlockUploader对象池
+		private var lock:Boolean; //加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
+		private var UPMonitorTimer:Timer; //uploader对象池监控timer
+		private var DBQMonitorTimer:Timer; //DataBlock队列监控timer
+		private var makeThumbTimer:Timer; //生成缩略图的timer
+		private var fileItemQueuedNum:uint = 0; //已加入上传队列的FileItem数量
+		private var curProcessFile:FileItem; //当前从本地加载的图片文件
+		private var curProcessFileExif:ByteArray; //当前处理的文件的EXIF信息
 		
 		/**
 		 * 构造函数
 		 */
-		public function PicUploader() 
+		public function PicUploader()
 		{
 		}
 		
@@ -59,13 +61,25 @@ package com.renren.picUpload
 		 */
 		public function init():void
 		{
-			DataSlicer.block_size_limit = dataBlockSizeLimit;//设置文件切片上限
-			DBqueue = new Array();//TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
+			DataSlicer.block_size_limit = dataBlockSizeLimit; //设置文件切片上限
+			DBqueue = new Array(); //TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
 			fileItemQueue = new CirularQueue(picUploadNumOnce);
+			beMakeThumbQueue = new CirularQueue(picUploadNumOnce);
 			DBQMonitorTimer = new Timer(DBQCheckInterval);
 			UPMonitorTimer = new Timer(UPCheckInterval);
-			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
-			UPMonitorTimer.addEventListener(TimerEvent.TIMER, function() { uploaderPoolMonitor(); } );
+			makeThumbTimer = new Timer(500);
+			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function()
+				{
+					DBQueueMonitor();
+				});
+			UPMonitorTimer.addEventListener(TimerEvent.TIMER, function()
+				{
+					uploaderPoolMonitor();
+				});
+			makeThumbTimer.addEventListener(TimerEvent.TIMER, function()
+				{
+					makeThumbLoop();
+				});
 			initUploaderPoll();
 		}
 		
@@ -87,7 +101,8 @@ package com.renren.picUpload
 		 */
 		public function start():void
 		{
-			DBQMonitorTimer.start();
+			makeThumbTimer.start();
+			//DBQMonitorTimer.start();
 			UPMonitorTimer.start();
 			log("开启上传进程");
 		}
@@ -97,6 +112,7 @@ package com.renren.picUpload
 		 */
 		public function stop():void
 		{
+			makeThumbTimer.stop();
 			DBQMonitorTimer.stop();
 			UPMonitorTimer.stop();
 			log("关闭上传进程");
@@ -104,24 +120,25 @@ package com.renren.picUpload
 		
 		/**
 		 * 添加FileItem对象
-		 * @param	fileItem	<FileItem>	
+		 * @param	fileItem	<FileItem>
 		 */
 		public function addFileItem(fileItem:FileItem):void
 		{
-			if(fileItemQueuedNum < picUploadNumOnce)
+			if (fileItemQueuedNum < picUploadNumOnce)
 			{
+				beMakeThumbQueue.enQueue(fileItem);
 				fileItemQueue.enQueue(fileItem);
-				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
+				fileItem.status = FileItem.FILE_STATUS_QUEUED; //修改文件状态为:已加入上传队列
 				fileItemQueuedNum++;
 				log("[" + fileItem.fileReference.name + "]加入上传队列");
 			}
 			else
 			{
-				log("超过了一次可上传的最大数量:"+picUploadNumOnce);
+				log("超过了一次可上传的最大数量:" + picUploadNumOnce);
 			}
-			log("fileQueuelength:"+fileItemQueue.count)
+			log("fileQueuelength:" + fileItemQueue.count)
 		}
-	
+		
 		/**
 		 * 监控DBuploader对象池:
 		 * TODO:1.有空闲DBuploader时，从DataBlock对象队列中取对象上传。
@@ -129,7 +146,7 @@ package com.renren.picUpload
 		private function uploaderPoolMonitor():void
 		{
 			
-			log("!!!Uploader空闲数量:"+uploaderPool.length,"***上传缓冲区长度:"+DBqueue.length);
+			log("!!!Uploader空闲数量:" + uploaderPool.length, "***上传缓冲区长度:" + DBqueue.length);
 			if (uploaderPool.isEmpty || !DBqueue.length)
 			{
 				/*如果没有空闲的DBUploader对象或者没有需要上传的数据块，就什么都不做*/
@@ -139,7 +156,7 @@ package com.renren.picUpload
 			/*用一个uploader上传一个dataBlock*/
 			var uploader:DBUploader = uploaderPool.fetch() as DBUploader;
 			var dataBlock:DataBlock = DBqueue.shift() as DataBlock;
-			log("***上传缓冲区长度:"+DBqueue.length);
+			log("***上传缓冲区长度:" + DBqueue.length);
 			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
 			uploader.upload(dataBlock);
@@ -159,11 +176,10 @@ package com.renren.picUpload
 			
 			curProcessFile = fileItemQueue.deQueue();
 			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
-			lock = true;//上锁
+			lock = true; //上锁
 			curProcessFile.fileReference.load();
-			log("!!!上传缓冲区有空间,开始加载上传队列中的文件!!!DBQueue.length:"+DBqueue.length);
+			log("!!!上传缓冲区有空间,开始加载上传队列中的文件!!!DBQueue.length:" + DBqueue.length);
 		}
-		
 		
 		/**
 		 * 处理本地文件加载完毕。
@@ -175,63 +191,78 @@ package com.renren.picUpload
 		private function handle_fileData_loaded(evt:Event):void
 		{
 			log("[" + curProcessFile.fileReference.name + "]加载到内存");
-			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
+			var fileData:ByteArray = evt.target.data as ByteArray; //从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
 			
-			fileData.position = 0;
-			fileData.readBytes(temp, 0, fileData.length);
-			makeThumb(temp,curProcessFile);
 			temp = new ByteArray();
 			fileData.position = 0;
 			fileData.readBytes(temp, 0, fileData.length);
 			resizePic(temp);
-			fileData.clear();//释放内存
+			//fileData.clear(); //释放内存
+		}
+		
+		private function makeThumbLoop():void
+		{
+			if (beMakeThumbQueue.isEmpty)
+			{
+				return;
+			}
+			var fileItem:FileItem = beMakeThumbQueue.deQueue() as FileItem;
+			fileItem.fileReference.addEventListener(Event.COMPLETE, handle_file_loaded);
+			fileItem.fileReference.load();
+			
+			function handle_file_loaded(evt:Event):void
+			{
+				var fileData:ByteArray = (evt.target as FileReference).data;
+				makeThumb(fileData, fileItem);
+			}
 		}
 		
 		/**
 		 * 获取缩略图
-		 * @param	picData	<ByteArray>	
+		 * @param	picData	<ByteArray>
 		 * @param	file	<FileItem>
 		 */
-		private function makeThumb(picData:ByteArray,file:FileItem):void
+		private function makeThumb(picData:ByteArray, file:FileItem):void
 		{
-			log("[" + curProcessFile.fileReference.name + "]开始缩略图制作");
+			log("[" + file.fileReference.name + "]开始缩略图制作");
 			var thumbMaker:ThumbMaker = new ThumbMaker();
 			thumbMaker.addEventListener(ThumbMakerEvent.THUMB_MAKED, handle_thumb_maked);
-			thumbMaker.make(picData,file);
+			thumbMaker.make(picData, file);
 			
 			function handle_thumb_maked(evt:Event):void
 			{
+				
 				dispatchEvent(evt);
-				log("[" + curProcessFile.fileReference.name + "]的缩略图制作完成");
+				log("[" + file.fileReference.name + "]的缩略图制作完成");
 				//TODO:调度事件，通知截图已经完成
 			}
 		}
 		
 		private function resizePic(picData:ByteArray):void
 		{
-			log("["+curProcessFile.fileReference.name+"]开始标准化");
+			log("[" + curProcessFile.fileReference.name + "]开始标准化");
 			var resizer:PicStandardizer = new PicStandardizer();
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
-			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
+			curProcessFileExif = ExifInjector.extract(picData); //提取Exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			resizer.standardize(picData);
 		}
 		
 		private function handle_pic_resized(evt:Event):void
 		{
-			log("["+curProcessFile.fileReference.name+"]标准化完毕");
+			log("[" + curProcessFile.fileReference.name + "]标准化完毕");
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
-			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
+			picData = ExifInjector.inject(curProcessFileExif, picData); //插入exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 装入完毕");
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
-		    log("["+curProcessFile.fileReference.name + "]被分成了" + dataArr.length + "块");
-			picData.clear();//释放内存
+			log("[" + curProcessFile.fileReference.name + "]被分成了" + dataArr.length + "块");
+			picData.clear(); //释放内存
 			for (var i:int = 0; i < dataArr.length; i++)
 			{
-				log("["+curProcessFile.fileReference.name + "]的第"+i+"块被加入上传缓存区");
-				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr.length,dataArr[i]);
+				log("[" + curProcessFile.fileReference.name + "]的第" + i + "块被加入上传缓存区");
+				var dataBlock:DataBlock = new DataBlock(curProcessFile, i, dataArr.length, dataArr[i]);
 				DBqueue.push(dataBlock);
 			}
 			lock = false;
@@ -245,7 +276,7 @@ package com.renren.picUpload
 		 */
 		private function handle_dataBlock_uploaded(evt:DBUploaderEvent):void
 		{
-			log("["+evt.dataBlock.file.fileReference.name+"]的第"+evt.dataBlock.index+"块上传完毕，释放空间");
+			log("[" + evt.dataBlock.file.fileReference.name + "]的第" + evt.dataBlock.index + "块上传完毕，释放空间");
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
 		}
