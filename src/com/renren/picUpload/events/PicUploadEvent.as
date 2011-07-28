@@ -10,11 +10,13 @@ package com.renren.picUpload.events
 	public class PicUploadEvent extends Event
 	{
 		public static const UPLOAD_SUCCESS:String = "uploadSuccess";//上传成功
+		public static const UPLOAD_PROGRESS:String = "uploadProgress";//上传中
 		
 		private var _fileItem:FileItem;
 		
 		public function PicUploadEvent(type:String, fileItem:FileItem, bubbles:Boolean = false, cancelable:Boolean = false)
 		{
+			_fileItem = fileItem;
 			super(type, bubbles, cancelable);
 		}
 		

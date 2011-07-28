@@ -35,6 +35,7 @@ package com.renren.picUpload
 		 */
 		public function upload(dataBlock:DataBlock):void
 		{
+		
 			init();
 			
 			this.dataBlock = dataBlock;

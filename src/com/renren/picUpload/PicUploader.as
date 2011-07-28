@@ -25,6 +25,11 @@ package com.renren.picUpload
 	[Event(name = PicUploadEvent.UPLOAD_SUCCESS, type = "PicUploadEvent")]
 	
 	/**
+	 * 缩略图制作中
+	 */
+	[Event(name = ThumbMakerEvent.THUMB_MAKE_PROGRESS, type = "ThumbMakerEvent")]
+	
+	/**
 	 * 上传主程序
 	 * @author taowenzhang@gmail.com 
 	 */
@@ -142,6 +147,8 @@ package com.renren.picUpload
 			log("***上传缓冲区长度:"+DBqueue.length);
 			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
+
+			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_PROGRESS,dataBlock.file));
 			uploader.upload(dataBlock);
 		}
 		
@@ -199,7 +206,7 @@ package com.renren.picUpload
 			var thumbMaker:ThumbMaker = new ThumbMaker();
 			thumbMaker.addEventListener(ThumbMakerEvent.THUMB_MAKED, handle_thumb_maked);
 			thumbMaker.make(picData,file);
-			
+			dispatchEvent(new ThumbMakerEvent(ThumbMakerEvent.THUMB_MAKE_PROGRESS,null, file));//制作缩略图中
 			function handle_thumb_maked(evt:Event):void
 			{
 				dispatchEvent(evt);

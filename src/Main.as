@@ -11,6 +11,7 @@ package
 	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.picUpload.log;
 	import flash.utils.Dictionary;
+	import com.renren.picUpload.events.PicUploadEvent;
 	
 	/**
 	 * ...
@@ -26,6 +27,8 @@ package
 		public function Main() 
 		{
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKED, huandle_thumb_maked);
+			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKE_PROGRESS, handle_thumb_making);
+			mainP.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
 			stage.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			mainP.dataBlockNumLimit = 100;
@@ -36,10 +39,19 @@ package
 			mainP.init();
 		}
 		
+		function handle_upload_progress(evt:PicUploadEvent):void
+		{
+			(fileThumb[evt.fileItem] as ThumbContainer).status = ThumbContainer.STATUS_UPLOAD_PROGRESS;
+		}
+		
+		function handle_thumb_making(evt:ThumbMakerEvent):void
+		{
+			(fileThumb[evt.fileItem] as ThumbContainer).status = ThumbContainer.STATUS_THUMB_MAKING;
+		}
 		
 		function huandle_thumb_maked(evt:ThumbMakerEvent):void
 		{
-			(fileThumb[evt.fileItem] as PicContainer).addThumb(evt.Thumb);
+			(fileThumb[evt.fileItem] as ThumbContainer).addThumb(evt.Thumb);
 		}
 		
 		function handle_stage_clicked(evt:MouseEvent):void 
@@ -53,7 +65,8 @@ package
 			for each(var file:FileReference in evt.target.fileList)
 			{
 				var fileItem:FileItem = new FileItem(i, file);
-				var tc:PicContainer = new PicContainer();
+				var tc:ThumbContainer = new ThumbContainer();
+				tc.status = ThumbContainer.STATUS_QUEUED;
 				fileThumb[fileItem] = tc;
 				addThumbContainer(tc);
 				mainP.addFileItem(fileItem);
@@ -62,7 +75,7 @@ package
 			mainP.start();
 		}
 		
-		private function addThumbContainer(tc:PicContainer):void
+		private function addThumbContainer(tc:ThumbContainer):void
 		{
 			addChild(tc);
 			tc.x = px;

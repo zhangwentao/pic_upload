@@ -12,6 +12,8 @@ package com.renren.picUpload.events
 	public class ThumbMakerEvent extends Event 
 	{
 		public static const THUMB_MAKED:String = "thumbMaked";//缩略图制作完成
+		public static const THUMB_MAKE_PROGRESS:String = "thumbMakeProgress";//制作中
+		
 		private var _thumb:Sprite;
 		private var _fileItem:FileItem;
 		

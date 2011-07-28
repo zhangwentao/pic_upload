@@ -34,6 +34,7 @@ package com.renren.picUpload
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handle_load_complete);
 			loader.loadBytes(pic_data);
+			
 		}
 		
 		private function handle_load_complete(evt:Event):void
