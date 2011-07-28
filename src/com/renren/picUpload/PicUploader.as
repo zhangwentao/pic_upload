@@ -62,7 +62,7 @@ package com.renren.picUpload
 		public function init():void
 		{
 			DataSlicer.block_size_limit = dataBlockSizeLimit; //设置文件切片上限
-			DBqueue = new Array(); //TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
+			DBqueue = new Array(); //TODO:应该是一个不限长度的队列,因为这里存在一种'透支'的情况。
 			fileItemQueue = new CirularQueue(picUploadNumOnce);
 			beMakeThumbQueue = new CirularQueue(picUploadNumOnce);
 			DBQMonitorTimer = new Timer(DBQCheckInterval);
@@ -102,7 +102,7 @@ package com.renren.picUpload
 		public function start():void
 		{
 			makeThumbTimer.start();
-			//DBQMonitorTimer.start();
+			DBQMonitorTimer.start();
 			UPMonitorTimer.start();
 			log("开启上传进程");
 		}
@@ -175,10 +175,21 @@ package com.renren.picUpload
 			}
 			
 			curProcessFile = fileItemQueue.deQueue();
-			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
+			
+			if (curProcessFile.fileReference.data != null)
+			{
+				sliceData(curProcessFile.fileReference.data);
+			}
+			else
+			{
+				if (curProcessFile.status != FileItem.FILE_STATUS_LOADING)
+				{
+					curProcessFile.fileReference.load();
+				}
+				curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
+				log("!!!上传缓冲区有空间,开始加载上传队列中的文件!!!DBQueue.length:" + DBqueue.length);
+			}
 			lock = true; //上锁
-			curProcessFile.fileReference.load();
-			log("!!!上传缓冲区有空间,开始加载上传队列中的文件!!!DBQueue.length:" + DBqueue.length);
 		}
 		
 		/**
@@ -190,10 +201,21 @@ package com.renren.picUpload
 		 */
 		private function handle_fileData_loaded(evt:Event):void
 		{
-			log("[" + curProcessFile.fileReference.name + "]加载到内存");
 			var fileData:ByteArray = evt.target.data as ByteArray; //从本地加载的图片数据
-			var temp:ByteArray = new ByteArray();
-			
+			sliceData(fileData);
+		}
+		
+		/**
+		 * 处理本地文件加载完毕。
+		 * TODO:1.压缩图片
+		 * TODO:2.生成缩略图
+		 * TODO:3.文件分块，放入DataBlock队列
+		 * @param	fileData
+		 */
+		private function sliceData(fileData:ByteArray):void
+		{
+			log("[" + curProcessFile.fileReference.name + "]加载到内存");
+			var temp:ByteArray = fileData;
 			temp = new ByteArray();
 			fileData.position = 0;
 			fileData.readBytes(temp, 0, fileData.length);
@@ -210,6 +232,7 @@ package com.renren.picUpload
 			var fileItem:FileItem = beMakeThumbQueue.deQueue() as FileItem;
 			fileItem.fileReference.addEventListener(Event.COMPLETE, handle_file_loaded);
 			fileItem.fileReference.load();
+			fileItem.status = FileItem.FILE_STATUS_LOADING;
 			
 			function handle_file_loaded(evt:Event):void
 			{

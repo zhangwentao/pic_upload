@@ -12,6 +12,7 @@ package com.renren.picUpload
 		public static var FILE_STATUS_ERROR:int			= -3;//发生错误
 		public static var FILE_STATUS_SUCCESS:int		= -4;//上传完毕
 		public static var FILE_STATUS_CANCELLED:int		= -5;//已取消
+		public static var FILE_STATUS_LOADING:int 		= -6;
 		
 		public var id:uint;//编号
 		public var status:int;//状态
