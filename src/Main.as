@@ -51,6 +51,7 @@ package
 		
 		function huandle_thumb_maked(evt:ThumbMakerEvent):void
 		{
+			(fileThumb[evt.fileItem] as ThumbContainer).status = ThumbContainer.STATUS_WAIT_FOR_UPLOAD;
 			(fileThumb[evt.fileItem] as ThumbContainer).addThumb(evt.Thumb);
 		}
 		
