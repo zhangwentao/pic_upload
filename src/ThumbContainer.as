@@ -10,11 +10,11 @@
 	 */
 	public class ThumbContainer extends Sprite 
 	{
-		public static const STATUS_UPLOAD_COMPLETE:int = 0;//上传完毕
-		public static const STATUS_UPLOAD_PROGRESS:int = 1;//上传中
-		public static const STATUS_QUEUED:int = 2;//已加入上传队列，等待下一步操作中
-		public static const STATUS_THUMB_MAKING:int = 3;//缩略图绘制中
-		public static const STATUS_ERROR:int = 4;//发生错误
+		public static const STATUS_UPLOAD_COMPLETE:int = 0;	//上传完毕
+		public static const STATUS_UPLOAD_PROGRESS:int = 1;	//上传中
+		public static const STATUS_QUEUED:int = 2;			//已加入上传队列，等待下一步操作中
+		public static const STATUS_THUMB_MAKING:int = 3;	//缩略图绘制中
+		public static const STATUS_ERROR:int = 4;			//发生错误
 		
 		
 		private var container_width:Number = 100;
@@ -25,8 +25,6 @@
 		{
 			
 		}
-		
-		
 		
 		/**
 		 * 加入 缩略图

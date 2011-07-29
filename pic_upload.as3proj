@@ -4,22 +4,20 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="D:\wwwroot\static\xn\swf\pic_uploader.swf" />
+    <movie path="bin\pic_uploader.swf" />
     <movie fps="30" />
-    <movie width="500" />
-    <movie height="500" />
+    <movie width="800" />
+    <movie height="600" />
     <movie version="10" />
     <movie minorVersion="0" />
     <movie platform="Flash Player" />
     <movie background="#008000" />
-    <movie preferredSDK="Flex 4.1;4.1.0;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
     <class path="..\renrenCoreLib\src" />
     <class path="..\..\project\as3corelib-.93\src" />
-    <class path="..\..\..\deskTop\thirdParty" />
   </classpaths>
   <!-- Build options -->
   <build>
@@ -74,12 +72,11 @@
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\Main.as" />
+    <!-- example: <compile path="..." /> -->
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <hidden path="SWCSettings.lxml" />
-    <hidden path="src\com\renren\picUpload\Config.as" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand />
