@@ -74,7 +74,6 @@ package
 			stage.addEventListener(MouseEvent.MOUSE_UP, handle_stage_mouseUp);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, handle_stage_mouseMove);
 			thumb.startDrag(false, new Rectangle(0, 0, 0, _pageSize-thumb.height));
-			
 		}
 		
 		private function handle_stage_mouseUp(evt:MouseEvent):void

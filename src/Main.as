@@ -27,9 +27,12 @@ package
 		private var scroll:ScrollBar = new ScrollBar(300,740);
 		private var curCollumNum:uint = 0;
 		private var container:Sprite = new Sprite();
+		private var addBtn:Sprite = new AddPicBtn();
 		public function Main() 
 		{
+			
 			addChild(container);
+			container.addChild(addBtn);
 			addChild(scroll);
 			scroll.x = 745;
 			scroll.target = container;
@@ -38,7 +41,7 @@ package
 			mainP.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
 			
 			
-			stage.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
+			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			mainP.dataBlockNumLimit = 100;
 			mainP.dataBlockSizeLimit = 10240;
@@ -86,7 +89,7 @@ package
 			mainP.start();
 		}
 		
-		private function addThumbContainer(tc:ThumbContainer):void
+		private function addThumbContainer(tc:Sprite):void
 		{
 			container.addChild(tc);
 			tc.x = px;
@@ -102,7 +105,16 @@ package
 			{
 				px += 105;
 			}
+			adjustAddBtn();
 		}
+		
+		private function adjustAddBtn():void
+		{
+			addBtn.x = px;
+			addBtn.y = py;
+		}
+		
+		
 	}
 
 }
