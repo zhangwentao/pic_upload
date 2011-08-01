@@ -84,7 +84,7 @@ package
 		
 		private function handle_stage_mouseMove(evt:MouseEvent):void
 		{
-			
+			_target.y =  - _target.height * thumb.y / _pageSize;
 		}
 	}
 
