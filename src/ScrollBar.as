@@ -43,6 +43,7 @@ package
 			adjustThumb();
 			initMasker();
 			addChild(thumb);
+			thumb.buttonMode = true;
 			initThumbEvent();
 		}
 		
