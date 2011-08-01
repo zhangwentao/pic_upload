@@ -24,11 +24,15 @@ package
 		private var mainP:PicUploader = new PicUploader();
 		private var fileList:FileReferenceList = new FileReferenceList();
 		private var fileThumb:Dictionary = new Dictionary();
+		
+		private var curCollumNum:uint = 0;
 		public function Main() 
 		{
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKED, huandle_thumb_maked);
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKE_PROGRESS, handle_thumb_making);
 			mainP.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
+			
+			
 			stage.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			mainP.dataBlockNumLimit = 100;
@@ -81,14 +85,16 @@ package
 			addChild(tc);
 			tc.x = px;
 			tc.y = py;
-			if (px + 120 >= stage.stageWidth)
+			curCollumNum++;
+			if (curCollumNum >6)
 			{
 				px = 0;
-				py += 120;
+				py += 105;
+				curCollumNum = 0;
 			}
 			else
 			{
-				px += 120;
+				px += 105;
 			}
 		}
 	}

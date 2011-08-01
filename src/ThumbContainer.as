@@ -8,9 +8,9 @@
 	 * ...
 	 * @author taowenzhang@gmail.com
 	 */
-	public class ThumbContainer extends Sprite 
+	public class ThumbContainer extends MovieClip 
 	{
-		public static const STATUS_UPLOAD_COMPLETE:int = 0;	//上传完毕
+		public static const STATUS_UPLOAD_COMPLETE:int = 0;	//上传完成
 		public static const STATUS_UPLOAD_PROGRESS:int = 1;	//上传中
 		public static const STATUS_QUEUED:int = 2;			//已加入上传队列，等待下一步操作中
 		public static const STATUS_THUMB_MAKING:int = 3;	//缩略图绘制中
@@ -24,7 +24,7 @@
 		
 		public function ThumbContainer() 
 		{
-			
+			this.stop();
 		}
 		
 		/**
