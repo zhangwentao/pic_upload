@@ -24,10 +24,15 @@ package
 		private var mainP:PicUploader = new PicUploader();
 		private var fileList:FileReferenceList = new FileReferenceList();
 		private var fileThumb:Dictionary = new Dictionary();
-		
+		private var scroll:ScrollBar = new ScrollBar(300,740);
 		private var curCollumNum:uint = 0;
+		private var container:Sprite = new Sprite();
 		public function Main() 
 		{
+			addChild(container);
+			addChild(scroll);
+			
+			scroll.target = container;
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKED, huandle_thumb_maked);
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKE_PROGRESS, handle_thumb_making);
 			mainP.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
@@ -74,6 +79,7 @@ package
 				tc.status = ThumbContainer.STATUS_QUEUED;
 				fileThumb[fileItem] = tc;
 				addThumbContainer(tc);
+				scroll.update();
 				mainP.addFileItem(fileItem);
 				i++;
 			}
@@ -82,7 +88,7 @@ package
 		
 		private function addThumbContainer(tc:ThumbContainer):void
 		{
-			addChild(tc);
+			container.addChild(tc);
 			tc.x = px;
 			tc.y = py;
 			curCollumNum++;
