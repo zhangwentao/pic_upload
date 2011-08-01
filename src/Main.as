@@ -31,7 +31,7 @@ package
 		{
 			addChild(container);
 			addChild(scroll);
-			
+			scroll.x = 745;
 			scroll.target = container;
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKED, huandle_thumb_maked);
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKE_PROGRESS, handle_thumb_making);
