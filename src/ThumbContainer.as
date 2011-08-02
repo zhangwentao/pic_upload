@@ -15,8 +15,7 @@
 		public static const STATUS_QUEUED:int = 2;			//已加入上传队列，等待下一步操作中
 		public static const STATUS_THUMB_MAKING:int = 3;	//缩略图绘制中
 		public static const STATUS_ERROR:int = 4;			//发生错误
-		public static const STATUS_WAIT_FOR_UPLOAD:int = 5;//
-		
+		public static const STATUS_WAIT_FOR_UPLOAD:int = 5;	//
 		
 		private var container_width:Number = 100;
 		private var container_height:Number = 100;
