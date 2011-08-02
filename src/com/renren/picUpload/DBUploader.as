@@ -46,7 +46,8 @@ package com.renren.picUpload
 			urlVar["pagetype"] = "addflash";
 			urlVar["block_index"] = dataBlock.index;
 			urlVar["block_count"] = dataBlock.count;
-			urlVar["upload_id"] = dataBlock.file.id;
+			urlVar["uploadid"] = dataBlock.file.id;
+			urlVar["hostid"] = 200208111;
 			
 			
 			uploader.upLoad(dataBlock.data);
