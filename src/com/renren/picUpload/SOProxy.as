@@ -10,6 +10,7 @@ package com.renren.picUpload
 	public class SOProxy 
 	{
 		private var localPath:String = "/";
+		private var prifix:String = "picupload/"
 		private var raw_ready_name:String = "rawReady";
 		private var product_ready_name:String = "productReady";
 		private var raw_data_name:String = "raw";
@@ -27,7 +28,7 @@ package com.renren.picUpload
 		 */
 		public function get rawReady():Boolean
 		{
-			var so:SharedObject = SharedObject.getLocal(raw_ready_name);
+			var so:SharedObject = SharedObject.getLocal(getFullName(raw_ready_name),localPath);
 			log("rawReady? " + so.data.data);
 			return Boolean(so.data.data);
 		}
@@ -35,13 +36,14 @@ package com.renren.picUpload
 		
 		public function get productReady():Boolean
 		{
-			var so:SharedObject = SharedObject.getLocal(raw_ready_name, localPath);
+			var so:SharedObject = SharedObject.getLocal(getFullName(product_ready_name), localPath);
+			log("productReady? " + so.data.data);
 			return Boolean(so.data.data);
 		}
 		
 		public function addRaw(data:ByteArray):Boolean
 		{
-			var so:SharedObject = SharedObject.getLocal(raw_data_name, localPath);
+			var so:SharedObject = SharedObject.getLocal(getFullName(raw_data_name), localPath);
 			so.data.data = data;
 			var suc:String = so.flush();
 			if (suc == SharedObjectFlushStatus.FLUSHED)
@@ -58,7 +60,7 @@ package com.renren.picUpload
 		
 		public function addProduct(data:ByteArray):Boolean
 		{
-			var so:SharedObject = SharedObject.getLocal(product_data_name, localPath);
+			var so:SharedObject = SharedObject.getLocal(getFullName(product_data_name), localPath);
 			so.data.data = data;
 			var suc:String = so.flush();
 			if (suc == SharedObjectFlushStatus.FLUSHED)
@@ -75,30 +77,36 @@ package com.renren.picUpload
 		
 		public function getRaw():ByteArray
 		{
-			var so:SharedObject = SharedObject.getLocal(raw_data_name, localPath);
+			var so:SharedObject = SharedObject.getLocal(getFullName(raw_data_name), localPath);
 		    setRawReady(false);
 			return ByteArray(so.data.data);
 		}
 		
 		public function getProduct():ByteArray
 		{
-			var so:SharedObject = SharedObject.getLocal(product_data_name, localPath);
+			var so:SharedObject = SharedObject.getLocal(getFullName(product_data_name), localPath);
 			setProductReady(false);
 			return ByteArray(so.data.data);
 		}
 		
 		private function setRawReady(value:Boolean):void
 		{
-			var so:SharedObject = SharedObject.getLocal(raw_ready_name, localPath);
+			var so:SharedObject = SharedObject.getLocal(getFullName(raw_ready_name), localPath);
 			so.data.data = value;
 			so.flush();
 		}
 		
 		private function setProductReady(value:Boolean):void
 		{
-			var so:SharedObject = SharedObject.getLocal(product_data_name, localPath);
+			var so:SharedObject = SharedObject.getLocal(getFullName(product_ready_name), localPath);
 			so.data.data = value;
+			log("productReady?" + so.data.data);
 			so.flush();
+		}
+		
+		private function getFullName(name:String):String
+		{
+			return prifix + name;
 		}
 	}
 }

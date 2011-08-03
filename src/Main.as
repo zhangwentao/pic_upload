@@ -41,16 +41,21 @@ package
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKED, huandle_thumb_maked);
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKE_PROGRESS, handle_thumb_making);
 			mainP.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
-			
+			mainP.addEventListener(PicUploadEvent.UPLOAD_SUCCESS, handle_upload_success);
 			
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			mainP.dataBlockNumLimit = 100;
-			mainP.dataBlockSizeLimit = 10240;
+			mainP.dataBlockSizeLimit = 104857600;
 			mainP.uploaderPoolSize = 30;
 			mainP.picUploadNumOnce = 100;
 			mainP.DBQCheckInterval = 100;
 			mainP.init();
+		}
+		
+		private function handle_upload_success(evt:PicUploadEvent):void
+		{
+			(fileThumb[evt.fileItem] as ThumbContainer).status = ThumbContainer.STATUS_UPLOAD_COMPLETE;
 		}
 		
 		function handle_upload_progress(evt:PicUploadEvent):void

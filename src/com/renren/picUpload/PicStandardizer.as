@@ -78,6 +78,7 @@ package com.renren.picUpload
 		private function handle_encode_com(evt:EncodeCompleteEvent):void
 		{
 			_data = evt.data;
+			log("compressCom");
 			dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
 		}
 		

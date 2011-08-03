@@ -218,7 +218,7 @@ package com.renren.picUpload
 		private function resizePic(picData:ByteArray):void
 		{
 			log("["+curProcessFile.fileReference.name+"]开始标准化");
-			var resizer:PicStandardizer = new PicStandardizer();
+			var resizer:PicStanConsumer = new PicStanConsumer();
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
 			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
@@ -228,7 +228,7 @@ package com.renren.picUpload
 		private function handle_pic_resized(evt:Event):void
 		{
 			log("["+curProcessFile.fileReference.name+"]标准化完毕");
-			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
+			var picData:ByteArray = (evt.target as PicStanConsumer).dataBeenStandaized;
 			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 装入完毕");
 			var fileSlicer:DataSlicer = new DataSlicer();
@@ -255,6 +255,7 @@ package com.renren.picUpload
 			log("["+evt.dataBlock.file.fileReference.name+"]的第"+evt.dataBlock.index+"块上传完毕，释放空间");
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
+			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_SUCCESS,evt.dataBlock.file));
 		}
 	}
 
