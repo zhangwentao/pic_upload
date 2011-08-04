@@ -220,7 +220,7 @@ package com.renren.picUpload
 			log("["+curProcessFile.fileReference.name+"]开始标准化");
 			var resizer:PicStanConsumer = new PicStanConsumer();
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
-			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
+			//curProcessFileExif = ExifInjector.extract(picData);//提取Exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			resizer.standardize(picData);
 		}
@@ -229,7 +229,7 @@ package com.renren.picUpload
 		{
 			log("["+curProcessFile.fileReference.name+"]标准化完毕");
 			var picData:ByteArray = (evt.target as PicStanConsumer).dataBeenStandaized;
-			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
+			//picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 装入完毕");
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);

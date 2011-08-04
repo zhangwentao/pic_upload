@@ -70,8 +70,9 @@ package com.renren.picUpload
 				
 				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height);
 				bitmapData.draw(loader);
-				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,300,500);
+				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,10,10);
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
+				log("startCompress");
 				jpgEncoder.encode(bitmapData);
 			}
 		}
