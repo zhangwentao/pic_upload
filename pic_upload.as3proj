@@ -2,9 +2,9 @@
 <project version="2">
   <!-- Output SWF options -->
   <output>
-    <movie outputType="Application" />
+    <movie outputType="OtherIDE" />
     <movie input="" />
-    <movie path="bin\pic_uploader.swf" />
+    <movie path="bin\picStanProducer.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
@@ -52,7 +52,7 @@
   </includeLibraries>
   <!-- SWC Libraries -->
   <libraryPaths>
-    <!-- example: <element path="..." /> -->
+    <element path="D:\deskTop\jpegencoder.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
@@ -85,7 +85,7 @@
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
-    <option testMovie="Default" />
+    <option testMovie="Unknown" />
   </options>
   <!-- Plugin storage -->
   <storage />
