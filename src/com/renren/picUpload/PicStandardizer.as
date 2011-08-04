@@ -6,6 +6,7 @@ package com.renren.picUpload
 	import flash.display.Loader;
 	import flash.display.BitmapData;
 	import flash.events.Event;
+	import cmodule.aircall.CLibInit;
 	
 	
 	/**
@@ -67,17 +68,26 @@ package com.renren.picUpload
 					loader.height = _limit;
 					loader.width = loader.height * aspectRatio;
 				}
+				trace(loader.width, loader.height);
+				var jpeginit:CLibInit = new CLibInit(); // get library obejct
+				var jpeglib:Object = jpeginit.init(); // initialize library exported class  
 				
-				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height);
+				
+				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height,false,0xFFFFFF);
 				bitmapData.draw(loader);
-				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,300,500);
-				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
-				jpgEncoder.encode(bitmapData);
+				var imgData:ByteArray = bitmapData.getPixels(bitmapData.rect);
+				trace("imgData", imgData.length);
+				_data = new ByteArray();
+				imgData.position = 0;
+				jpeglib.encodeAsync(handle_encode_com, imgData, _data, bitmapData.width, bitmapData.height, 50);
+				//var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,300,500);
+				//jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
+				//jpgEncoder.encode(bitmapData);
 			}
 		}
-		private function handle_encode_com(evt:EncodeCompleteEvent):void
+		private function handle_encode_com(evt):void
 		{
-			_data = evt.data;
+			//_data = evt.data;
 			dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
 		}
 		
