@@ -6,7 +6,8 @@ package com.renren.picUpload
 	import flash.display.Loader;
 	import flash.display.BitmapData;
 	import flash.events.Event;
-	
+	import flash.utils.Timer;
+
 	
 	/**
 	 * 标准化图片尺寸
@@ -19,7 +20,7 @@ package com.renren.picUpload
 		private var _limit:Number;//上限值
 		private var _data:ByteArray;//尺寸标准化后的图片数据
 		private var _rawData:ByteArray;//原始数据
-		
+		private var _comStartTime:Number;
 		/**
 		 * 构造函数
 		 * @param	limit	<Number>	图片宽度和高度的上限值
@@ -68,16 +69,17 @@ package com.renren.picUpload
 				
 				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height);
 				bitmapData.draw(loader);
-				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,500,500);
+				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,100,100);
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
 				log("startCompress");
+				_comStartTime = new Date().getTime();
 				jpgEncoder.encode(bitmapData);
 			}
 		}
 		private function handle_encode_com(evt:EncodeCompleteEvent):void
 		{
 			_data = evt.data;
-			log("compressCom");
+			log("compressCom use time(sec):"+String(new Date().getTime()-_comStartTime));
 			dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
 		}
 		
