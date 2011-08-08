@@ -10,8 +10,6 @@ package com.renren.picUpload
 		public static var maxSingleFileSize:int//单个上传文件的最大长度
 		
 		
-		
-		
 		public static function getAllparamsName():Array
 		{
 			var paramsArray:Array = new Array();
