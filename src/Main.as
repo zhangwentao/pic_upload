@@ -1,5 +1,6 @@
 package  
 {
+	import com.adobe.protocols.dict.Database;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -28,6 +29,7 @@ package
 		private var curCollumNum:uint = 0;
 		private var container:Sprite = new Sprite();
 		private var addBtn:Sprite = new AddPicBtn();
+		private var startTime:Number;
 		public function Main() 
 		{
 			
@@ -46,7 +48,7 @@ package
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			mainP.dataBlockNumLimit = 100;
-			mainP.dataBlockSizeLimit = 104857600;
+			mainP.dataBlockSizeLimit = 102400;
 			mainP.uploaderPoolSize = 30;
 			mainP.picUploadNumOnce = 100;
 			mainP.DBQCheckInterval = 100;
@@ -56,6 +58,7 @@ package
 		private function handle_upload_success(evt:PicUploadEvent):void
 		{
 			(fileThumb[evt.fileItem] as ThumbContainer).status = ThumbContainer.STATUS_UPLOAD_COMPLETE;
+			log("use time:" + String(new Date().getTime() - startTime));
 		}
 		
 		function handle_upload_progress(evt:PicUploadEvent):void
@@ -81,6 +84,7 @@ package
 		
 		private function handle_file_selected(evt:Event):void
 		{
+			startTime = new Date().getTime();
 			var i:uint = 0;
 			for each(var file:FileReference in evt.target.fileList)
 			{

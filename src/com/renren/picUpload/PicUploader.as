@@ -52,6 +52,7 @@ package com.renren.picUpload
 		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
 		
+	
 		/**
 		 * 构造函数
 		 */
