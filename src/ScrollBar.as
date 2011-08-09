@@ -79,11 +79,13 @@ package
 		
 		private function handle_stage_mouseUp(evt:MouseEvent):void
 		{
+			
 			thumb.stopDrag();
 		}
 		
 		private function handle_stage_mouseMove(evt:MouseEvent):void
 		{
+			
 			_target.y =  - _target.height * thumb.y / _pageSize;
 		}
 	}

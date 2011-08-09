@@ -69,7 +69,7 @@ package com.renren.picUpload
 				
 				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height);
 				bitmapData.draw(loader);
-				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,500,0);
+				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,20,20);
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
 				log("startCompress");
 				_comStartTime = new Date().getTime();
