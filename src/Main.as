@@ -1,5 +1,6 @@
 package  
 {
+	import com.adobe.protocols.dict.Database;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -28,6 +29,7 @@ package
 		private var curCollumNum:uint = 0;
 		private var container:Sprite = new Sprite();
 		private var addBtn:Sprite = new AddPicBtn();
+		private var startTime:Number;
 		public function Main() 
 		{
 			
@@ -41,16 +43,22 @@ package
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKED, huandle_thumb_maked);
 			mainP.addEventListener(ThumbMakerEvent.THUMB_MAKE_PROGRESS, handle_thumb_making);
 			mainP.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
-			
+			mainP.addEventListener(PicUploadEvent.UPLOAD_SUCCESS, handle_upload_success);
 			
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			mainP.dataBlockNumLimit = 100;
-			mainP.dataBlockSizeLimit = 10240;
+			mainP.dataBlockSizeLimit = 51200;
 			mainP.uploaderPoolSize = 30;
 			mainP.picUploadNumOnce = 100;
 			mainP.DBQCheckInterval = 100;
 			mainP.init();
+		}
+		
+		private function handle_upload_success(evt:PicUploadEvent):void
+		{
+			(fileThumb[evt.fileItem] as ThumbContainer).status = ThumbContainer.STATUS_UPLOAD_COMPLETE;
+			log("use time:" + String(new Date().getTime() - startTime));
 		}
 		
 		function handle_upload_progress(evt:PicUploadEvent):void
@@ -76,6 +84,7 @@ package
 		
 		private function handle_file_selected(evt:Event):void
 		{
+			startTime = new Date().getTime();
 			var i:uint = 0;
 			for each(var file:FileReference in evt.target.fileList)
 			{
