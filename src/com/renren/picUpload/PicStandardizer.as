@@ -48,9 +48,9 @@ package com.renren.picUpload
 		private function handle_load_complete(evt:Event):void
 		{
 			var loader:Loader = evt.target.loader as Loader;
-			var aspectRatio:Number = loader.width / loader.height;//图片的宽高比
+			var aspectRatio:Number = loader.content.width / loader.content.height;//图片的宽高比
 
-			if (loader.width <= _limit && loader.height <= _limit)
+			if (loader.content.width <= _limit && loader.content.height <= _limit)
 			{
 				//如果图片的宽高均在上限值以下
 				_data = _rawData;
@@ -60,25 +60,25 @@ package com.renren.picUpload
 			{
 				if (aspectRatio >= 1)//如果宽大于等于高
 				{
-					loader.width = _limit;
-					loader.height = loader.width / aspectRatio;
+					loader.content.width = _limit;
+					loader.content.height = loader.content.width / aspectRatio;
 				}
 				else//
 				{
 					loader.height = _limit;
-					loader.width = loader.height * aspectRatio;
+					loader.width = loader.content.height * aspectRatio;
 				}
-				trace(loader.width, loader.height);
-				var jpeginit:CLibInit = new CLibInit(); // get library obejct
-				var jpeglib:Object = jpeginit.init(); // initialize library exported class  
+				trace(loader.content.width, loader.content.height);
+				//var jpeginit:CLibInit = new CLibInit(); // get library obejct
+				//var jpeglib:Object = jpeginit.init(); // initialize library exported class  
 				
 				
-				var bitmapData:BitmapData = new BitmapData(loader.width, loader.height,false,0xFFFFFF);
+				var bitmapData:BitmapData = new BitmapData(loader.content.width, loader.content.height,false,0xFFFFFF);
 				bitmapData.draw(loader);
-				var imgData:ByteArray = bitmapData.getPixels(bitmapData.rect);
-				trace("imgData", imgData.length);
+				//var imgData:ByteArray = bitmapData.getPixels(bitmapData.rect);
+				//trace("imgData", imgData.length);
 				_data = new ByteArray();
-				imgData.position = 0;
+				//imgData.position = 0;
 				//jpeglib.encodeAsync(handle_encode_com, imgData, _data, bitmapData.width, bitmapData.height, 50);
 				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,300,500);
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);

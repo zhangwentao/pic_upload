@@ -48,7 +48,7 @@ package
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			mainP.dataBlockNumLimit = 100;
-			mainP.dataBlockSizeLimit = 51200;
+			mainP.dataBlockSizeLimit = 10485760;
 			mainP.uploaderPoolSize = 30;
 			mainP.picUploadNumOnce = 100;
 			mainP.DBQCheckInterval = 100;

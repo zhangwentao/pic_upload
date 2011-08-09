@@ -24,6 +24,8 @@
 		public function ThumbContainer() 
 		{
 			this.stop();
+			loading.stop();
+			loading.visible = false;
 		}
 		
 		/**
@@ -74,10 +76,14 @@
 				break;
 				
 				case STATUS_UPLOAD_COMPLETE:
+					loading.stop();
+					loading.visible = false;
 					setInfoTxt("上传完毕");
 				break;
 				
 				case STATUS_UPLOAD_PROGRESS:
+					loading.visible = true;
+					loading.play();
 					setInfoTxt("上传中");
 				break;
 				

@@ -193,6 +193,8 @@ package com.renren.picUpload
 			fileData.readBytes(temp, 0, fileData.length);
 			resizePic(temp);
 			fileData.clear();//释放内存
+			
+			
 		}
 		
 		/**
@@ -255,6 +257,8 @@ package com.renren.picUpload
 			log("["+evt.dataBlock.file.fileReference.name+"]的第"+evt.dataBlock.index+"块上传完毕，释放空间");
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
+			
+			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_SUCCESS, evt.dataBlock.file));
 		}
 	}
 
