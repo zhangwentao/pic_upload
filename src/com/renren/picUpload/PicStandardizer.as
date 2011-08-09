@@ -79,15 +79,15 @@ package com.renren.picUpload
 				trace("imgData", imgData.length);
 				_data = new ByteArray();
 				imgData.position = 0;
-				jpeglib.encodeAsync(handle_encode_com, imgData, _data, bitmapData.width, bitmapData.height, 50);
-				//var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,300,500);
-				//jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
-				//jpgEncoder.encode(bitmapData);
+				//jpeglib.encodeAsync(handle_encode_com, imgData, _data, bitmapData.width, bitmapData.height, 50);
+				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,300,500);
+				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
+				jpgEncoder.encode(bitmapData);
 			}
 		}
 		private function handle_encode_com(evt):void
 		{
-			//_data = evt.data;
+			_data = evt.data;
 			dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
 		}
 		
