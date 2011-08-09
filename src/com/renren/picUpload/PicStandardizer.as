@@ -80,7 +80,7 @@ package com.renren.picUpload
 				_data = new ByteArray();
 				//imgData.position = 0;
 				//jpeglib.encodeAsync(handle_encode_com, imgData, _data, bitmapData.width, bitmapData.height, 50);
-				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(50,300,500);
+				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(80,300,500);
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
 				jpgEncoder.encode(bitmapData);
 			}
