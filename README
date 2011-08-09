@@ -1,4 +1,5 @@
 release 1:
 1.single .swf file
-2.AsyncJPEGEncoder
+2.use AsyncJPEGEncoder encode bitmapData
 3.flash UI
+
