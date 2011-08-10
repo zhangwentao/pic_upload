@@ -69,22 +69,17 @@ package com.renren.picUpload
 					loader.width = loader.content.height * aspectRatio;
 				}
 				trace(loader.content.width, loader.content.height);
-				//var jpeginit:CLibInit = new CLibInit(); // get library obejct
-				//var jpeglib:Object = jpeginit.init(); // initialize library exported class  
 				
 				
 				var bitmapData:BitmapData = new BitmapData(loader.content.width, loader.content.height,false,0xFFFFFF);
 				bitmapData.draw(loader);
-				//var imgData:ByteArray = bitmapData.getPixels(bitmapData.rect);
-				//trace("imgData", imgData.length);
 				_data = new ByteArray();
-				//imgData.position = 0;
-				//jpeglib.encodeAsync(handle_encode_com, imgData, _data, bitmapData.width, bitmapData.height, 50);
 				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(80,300,500);
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
 				jpgEncoder.encode(bitmapData);
 			}
 		}
+		
 		private function handle_encode_com(evt):void
 		{
 			_data = evt.data;
