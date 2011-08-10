@@ -57,11 +57,14 @@ package
 		{
 			ExternalEventDispatcher.getInstance().addExternalCall();
 			ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
+			ExternalInterface.call("flashReady");
 		}
 		
 		private function handle_upload_success(evt:PicUploadEvent):void
 		{
-			
+			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_SUCCESS);
+			event.addParam("file", evt.fileItem.getInfoObject());
+			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
 		function handle_upload_progress(evt:PicUploadEvent):void
