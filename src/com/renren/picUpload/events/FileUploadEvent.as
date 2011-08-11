@@ -22,7 +22,7 @@ package com.renren.picUpload.events
 		public function FileUploadEvent(type:String) 
 		{
 			super(type);
-		}
+		} 
 		
 	}
 

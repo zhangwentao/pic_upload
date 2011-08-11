@@ -6,4 +6,4 @@ package com.renren.picUpload
 		Logger.status = Logger.STATUS_OFF;
 		Logger.log(param);
 	}
-}
+} 

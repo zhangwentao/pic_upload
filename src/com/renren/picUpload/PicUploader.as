@@ -194,8 +194,6 @@ package com.renren.picUpload
 			fileData.readBytes(temp, 0, fileData.length);
 			resizePic(temp);
 			fileData.clear();//释放内存
-			
-			
 		}
 		
 		/**
