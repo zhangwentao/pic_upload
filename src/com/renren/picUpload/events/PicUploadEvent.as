@@ -13,7 +13,7 @@ package com.renren.picUpload.events
 		public static const UPLOAD_PROGRESS:String = "uploadProgress";//上传中
 		
 		private var _fileItem:FileItem;
-		
+		public var data:*;
 		public function PicUploadEvent(type:String, fileItem:FileItem, bubbles:Boolean = false, cancelable:Boolean = false)
 		{
 			_fileItem = fileItem;

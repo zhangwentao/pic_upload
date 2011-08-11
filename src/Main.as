@@ -17,7 +17,8 @@ package
 	import com.renren.external.ExternalEventDispatcher;
 	import com.renren.picUpload.events.FileUploadEvent;
 	import flash.external.ExternalInterface;
-	
+	import flash.display.StageScaleMode;
+	import flash.display.StageAlign;
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 
@@ -30,6 +31,8 @@ package
 		private var addBtn:AddBtn = new AddBtn();
 		public function Main() 
 		{
+			stage.scaleMode = StageScaleMode.NO_SCALE;
+			stage.align = StageAlign.TOP_LEFT;
 			if (stage)
 				init();
 			else
@@ -64,6 +67,7 @@ package
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_SUCCESS);
 			event.addParam("file", evt.fileItem.getInfoObject());
+			event.addParam("respons", evt.data);
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		

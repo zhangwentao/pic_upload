@@ -21,7 +21,7 @@ package com.renren.picUpload.events
 		
 		public override function clone():Event 
 		{ 
-			return new DBUploaderEvent(type, bubbles, cancelable);
+			return new DBUploaderEvent(type, bubbles, cancelable);  
 		} 
 		
 		public override function toString():String 

@@ -15,7 +15,7 @@ package com.renren.picUpload
 		public static const UPLOAD_URL:String = "http://upload.renren.com/upload.fcgi";
 		private var uploader:ByteArrayUploader;
 		private var dataBlock:DataBlock;//上传的数据块
-		
+		private var _responseData:*;
 		public function DBUploader() 
 		{
 			
@@ -64,6 +64,11 @@ package com.renren.picUpload
 			//--------------------
 		}
 		
+		public function get responseData():*
+		{
+			return _responseData; 
+		}
+		
 		/**
 		 * 处理ioError
 		 * @param	evt		<ioErrorEvent>	
@@ -80,6 +85,7 @@ package com.renren.picUpload
 		private function handle_upload_complete(evt:Event):void
 		{
 			log("[server info]:" + evt.target.data);
+			_responseData = evt.target.data;
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
