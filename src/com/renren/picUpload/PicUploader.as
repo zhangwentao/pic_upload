@@ -13,6 +13,7 @@ package com.renren.picUpload
 	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.util.img.ExifInjector;
 	import com.renren.picUpload.events.PicUploadEvent;
+	import flash.external.ExternalInterface;
 	
 	/**
 	 * 缩略图绘制完毕事件
@@ -58,6 +59,7 @@ package com.renren.picUpload
 		 */
 		public function PicUploader() 
 		{
+			
 		}
 		
 		/**
@@ -116,7 +118,7 @@ package com.renren.picUpload
 		{
 			if(fileItemQueuedNum < picUploadNumOnce)
 			{
-				fileItemQueue.enQueue(fileItem);
+				fileItemQueue.enQueue(fileItem);   
 				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
 				fileItemQueuedNum++;
 				log("[" + fileItem.fileReference.name + "]加入上传队列");
@@ -128,6 +130,26 @@ package com.renren.picUpload
 			log("fileQueuelength:"+fileItemQueue.count)
 		}
 	
+		
+		public function cancelAFile(fileId:String):void
+		{
+			
+			var arr:Array = fileItemQueue.toArray();
+			
+			for each(var file:FileItem in arr)
+			{
+				if (file.id == fileId)
+				{
+					file.status = FileItem.FILE_STATUS_CANCELLED;
+					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
+					dispatchEvent(event);
+					break;
+				}
+			}
+			
+		    
+		}
+		
 		/**
 		 * 监控DBuploader对象池:
 		 * TODO:1.有空闲DBuploader时，从DataBlock对象队列中取对象上传。
@@ -166,6 +188,10 @@ package com.renren.picUpload
 			}
 			
 			curProcessFile = fileItemQueue.deQueue();
+			while (curProcessFile.status == FileItem.FILE_STATUS_CANCELLED)
+			{
+				curProcessFile = fileItemQueue.deQueue();
+			}
 			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
 			lock = true;//上锁
 			curProcessFile.fileReference.load();

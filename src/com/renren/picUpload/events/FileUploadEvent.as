@@ -17,6 +17,7 @@ package com.renren.picUpload.events
 		public static const FILE_UPLOAD_PROGRESS:String = "fileUploadProgress";//一个文件正在上传中
 		public static const FILE_UPLOAD_SUCCESS:String = "fileUploadSuccess";//一个文件上传成功
 		public static const ALL_FILE_UPLOAD_COMPLETE:String = "allFileUploadComplete";//上传流程完毕
+		public static const FILE_UPLOAD_CANCELED:String = "fileUploadCanceled";//取消一个文件的上传
 		
 		
 		public function FileUploadEvent(type:String) 

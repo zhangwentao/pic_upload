@@ -44,6 +44,7 @@ package
 			picUploader.addEventListener(ThumbMakerEvent.THUMB_MAKE_PROGRESS, handle_thumb_making);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_SUCCESS, handle_upload_success);
+			picUploader.addEventListener(PicUploadEvent.UPLOAD_CANCELED, handle_upload_canceled);
 			
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
@@ -56,10 +57,18 @@ package
 			picUploader.init();
 		}
 		
+		private function handle_upload_canceled(evt:PicUploadEvent):void
+		{
+			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_CANCELED);
+			event.addParam("file", evt.fileItem.getInfoObject());
+			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+		}
+		
 		private function init():void
 		{
 			ExternalEventDispatcher.getInstance().addExternalCall();
 			ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
+			ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
 			ExternalInterface.call("flashReady");
 		}
 		

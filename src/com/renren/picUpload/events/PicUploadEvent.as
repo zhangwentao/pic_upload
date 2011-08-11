@@ -11,6 +11,7 @@ package com.renren.picUpload.events
 	{
 		public static const UPLOAD_SUCCESS:String = "uploadSuccess";//上传成功
 		public static const UPLOAD_PROGRESS:String = "uploadProgress";//上传中
+		public static const UPLOAD_CANCELED:String = "uploadCanceled";//取消一个文件的上传
 		
 		private var _fileItem:FileItem;
 		public var data:*;
