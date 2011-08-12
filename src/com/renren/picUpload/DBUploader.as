@@ -36,14 +36,10 @@ package com.renren.picUpload
 		 */
 		public function upload(dataBlock:DataBlock):void
 		{
-		
 			init();
-			
 			this.dataBlock = dataBlock;
 			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
 			var urlVar:Object = uploader.urlVariables;
-			
-			
 			urlVar["pagetype"] = "addflash";
 			urlVar["block_index"] = dataBlock.index;
 			urlVar["block_count"] = dataBlock.count;
@@ -65,7 +61,7 @@ package com.renren.picUpload
 		 */
 		private function handle_ioError(evt:IOErrorEvent):void
 		{
-			
+			dispatchEvent(evt);
 		}
 		
 		/**
@@ -74,11 +70,11 @@ package com.renren.picUpload
 		 */
 		private function handle_upload_complete(evt:Event):void
 		{
-			log("[server info]:" + evt.target.data);
 			_responseData = evt.target.data;
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
+			
 			dataBlock.dispose();//释放内存
 		}
 	}

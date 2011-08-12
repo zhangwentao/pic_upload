@@ -3,6 +3,7 @@ package
 	import com.adobe.protocols.dict.Database;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.errors.IOError;
 	import flash.events.Event;
 	import flash.net.FileReference;
 	import flash.net.FileReferenceList;
@@ -21,6 +22,7 @@ package
 	import flash.display.StageAlign;
 	import com.adobe.serialization.json.JSON;
 	import com.adobe.serialization.json.JSONParseError;
+	import flash.events.IOErrorEvent;
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 
@@ -48,6 +50,7 @@ package
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_SUCCESS, handle_upload_success);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_CANCELED, handle_upload_canceled);
 			picUploader.addEventListener(PicUploadEvent.START_PROCESS_FILE, handle_file_process);
+			picUploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 			
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
@@ -59,12 +62,17 @@ package
 			picUploader.DBQCheckInterval = 100;
 			picUploader.init();
 		}
-		
+		private function handle_IOError(evt:IOErrorEvent):void
+		{
+			var event:ExternalEvent = new ExternalEvent("networkError");
+			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+		}
 		private function handle_file_process(evt:PicUploadEvent):void
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_PROCESS_START);
 			event.addParam("file", evt.fileItem.getInfoObject());
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+			
 		}
 		
 		private function handle_upload_canceled(evt:PicUploadEvent):void
@@ -94,6 +102,7 @@ package
 			{
 				ExternalInterface.call("console.log", "jsonParseError:" ,e);
 			}
+			ExternalInterface.call("console.log", "success");
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		

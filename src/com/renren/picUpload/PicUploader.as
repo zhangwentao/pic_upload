@@ -14,6 +14,7 @@ package com.renren.picUpload
 	import com.renren.util.img.ExifInjector;
 	import com.renren.picUpload.events.PicUploadEvent;
 	import flash.external.ExternalInterface;
+	import flash.events.IOErrorEvent;
 	
 	/**
 	 * 缩略图绘制完毕事件
@@ -170,9 +171,14 @@ package com.renren.picUpload
 			log("***上传缓冲区长度:"+DBqueue.length);
 			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
-
+            uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_PROGRESS,dataBlock.file));
 			uploader.upload(dataBlock);
+		}
+		
+		private function handle_IOError(evt:IOErrorEvent):void
+		{
+			dispatchEvent(evt);
 		}
 		
 		/**
@@ -244,6 +250,9 @@ package com.renren.picUpload
 		
 		private function resizePic(picData:ByteArray):void
 		{
+			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.START_PROCESS_FILE, curProcessFile);
+			dispatchEvent(event);
+			
 			log("[" + curProcessFile.fileReference.name + "]开始标准化");
 			
 			var resizer:PicStandardizer = new PicStandardizer();
@@ -255,8 +264,7 @@ package com.renren.picUpload
 		
 		private function handle_pic_resized(evt:Event):void
 		{
-			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.START_PROCESS_FILE, curProcessFile);
-			dispatchEvent(event);
+			
 			log("["+curProcessFile.fileReference.name+"]标准化完毕");
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
 			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif

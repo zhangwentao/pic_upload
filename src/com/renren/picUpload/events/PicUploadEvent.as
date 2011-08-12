@@ -13,6 +13,7 @@ package com.renren.picUpload.events
 		public static const UPLOAD_PROGRESS:String = "uploadProgress";//上传中
 		public static const UPLOAD_CANCELED:String = "uploadCanceled";//取消一个文件的上传
 		public static const START_PROCESS_FILE:String = "startProcessFile";//对图片进行处理
+	
 		
 		private var _fileItem:FileItem;
 		public var data:*;
