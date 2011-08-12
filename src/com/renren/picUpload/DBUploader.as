@@ -16,6 +16,7 @@ package com.renren.picUpload
 		private var uploader:ByteArrayUploader;
 		private var dataBlock:DataBlock;//上传的数据块
 		private var _responseData:*;
+		
 		public function DBUploader() 
 		{
 			
