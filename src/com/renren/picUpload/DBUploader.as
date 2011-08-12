@@ -12,7 +12,7 @@ package com.renren.picUpload
 	 */
 	class DBUploader extends EventDispatcher
 	{
-		public static const UPLOAD_URL:String = "http://upload.renren.com/upload.fcgi";
+		public static const UPLOAD_URL:String = "http://upload.renren.com/upload.fcgi?pagetype=addflash&hostid=200208111";
 		private var uploader:ByteArrayUploader;
 		private var dataBlock:DataBlock;//上传的数据块
 		private var _responseData:*;
@@ -26,6 +26,7 @@ package com.renren.picUpload
 		{
 			uploader= new ByteArrayUploader();//用于上传二进制数据
 			uploader.url = UPLOAD_URL;//上传cgiurl
+			
 			uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_ioError);
 			uploader.addEventListener(Event.COMPLETE, handle_upload_complete);
 		}
@@ -40,12 +41,9 @@ package com.renren.picUpload
 			this.dataBlock = dataBlock;
 			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
 			var urlVar:Object = uploader.urlVariables;
-			urlVar["pagetype"] = "addflash";
 			urlVar["block_index"] = dataBlock.index;
 			urlVar["block_count"] = dataBlock.count;
 			urlVar["uploadid"] = dataBlock.file.id;
-			urlVar["hostid"] = 200208111;
-	
 			uploader.upLoad(dataBlock.data);
 		}
 		
