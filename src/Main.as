@@ -19,6 +19,7 @@ package
 	import flash.external.ExternalInterface;
 	import flash.display.StageScaleMode;
 	import flash.display.StageAlign;
+	import com.adobe.serialization.json.JSON;
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 
@@ -45,6 +46,7 @@ package
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_SUCCESS, handle_upload_success);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_CANCELED, handle_upload_canceled);
+			picUploader.addEventListener(PicUploadEvent.START_PROCESS_FILE, handle_file_process);
 			
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
@@ -55,6 +57,13 @@ package
 			picUploader.picUploadNumOnce = 100;
 			picUploader.DBQCheckInterval = 100;
 			picUploader.init();
+		}
+		
+		private function handle_file_process(evt:PicUploadEvent):void
+		{
+			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_PROCESS_START);
+			event.addParam("file", evt.fileItem.getInfoObject());
+			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
 		private function handle_upload_canceled(evt:PicUploadEvent):void
@@ -76,7 +85,14 @@ package
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_SUCCESS);
 			event.addParam("file", evt.fileItem.getInfoObject());
-			event.addParam("respons", evt.data);
+			try {
+				var resData:Object =  JSON.decode(evt.data);
+				event.addParam("response", resData);
+			}
+			catch (e)
+			{
+				ExternalInterface.call("console.log", "jsonParseError:" + e.toString());
+			}
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		

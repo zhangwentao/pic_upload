@@ -5,7 +5,7 @@ package com.renren.picUpload
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.EventDispatcher;
-	import flash.utils.setTimeout;
+	
 	/**
 	 * 上传 DataBlock 至服务器
 	 * @author taowenzhang@gmail.com
@@ -49,20 +49,9 @@ package com.renren.picUpload
 			urlVar["block_count"] = dataBlock.count;
 			urlVar["uploadid"] = dataBlock.file.id;
 			urlVar["hostid"] = 200208111;
-			
-			
+	
 			uploader.upLoad(dataBlock.data);
-			
-			//------test----------
-				//setTimeout(dispatch, 5000);
-				//function dispatch():void
-				//{
-					//var evt:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
-					//evt.dataBlock = dataBlock;
-					//dispatchEvent(evt);
-					//dataBlock.dispose();
-				//}
-			//--------------------
+
 		}
 		
 		public function get responseData():*

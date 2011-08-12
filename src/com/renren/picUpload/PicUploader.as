@@ -244,7 +244,8 @@ package com.renren.picUpload
 		
 		private function resizePic(picData:ByteArray):void
 		{
-			log("["+curProcessFile.fileReference.name+"]开始标准化");
+			log("[" + curProcessFile.fileReference.name + "]开始标准化");
+			
 			var resizer:PicStandardizer = new PicStandardizer();
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
 			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
@@ -254,6 +255,8 @@ package com.renren.picUpload
 		
 		private function handle_pic_resized(evt:Event):void
 		{
+			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.START_PROCESS_FILE, curProcessFile);
+			dispatchEvent(event);
 			log("["+curProcessFile.fileReference.name+"]标准化完毕");
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
 			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
