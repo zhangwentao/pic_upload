@@ -20,6 +20,7 @@ package
 	import flash.display.StageScaleMode;
 	import flash.display.StageAlign;
 	import com.adobe.serialization.json.JSON;
+	import com.adobe.serialization.json.JSONParseError;
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 
@@ -89,9 +90,9 @@ package
 				var resData:Object =  JSON.decode(evt.data);
 				event.addParam("response", resData);
 			}
-			catch (e)
+			catch (e:JSONParseError)
 			{
-				ExternalInterface.call("console.log", "jsonParseError:" + e.toString());
+				ExternalInterface.call("console.log", "jsonParseError:" ,e);
 			}
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
