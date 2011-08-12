@@ -47,7 +47,6 @@ package com.renren.picUpload
 			urlVar["hostid"] = 200208111;
 	
 			uploader.upLoad(dataBlock.data);
-
 		}
 		
 		public function get responseData():*
