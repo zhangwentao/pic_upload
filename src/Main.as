@@ -56,7 +56,8 @@ package
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			
 			picUploader.dataBlockNumLimit = 100;
-			picUploader.dataBlockSizeLimit = 10485760;
+			//picUploader.dataBlockSizeLimit = 10485760;
+			picUploader.dataBlockSizeLimit = 102400;
 			picUploader.uploaderPoolSize = 30;
 			picUploader.picUploadNumOnce = 100;
 			picUploader.DBQCheckInterval = 100;

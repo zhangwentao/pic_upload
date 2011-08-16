@@ -170,6 +170,7 @@ package com.renren.picUpload
 			var dataBlock:DataBlock = DBqueue.shift() as DataBlock;
 			log("***上传缓冲区长度:"+DBqueue.length);
 			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
+			uploader.addEventListener(DBUploaderEvent.FILE_COMPLETE, handle_file_uploaded);
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
             uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_PROGRESS,dataBlock.file));
@@ -288,14 +289,21 @@ package com.renren.picUpload
 		 * TODO:2.
 		 * @param	evt	<DBUploaderEvent>
 		 */
-		private function handle_dataBlock_uploaded(evt:DBUploaderEvent):void
+		private function handle_file_uploaded(evt:DBUploaderEvent):void
 		{
-			log("["+evt.dataBlock.file.fileReference.name+"]的第"+evt.dataBlock.index+"块上传完毕，释放空间");
+			log("["+evt.dataBlock.file.fileReference.name+"]上传完毕");
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
 			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_SUCCESS, evt.dataBlock.file);
 			event.data = evt.target.responseData;
 			dispatchEvent(event);
+		}
+		
+		private function handle_dataBlock_uploaded(evt:DBUploaderEvent):void
+		{
+			log("["+evt.dataBlock.file.fileReference.name+"]的第"+evt.dataBlock.index+"块上传完毕，释放空间");
+			var uploader:DBUploader = evt.target as DBUploader;
+			uploaderPool.put(uploader);
 		}
 	}
 

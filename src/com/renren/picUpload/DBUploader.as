@@ -5,6 +5,8 @@ package com.renren.picUpload
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.EventDispatcher;
+	import com.adobe.serialization.json.JSON;
+	import flash.external.ExternalInterface;
 	
 	/**
 	 * 上传 DataBlock 至服务器
@@ -12,10 +14,11 @@ package com.renren.picUpload
 	 */
 	class DBUploader extends EventDispatcher
 	{
+		//"http://upload.renren.com/upload.fcgi?pagetype=addflash&hostid=200208111"
 		public static const UPLOAD_URL:String = "http://upload.renren.com/upload.fcgi?pagetype=addflash&hostid=200208111";
 		private var uploader:ByteArrayUploader;
-		private var dataBlock:DataBlock;//上传的数据块
-		private var _responseData:*;
+		private var dataBlock:DataBlock;		//上传的数据块
+		private var _responseData:Object;
 		
 		public function DBUploader() 
 		{
@@ -40,6 +43,7 @@ package com.renren.picUpload
 			init();
 			this.dataBlock = dataBlock;
 			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
+			
 			var urlVar:Object = uploader.urlVariables;
 			urlVar["block_index"] = dataBlock.index;
 			urlVar["block_count"] = dataBlock.count;
@@ -47,7 +51,7 @@ package com.renren.picUpload
 			uploader.upLoad(dataBlock.data);
 		}
 		
-		public function get responseData():*
+		public function get responseData():Object
 		{
 			return _responseData; 
 		}
@@ -67,12 +71,53 @@ package com.renren.picUpload
 		 */
 		private function handle_upload_complete(evt:Event):void
 		{
-			_responseData = evt.target.data;
+			try 
+			{
+				_responseData = JSON.decode(String(uploader.data));
+			}
+			catch (e)
+			{
+				ExternalInterface.call("console.log", "json error");
+			}
+			
+			switch(int(_responseData.code))
+			{
+				case 0:
+					checkFileCode();
+				break;
+			}
+		}
+		
+		private function checkFileCode():void
+		{
+			var code:int = int(_responseData.files[0].code);
+			switch(code)
+			{
+				case 0:
+					oneFileCompleteDo();
+				break;
+				
+				case 523:
+					oneBlockCompleteDo();
+				break;
+			}
+		}
+		
+		private function oneBlockCompleteDo():void
+		{
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
-			
 			dataBlock.dispose();//释放内存
 		}
+		
+		private function oneFileCompleteDo():void
+		{
+			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.FILE_COMPLETE);
+			event.dataBlock = dataBlock;
+			dispatchEvent(event);
+			dataBlock.dispose();//释放内存
+		}
+		
 	}
 }
