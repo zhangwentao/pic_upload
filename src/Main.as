@@ -20,8 +20,6 @@ package
 	import flash.external.ExternalInterface;
 	import flash.display.StageScaleMode;
 	import flash.display.StageAlign;
-	import com.adobe.serialization.json.JSON;
-	import com.adobe.serialization.json.JSONParseError;
 	import flash.events.IOErrorEvent;
 	/**
 	 * ...
@@ -95,14 +93,11 @@ package
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_SUCCESS);
 			event.addParam("file", evt.fileItem.getInfoObject());
-			try {
-				var resData:Object =  JSON.decode(evt.data);
-				event.addParam("response", resData);
-			}
-			catch (e:JSONParseError)
-			{
-				ExternalInterface.call("console.log", "jsonParseError:" ,e);
-			}
+			
+			var resData:Object = evt.data
+			event.addParam("response", resData);
+			
+			
 			ExternalInterface.call("console.log", "success");
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
