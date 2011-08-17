@@ -153,7 +153,6 @@ package com.renren.picUpload
 		
 		public function cancelAFile(fileId:String):void
 		{
-			
 			var arr:Array = fileItemQueue.toArray();
 			
 			for each(var file:FileItem in arr)
@@ -166,8 +165,6 @@ package com.renren.picUpload
 					break;
 				}
 			}
-			
-		    
 		}
 		
 		/**

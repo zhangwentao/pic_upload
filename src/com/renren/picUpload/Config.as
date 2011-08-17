@@ -2,6 +2,7 @@ package com.renren.picUpload
 {
 	import flash.display.Stage;
 	import flash.utils.describeType;
+	import flash.external.ExternalInterface;
 	/**
 	 * 配置信息
 	 * @author taowenzhang@gmail.com 

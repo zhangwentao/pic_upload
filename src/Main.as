@@ -89,12 +89,14 @@ package
 		
 		private function init():void
 		{
+			Config.getFlashVars(stage);
 			ExternalEventDispatcher.getInstance().addExternalCall();
 			ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
 			ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
 			ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
 			
-			Config.getFlashVars(stage);
+			
+			
 			picUploader.init();
 			picUploader.start();
 			
@@ -160,7 +162,7 @@ package
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			
 			//用户选择的图片的总数超出一次可上传图片的数目
-			if (filesOverflow)
+			if (filesOverflow.length>0)
 			{
 				var overflowEvt:ExternalEvent = new ExternalEvent(FileUploadEvent.QUEUE_LIMIT_EXCEEDED);
 				overflowEvt.addParam("files", filesOverflow);

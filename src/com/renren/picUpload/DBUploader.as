@@ -15,19 +15,19 @@ package com.renren.picUpload
 	class DBUploader extends EventDispatcher
 	{
 		//"http://upload.renren.com/upload.fcgi?pagetype=addflash&hostid=200208111"
-		public static var upload_url:String = Config.uploadUrl;
 		private var uploader:ByteArrayUploader;
 		private var dataBlock:DataBlock;		//上传的数据块
 		private var _responseData:Object;
 		
 		public function DBUploader() 
 		{
+			
 		}
 		
 		private function init():void
 		{
 			uploader= new ByteArrayUploader();//用于上传二进制数据
-			uploader.url = upload_url;//上传cgiurl
+			uploader.url = Config.uploadUrl;//上传cgiurl
 			uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_ioError);
 			uploader.addEventListener(Event.COMPLETE, handle_upload_complete);
 		}
