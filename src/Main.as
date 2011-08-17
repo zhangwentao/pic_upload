@@ -58,8 +58,6 @@ package
 			
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
-			
-			
 		}
 		
 		

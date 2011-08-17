@@ -21,7 +21,6 @@ package com.renren.picUpload
 		{
 			var infoObj:Object = stage.loaderInfo.parameters;
 			var params:Array = getAllparamsName();
-			
 			for each(var paraName:String in params)
 			{
 				Config[paraName] = infoObj[paraName]?infoObj[paraName]:Config[paraName];
