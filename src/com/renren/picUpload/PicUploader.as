@@ -219,10 +219,10 @@ package com.renren.picUpload
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
 			
-			fileData.position = 0;
-			fileData.readBytes(temp, 0, fileData.length);
-			makeThumb(temp,curProcessFile);
-			temp = new ByteArray();
+			//fileData.position = 0;
+			//fileData.readBytes(temp, 0, fileData.length);
+			//makeThumb(temp,curProcessFile);
+			//temp = new ByteArray();
 			fileData.position = 0;
 			fileData.readBytes(temp, 0, fileData.length);
 			resizePic(temp);
