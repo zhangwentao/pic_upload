@@ -22,7 +22,6 @@ package com.renren.picUpload
 		
 		public function DBUploader() 
 		{
-			
 		}
 		
 		private function init():void
