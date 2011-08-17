@@ -15,7 +15,14 @@ package com.renren.picUpload
 		public static var picUploadNumOnce:uint = 10;     	//一次可以上传的照片数量
 		public static var DBQCheckInterval:Number = 500;	//dataBlock队列检查间隔
 		public static var UPCheckInterval:Number = 100;		//uploader对象池检查间隔
+		public static var uploadUrl:String;					//上传url
 		
+		
+		
+		public static function setUploadUrl(url:String):void
+		{
+			uploadUrl = url;
+		}
 		
 		public static function getFlashVars(stage:Stage):void
 		{

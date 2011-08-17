@@ -92,11 +92,13 @@ package
 			ExternalEventDispatcher.getInstance().addExternalCall();
 			ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
 			ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
-			ExternalInterface.call("flashReady");
+			ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
 			
 			Config.getFlashVars(stage);
 			picUploader.init();
 			picUploader.start();
+			
+			ExternalInterface.call("flashReady");
 		}
 		
 		private function handle_upload_success(evt:PicUploadEvent):void

@@ -15,7 +15,7 @@ package com.renren.picUpload
 	class DBUploader extends EventDispatcher
 	{
 		//"http://upload.renren.com/upload.fcgi?pagetype=addflash&hostid=200208111"
-		public static var upload_url:String = "http://upload.renren.com/upload.fcgi?pagetype=addflash&hostid=200208111";
+		public static var upload_url:String = Config.uploadUrl;
 		private var uploader:ByteArrayUploader;
 		private var dataBlock:DataBlock;		//上传的数据块
 		private var _responseData:Object;
