@@ -28,7 +28,6 @@ package com.renren.picUpload
 		{
 			uploader= new ByteArrayUploader();//用于上传二进制数据
 			uploader.url = UPLOAD_URL;//上传cgiurl
-			
 			uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_ioError);
 			uploader.addEventListener(Event.COMPLETE, handle_upload_complete);
 		}
@@ -44,9 +43,11 @@ package com.renren.picUpload
 			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
 			
 			var urlVar:Object = uploader.urlVariables;
+			
 			urlVar["block_index"] = dataBlock.index;
 			urlVar["block_count"] = dataBlock.count;
 			urlVar["uploadid"] = dataBlock.file.id;
+			
 			uploader.upLoad(dataBlock.data);
 		}
 		
