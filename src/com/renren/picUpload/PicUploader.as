@@ -37,13 +37,6 @@ package com.renren.picUpload
 	 */
 	public class PicUploader extends EventDispatcher
 	{
-		public var dataBlockNumLimit:uint = 50;			//DataBlock对象的数量上限值
-		public var dataBlockSizeLimit:uint = 20480;  	//文件切片大小的上限单位字节
-		public var uploaderPoolSize:uint = 40;			//DBUploader对象池容量(uploader总数量)
-		public var picUploadNumOnce:uint = 100;     	//一次可以上传的照片数量
-		public var DBQCheckInterval:Number = 500;		//dataBlock队列检查间隔
-		public var UPCheckInterval:Number = 100;		//uploader对象池检查间隔
-		
 		private var fileItemQueue:CirularQueue;			//用户选择的文件的File队列
 		private var DBqueue:Array;						//DataBlock队列
 		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
@@ -68,11 +61,11 @@ package com.renren.picUpload
 		 */
 		public function init():void
 		{
-			DataSlicer.block_size_limit = dataBlockSizeLimit;//设置文件切片上限
+			DataSlicer.block_size_limit = Config.dataBlockSizeLimit;//设置文件切片上限
 			DBqueue = new Array();//TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
-			fileItemQueue = new CirularQueue(picUploadNumOnce);
-			DBQMonitorTimer = new Timer(DBQCheckInterval);
-			UPMonitorTimer = new Timer(UPCheckInterval);
+			fileItemQueue = new CirularQueue(Config.picUploadNumOnce);
+			DBQMonitorTimer = new Timer(Config.DBQCheckInterval);
+			UPMonitorTimer = new Timer(Config.UPCheckInterval);
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
 			UPMonitorTimer.addEventListener(TimerEvent.TIMER, function() { uploaderPoolMonitor(); } );
 			initUploaderPoll();
@@ -84,7 +77,7 @@ package com.renren.picUpload
 		 */
 		private function initUploaderPoll():void
 		{
-			uploaderPool = new ObjectPool(uploaderPoolSize);
+			uploaderPool = new ObjectPool(Config.uploaderPoolSize);
 			for (var i:int = 0; i < uploaderPool.size; i++)
 			{
 				uploaderPool.put(new DBUploader());
@@ -117,24 +110,49 @@ package com.renren.picUpload
 		 */
 		public function addFileItem(fileItem:FileItem):void
 		{
-			if(fileItemQueuedNum < picUploadNumOnce)
+			if(fileItemQueuedNum >= Config.picUploadNumOnce)
 			{
-				fileItemQueue.enQueue(fileItem);   
-				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
-				fileItemQueuedNum++;
-				log("[" + fileItem.fileReference.name + "]加入上传队列");
+				var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.QUEUE_LIMIT_EXCEEDED, fileItem);
+				dispatchEvent(event);
+				log("超过了一次可上传的最大数量:"+Config.picUploadNumOnce);
+				return;
 			}
-			else
+			
+			if (!validateFile(fileItem))
 			{
-				log("超过了一次可上传的最大数量:"+picUploadNumOnce);
+				return;
 			}
+			
+			
+			fileItemQueue.enQueue(fileItem);   
+			fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
+			dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
+			fileItemQueuedNum++;
+			
 			log("fileQueuelength:"+fileItemQueue.count)
 		}
 	
 		
+		/**
+		 * 验证文件是否合法
+		 * 1.文件是否为空文件
+		 * @param	fileItem
+		 * @return	<Boolean>	是否合法
+		 */
+		private function validateFile(fileItem:FileItem):Boolean
+		{
+			var result:Boolean = true;
+			if (fileItem.fileReference.size == 0)
+			{
+				
+				result = false;
+			}
+				
+			return result;
+		}
+		
 		public function cancelAFile(fileId:String):void
 		{
-			
 			var arr:Array = fileItemQueue.toArray();
 			
 			for each(var file:FileItem in arr)
@@ -147,8 +165,6 @@ package com.renren.picUpload
 					break;
 				}
 			}
-			
-		    
 		}
 		
 		/**
@@ -170,6 +186,7 @@ package com.renren.picUpload
 			var dataBlock:DataBlock = DBqueue.shift() as DataBlock;
 			log("***上传缓冲区长度:"+DBqueue.length);
 			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
+			uploader.addEventListener(DBUploaderEvent.FILE_COMPLETE, handle_file_uploaded);
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
             uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_PROGRESS,dataBlock.file));
@@ -187,7 +204,7 @@ package com.renren.picUpload
 		 */
 		private function DBQueueMonitor():void
 		{
-			if (DBqueue.length >= dataBlockNumLimit || fileItemQueue.isEmpty || lock)
+			if (DBqueue.length >= Config.dataBlockNumLimit || fileItemQueue.isEmpty || lock)
 			{
 				/*如果DBQueue中的DataBlock数量大于等于的上限或者。。就什么都不做*/
 				return;
@@ -218,10 +235,6 @@ package com.renren.picUpload
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
 			
-			fileData.position = 0;
-			fileData.readBytes(temp, 0, fileData.length);
-			makeThumb(temp,curProcessFile);
-			temp = new ByteArray();
 			fileData.position = 0;
 			fileData.readBytes(temp, 0, fileData.length);
 			resizePic(temp);
@@ -288,14 +301,21 @@ package com.renren.picUpload
 		 * TODO:2.
 		 * @param	evt	<DBUploaderEvent>
 		 */
-		private function handle_dataBlock_uploaded(evt:DBUploaderEvent):void
+		private function handle_file_uploaded(evt:DBUploaderEvent):void
 		{
-			log("["+evt.dataBlock.file.fileReference.name+"]的第"+evt.dataBlock.index+"块上传完毕，释放空间");
+			log("["+evt.dataBlock.file.fileReference.name+"]上传完毕");
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
 			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_SUCCESS, evt.dataBlock.file);
 			event.data = evt.target.responseData;
 			dispatchEvent(event);
+		}
+		
+		private function handle_dataBlock_uploaded(evt:DBUploaderEvent):void
+		{
+			log("["+evt.dataBlock.file.fileReference.name+"]的第"+evt.dataBlock.index+"块上传完毕，释放空间");
+			var uploader:DBUploader = evt.target as DBUploader;
+			uploaderPool.put(uploader);
 		}
 	}
 

@@ -19,9 +19,8 @@ package
 	import com.renren.picUpload.events.FileUploadEvent;
 	import flash.external.ExternalInterface;
 	import flash.display.StageScaleMode;
+	import com.renren.picUpload.Config;
 	import flash.display.StageAlign;
-	import com.adobe.serialization.json.JSON;
-	import com.adobe.serialization.json.JSONParseError;
 	import flash.events.IOErrorEvent;
 	/**
 	 * ...
@@ -33,6 +32,9 @@ package
 		private var picUploader:PicUploader = new PicUploader();
 		private var fileList:FileReferenceList = new FileReferenceList();
 		private var addBtn:AddBtn = new AddBtn();
+		
+		private var filesOverflow:Array;
+		private var filesQueued:Array;
 		public function Main() 
 		{
 			stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -51,28 +53,31 @@ package
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_CANCELED, handle_upload_canceled);
 			picUploader.addEventListener(PicUploadEvent.START_PROCESS_FILE, handle_file_process);
 			picUploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
+			picUploader.addEventListener(PicUploadEvent.QUEUE_LIMIT_EXCEEDED, handle_queue_limit_exceeded);
+			picUploader.addEventListener(PicUploadEvent.FILE_QUEUED, handle_file_queued);
 			
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
-			
-			picUploader.dataBlockNumLimit = 100;
-			picUploader.dataBlockSizeLimit = 10485760;
-			picUploader.uploaderPoolSize = 30;
-			picUploader.picUploadNumOnce = 100;
-			picUploader.DBQCheckInterval = 100;
-			picUploader.init();
 		}
+		
+		
+		
+		private function handle_queue_limit_exceeded(evt:PicUploadEvent):void
+		{
+			filesOverflow.push(evt.fileItem.getInfoObject());
+		}
+		
 		private function handle_IOError(evt:IOErrorEvent):void
 		{
 			var event:ExternalEvent = new ExternalEvent("networkError");
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
+		
 		private function handle_file_process(evt:PicUploadEvent):void
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_PROCESS_START);
 			event.addParam("file", evt.fileItem.getInfoObject());
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
-			
 		}
 		
 		private function handle_upload_canceled(evt:PicUploadEvent):void
@@ -84,9 +89,17 @@ package
 		
 		private function init():void
 		{
+			Config.getFlashVars(stage);
 			ExternalEventDispatcher.getInstance().addExternalCall();
 			ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
 			ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
+			ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
+			
+			
+			
+			picUploader.init();
+			picUploader.start();
+			
 			ExternalInterface.call("flashReady");
 		}
 		
@@ -94,14 +107,11 @@ package
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_SUCCESS);
 			event.addParam("file", evt.fileItem.getInfoObject());
-			try {
-				var resData:Object =  JSON.decode(evt.data);
-				event.addParam("response", resData);
-			}
-			catch (e:JSONParseError)
-			{
-				ExternalInterface.call("console.log", "jsonParseError:" ,e);
-			}
+			
+			var resData:Object = evt.data
+			event.addParam("response", resData);
+			
+			
 			ExternalInterface.call("console.log", "success");
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
@@ -128,23 +138,36 @@ package
 			fileList.browse();
 		}
 		
+		private function handle_file_queued(evt:PicUploadEvent):void
+		{
+			filesQueued.push(evt.fileItem.getInfoObject());
+		}
+		
 		private function handle_file_selected(evt:Event):void
 		{	
-			var fileItemArr:Array = [];
+			filesOverflow = new Array();
+			filesQueued = new Array();
+			
 			var i:uint = 0;
 			for each(var file:FileReference in evt.target.fileList)
 			{
 				var fileItem:FileItem = new FileItem(fileIdPrifix, file);			
 				picUploader.addFileItem(fileItem);
-				
-				fileItemArr.push(fileItem.getInfoObject());
 				i++;
 			}
-			picUploader.start();
+			
 			
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_QUEUED);
-			event.addParam("files",fileItemArr);
+			event.addParam("files",filesQueued);
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+			
+			//用户选择的图片的总数超出一次可上传图片的数目
+			if (filesOverflow.length>0)
+			{
+				var overflowEvt:ExternalEvent = new ExternalEvent(FileUploadEvent.QUEUE_LIMIT_EXCEEDED);
+				overflowEvt.addParam("files", filesOverflow);
+				ExternalEventDispatcher.getInstance().dispatchEvent(overflowEvt);
+			}
 		}
 	}
 }

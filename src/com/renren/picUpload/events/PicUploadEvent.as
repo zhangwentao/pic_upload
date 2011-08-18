@@ -13,7 +13,8 @@ package com.renren.picUpload.events
 		public static const UPLOAD_PROGRESS:String = "uploadProgress";//上传中
 		public static const UPLOAD_CANCELED:String = "uploadCanceled";//取消一个文件的上传
 		public static const START_PROCESS_FILE:String = "startProcessFile";//对图片进行处理
-	
+	    public static const QUEUE_LIMIT_EXCEEDED:String = "queueLimitExceeded";//上传队列以达到长度已达到上限
+		public static const FILE_QUEUED:String = "fileQueued";//文件被加入队列
 		
 		private var _fileItem:FileItem;
 		public var data:*;
