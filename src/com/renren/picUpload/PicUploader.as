@@ -159,10 +159,17 @@ package com.renren.picUpload
 			{
 				if (file.id == fileId)
 				{
-					file.status = FileItem.FILE_STATUS_CANCELLED;
-					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
-					dispatchEvent(event);
-					break;
+					switch(file.status)
+					{
+						case FileItem.FILE_STATUS_QUEUED:
+							file.status = FileItem.FILE_STATUS_CANCELLED;
+							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
+							dispatchEvent(event);
+						break;
+						
+						
+					}
+					return;
 				}
 			}
 		}

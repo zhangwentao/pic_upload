@@ -97,8 +97,6 @@ package
 			ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
 			ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
 			
-			
-			
 			picUploader.init();
 			picUploader.start();
 			
