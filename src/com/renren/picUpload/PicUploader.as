@@ -247,6 +247,12 @@ package com.renren.picUpload
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
 			
+			if (BMPValidater.validate(fileData))
+			{
+				sliceData(fileData);
+				return;
+			}
+			
 			fileData.position = 0;
 			fileData.readBytes(temp, 0, fileData.length);
 			resizePic(temp);
@@ -294,6 +300,11 @@ package com.renren.picUpload
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
 			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 装入完毕");
+			sliceData(picData);
+		}
+		
+		private function sliceData(picData:ByteArray):void
+		{
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
 		    log("["+curProcessFile.fileReference.name + "]被分成了" + dataArr.length + "块");
