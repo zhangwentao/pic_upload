@@ -10,7 +10,7 @@ package com.renren.picUpload
 	public class Config
 	{
 		public static var flashReadyDo:String;
-		public static var maxSingleFileSize:int;			//单个上传文件的最大长度
+		public static var maxSingleFileSize:int = 1024*1024*8;			//单个上传文件的最大长度
 		public static var dataBlockNumLimit:uint = 50;		//DataBlock对象的数量上限值
 		public static var dataBlockSizeLimit:uint = 20480;  //文件切片大小的上限单位字节
 		public static var uploaderPoolSize:uint = 40;		//DBUploader对象池容量(uploader总数量)
