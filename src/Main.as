@@ -39,10 +39,7 @@ package
 		{
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
-			if (stage)
-				init();
-			else
-				addEventListener(Event.ADDED_TO_STAGE, function() { init(); } );
+			
 			addBtn.buttonMode = true;
 			addBtn.mouseChildren = false;
 			addChild(addBtn);
@@ -58,6 +55,11 @@ package
 			
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
+			
+			if (stage)
+				init();
+			else
+				addEventListener(Event.ADDED_TO_STAGE, function() { init(); } );
 		}
 		
 		
@@ -100,7 +102,7 @@ package
 			picUploader.init();
 			picUploader.start();
 			
-			ExternalInterface.call("flashReady");
+			ExternalInterface.call(Config.flashReadyDo);
 		}
 		
 		private function handle_upload_success(evt:PicUploadEvent):void
