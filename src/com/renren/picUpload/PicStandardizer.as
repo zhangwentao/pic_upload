@@ -74,7 +74,7 @@ package com.renren.picUpload
 				var bitmapData:BitmapData = new BitmapData(loader.content.width, loader.content.height,false,0xFFFFFF);
 				bitmapData.draw(loader);
 				_data = new ByteArray();
-				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(80,200,300);
+				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(80,150,200);
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
 				jpgEncoder.encode(bitmapData);
 			}

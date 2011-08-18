@@ -622,7 +622,6 @@ package com.renren.picUpload
 			
 			runTime=run;
 			haltTime=stop;
-			
 			init();
 		}
 		

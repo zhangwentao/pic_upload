@@ -144,10 +144,14 @@ package com.renren.picUpload
 			var result:Boolean = true;
 			if (fileItem.fileReference.size == 0)
 			{
-				
 				result = false;
 			}
-				
+			
+			if (fileItem.fileReference.size > Config.maxSingleFileSize)
+			{
+				result = false;
+			}
+			
 			return result;
 		}
 		
@@ -162,6 +166,7 @@ package com.renren.picUpload
 					switch(file.status)
 					{
 						case FileItem.FILE_STATUS_QUEUED:
+						case FileItem.FILE_STATUS_SUCCESS:
 							file.status = FileItem.FILE_STATUS_CANCELLED;
 							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
 							dispatchEvent(event);
@@ -310,7 +315,8 @@ package com.renren.picUpload
 		 */
 		private function handle_file_uploaded(evt:DBUploaderEvent):void
 		{
-			log("["+evt.dataBlock.file.fileReference.name+"]上传完毕");
+			log("[" + evt.dataBlock.file.fileReference.name + "]上传完毕");
+			evt.dataBlock.file.status = FileItem.FILE_STATUS_SUCCESS;
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
 			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_SUCCESS, evt.dataBlock.file);
