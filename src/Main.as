@@ -52,8 +52,6 @@ package
 			addBtn.buttonMode = true;
 			addBtn.mouseChildren = false;
 			addChild(addBtn);
-			picUploader.addEventListener(ThumbMakerEvent.THUMB_MAKED, huandle_thumb_maked);
-			picUploader.addEventListener(ThumbMakerEvent.THUMB_MAKE_PROGRESS, handle_thumb_making);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_SUCCESS, handle_upload_success);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_CANCELED, handle_upload_canceled);
@@ -119,8 +117,14 @@ package
 			
 			picUploader.init();
 			picUploader.start();
-			
+			FileItem.id_prefix = fileIdPrifix + Math.round(Math.random() * 1000) +curTime();
 			ExternalInterface.call(Config.flashReadyDo);
+		}
+		
+		private function curTime():String
+		{
+			var date:Date = new Date();
+			return ''+date.getHours() + date.getMinutes() + date.getSeconds();
 		}
 		
 		private function handle_upload_success(evt:PicUploadEvent):void
@@ -139,15 +143,6 @@ package
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
-		function handle_thumb_making(evt:ThumbMakerEvent):void
-		{
-			
-		}
-		
-		function huandle_thumb_maked(evt:ThumbMakerEvent):void
-		{
-			
-		}
 		
 		function handle_stage_clicked(evt:MouseEvent):void 
 		{
@@ -167,7 +162,7 @@ package
 			var i:uint = 0;
 			for each(var file:FileReference in evt.target.fileList)
 			{
-				var fileItem:FileItem = new FileItem(fileIdPrifix, file);			
+				var fileItem:FileItem = new FileItem(file);			
 				picUploader.addFileItem(fileItem);
 				i++;
 			}
