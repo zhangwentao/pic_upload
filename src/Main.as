@@ -13,6 +13,7 @@ package
 	import com.renren.picUpload.FileItem;
 	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.picUpload.log;
+	import flash.ui.ContextMenu;
 	import flash.utils.Dictionary;
 	import com.renren.picUpload.events.PicUploadEvent;
 	import com.renren.external.ExternalEvent;
@@ -24,6 +25,7 @@ package
 	import flash.display.StageAlign;
 	import flash.events.IOErrorEvent;
 	import flash.net.FileFilter;
+	import flash.system.Security;
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 
@@ -43,6 +45,7 @@ package
         
 		public function Main() 
 		{
+			Security.allowInsecureDomain("www.renren.com");
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
@@ -104,6 +107,9 @@ package
 		
 		private function init():void
 		{
+			var cm:ContextMenu = new ContextMenu();
+			cm.hideBuiltInItems();
+			this.contextMenu = cm;
 			Config.getFlashVars(stage);
 			initFileFilters();
 			ExternalEventDispatcher.getInstance().addExternalCall();
@@ -121,12 +127,8 @@ package
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_SUCCESS);
 			event.addParam("file", evt.fileItem.getInfoObject());
-			
 			var resData:Object = evt.data
 			event.addParam("response", resData);
-			
-			
-			ExternalInterface.call("console.log", "success");
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
