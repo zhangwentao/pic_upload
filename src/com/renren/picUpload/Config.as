@@ -24,7 +24,6 @@ package com.renren.picUpload
 		
 		public static function setUploadUrl(url:String):Boolean
 		{
-			ExternalInterface.call("console.log", "url:" + url);
 			uploadUrl = url;
 			return true;
 		}
