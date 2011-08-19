@@ -10,14 +10,15 @@ package com.renren.picUpload
 	public class Config
 	{
 		public static var flashReadyDo:String;
-		public static var maxSingleFileSize:int = 1024*1024*8;			//单个上传文件的最大长度
-		public static var dataBlockNumLimit:uint = 50;		//DataBlock对象的数量上限值
-		public static var dataBlockSizeLimit:uint = 20480;  //文件切片大小的上限单位字节
-		public static var uploaderPoolSize:uint = 40;		//DBUploader对象池容量(uploader总数量)
-		public static var picUploadNumOnce:uint = 10;     	//一次可以上传的照片数量
-		public static var DBQCheckInterval:Number = 500;	//dataBlock队列检查间隔
-		public static var UPCheckInterval:Number = 100;		//uploader对象池检查间隔
-		public static var uploadUrl:String;					//上传url
+		public static var maxSingleFileSize:int = 1024*1024*8;	//单个上传文件的最大长度
+		public static var dataBlockNumLimit:uint = 50;			//DataBlock对象的数量上限值
+		public static var dataBlockSizeLimit:uint = 20480;  	//文件切片大小的上限单位字节
+		public static var uploaderPoolSize:uint = 40;			//DBUploader对象池容量(uploader总数量)
+		public static var picUploadNumOnce:uint = 10;     		//一次可以上传的照片数量
+		public static var DBQCheckInterval:Number = 500;		//dataBlock队列检查间隔
+		public static var UPCheckInterval:Number = 100;			//uploader对象池检查间隔
+		public static var uploadUrl:String;						//上传url
+		public static var fileFilters:Array=[["图片文件(*.jpg;*.png;*.gif;*.bmp)", "*.jpg;*.png;*.gif;*.bmp"]];//文件类型筛选
 		
 		
 		

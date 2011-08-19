@@ -5,6 +5,7 @@ package
 	import flash.display.Sprite;
 	import flash.errors.IOError;
 	import flash.events.Event;
+	import flash.filters.BevelFilter;
 	import flash.net.FileReference;
 	import flash.net.FileReferenceList;
 	import com.renren.picUpload.PicUploader;
@@ -22,6 +23,7 @@ package
 	import com.renren.picUpload.Config;
 	import flash.display.StageAlign;
 	import flash.events.IOErrorEvent;
+	import flash.net.FileFilter;
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 
@@ -35,6 +37,10 @@ package
 		
 		private var filesOverflow:Array;
 		private var filesQueued:Array;
+		
+		private var fileFilters:Array = new Array();
+	
+        
 		public function Main() 
 		{
 			stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -62,7 +68,14 @@ package
 				addEventListener(Event.ADDED_TO_STAGE, function() { init(); } );
 		}
 		
-		
+		private function initFileFilters():void
+		{
+			for each(var fileterInfo:Array in Config.fileFilters)
+			{
+				var filter:FileFilter = new FileFilter(fileterInfo[0], fileterInfo[1]);
+				fileFilters.push(filter);
+			}
+		}
 		
 		private function handle_queue_limit_exceeded(evt:PicUploadEvent):void
 		{
@@ -92,6 +105,7 @@ package
 		private function init():void
 		{
 			Config.getFlashVars(stage);
+			initFileFilters();
 			ExternalEventDispatcher.getInstance().addExternalCall();
 			ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
 			ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
@@ -135,7 +149,7 @@ package
 		
 		function handle_stage_clicked(evt:MouseEvent):void 
 		{
-			fileList.browse();
+			fileList.browse(fileFilters);
 		}
 		
 		private function handle_file_queued(evt:PicUploadEvent):void

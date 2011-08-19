@@ -144,11 +144,15 @@ package com.renren.picUpload
 			var result:Boolean = true;
 			if (fileItem.fileReference.size == 0)
 			{
+				var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.ZERO_BYTE_FILE, fileItem);
+				dispatchEvent(event);
 				result = false;
 			}
 			
 			if (fileItem.fileReference.size > Config.maxSingleFileSize)
 			{
+				var event2:PicUploadEvent = new PicUploadEvent(PicUploadEvent.FILE_EXCEEDS_SIZE_LIMIT, fileItem);
+				dispatchEvent(event);
 				result = false;
 			}
 			
