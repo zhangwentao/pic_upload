@@ -93,6 +93,12 @@ package com.renren.picUpload
 					var event:ExternalEvent = new ExternalEvent(FileUploadEvent.NOT_LOGIN);
 					ExternalEventDispatcher.getInstance().dispatchEvent(event);
 				break;
+				
+				case 503:
+				case 504:
+				case 508:
+					uploadErrorDo(uint(_responseData.code));
+				break;
 			}
 		}
 		
@@ -108,7 +114,18 @@ package com.renren.picUpload
 				case 523:
 					oneBlockCompleteDo();
 				break;
+				
+				default:
+					uploadErrorDo(code);
 			}
+		}
+		
+		private function uploadErrorDo(errorCode:uint):void
+		{
+			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.UPLOAD_ERROR);
+			event.addParam("file", dataBlock.file.getInfoObject());
+			event.addParam("errorCode", errorCode);
+			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
 		private function oneBlockCompleteDo():void
