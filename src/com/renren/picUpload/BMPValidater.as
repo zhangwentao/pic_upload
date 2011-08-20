@@ -13,9 +13,9 @@ package com.renren.picUpload
 			picData.position = 0;
 			var sign:String = picData.readUTFBytes(2);
 			if (sign == "BM")
-			return true;
+				return true;
 			else
-			return false;
+				return false;
 		}
 	}
 

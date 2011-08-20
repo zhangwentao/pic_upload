@@ -19,6 +19,7 @@ package com.renren.picUpload.events
 		public static const ALL_FILE_UPLOAD_COMPLETE:String = "allFileUploadComplete";//上传流程完毕
 		public static const FILE_UPLOAD_CANCELED:String = "fileUploadCanceled";//取消一个文件的上传
 		public static const FILE_PROCESS_START:String = "fileProcessStart";//取消一个文件的上传
+		public static const NOT_LOGIN:String = "notLogin";//用户未登录
 		
 		
 		public function FileUploadEvent(type:String) 

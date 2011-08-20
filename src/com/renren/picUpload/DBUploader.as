@@ -7,6 +7,9 @@ package com.renren.picUpload
 	import flash.events.EventDispatcher;
 	import com.adobe.serialization.json.JSON;
 	import flash.external.ExternalInterface;
+	import com.renren.external.ExternalEventDispatcher;
+	import com.renren.external.ExternalEvent;
+	import com.renren.picUpload.events.FileUploadEvent;
 	
 	/**
 	 * 上传 DataBlock 至服务器
@@ -84,6 +87,11 @@ package com.renren.picUpload
 			{
 				case 0:
 					checkFileCode();
+				break;
+				
+				case 501:
+					var event:ExternalEvent = new ExternalEvent(FileUploadEvent.NOT_LOGIN);
+					ExternalEventDispatcher.getInstance().dispatchEvent(event);
 				break;
 			}
 		}
