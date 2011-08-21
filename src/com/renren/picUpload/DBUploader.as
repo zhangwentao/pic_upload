@@ -6,10 +6,12 @@ package com.renren.picUpload
 	import flash.events.IOErrorEvent;
 	import flash.events.EventDispatcher;
 	import com.adobe.serialization.json.JSON;
+	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
 	import com.renren.external.ExternalEventDispatcher;
 	import com.renren.external.ExternalEvent;
 	import com.renren.picUpload.events.FileUploadEvent;
+	import flash.utils.Timer;
 	
 	/**
 	 * 上传 DataBlock 至服务器
@@ -18,22 +20,17 @@ package com.renren.picUpload
 	class DBUploader extends EventDispatcher
 	{
 		//"http://upload.renren.com/upload.fcgi?pagetype=addflash&hostid=200208111"
+		public static var timer:Timer;
 		private var uploader:ByteArrayUploader;
 		private var dataBlock:DataBlock;		//上传的数据块
 		private var _responseData:Object;
+		private var reUploadTimes:int = 0;//重传次数
 		
 		public function DBUploader() 
 		{
 			
 		}
 		
-		private function init():void
-		{
-			uploader= new ByteArrayUploader();//用于上传二进制数据
-			uploader.url = Config.uploadUrl;//上传cgiurl
-			uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_ioError);
-			uploader.addEventListener(Event.COMPLETE, handle_upload_complete);
-		}
 		
 		/**
 		 * 上传dataBlock
@@ -41,10 +38,19 @@ package com.renren.picUpload
 		 */
 		public function upload(dataBlock:DataBlock):void
 		{
-			init();
+			reUploadTimes = 0;//重设 重传次数
 			this.dataBlock = dataBlock;
 			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
-			
+			uploadProcess();
+		}
+		
+		private function uploadProcess():void
+		{
+			uploader= new ByteArrayUploader();//用于上传二进制数据
+			uploader.url = Config.uploadUrl;//上传cgiurl
+			uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_ioError);
+			uploader.addEventListener(Event.COMPLETE, handle_upload_complete);
+
 			var urlVar:Object = uploader.urlVariables;
 			
 			urlVar["block_index"] = dataBlock.index;
@@ -65,7 +71,31 @@ package com.renren.picUpload
 		 */
 		private function handle_ioError(evt:IOErrorEvent):void
 		{
-			dispatchEvent(evt);
+			if (!reUpload())
+			{
+				uploadErrorDo(1000);
+				//dispatchEvent(evt);
+			}
+		}
+		
+		private function reUpload():Boolean
+		{
+			if (reUploadTimes < Config.reUploadMaxTimes)
+			{   
+				log("开始重传" + dataBlock.file.fileReference.name + "的第" + dataBlock.index + "块","第"+(++reUploadTimes)+"次");
+				timer.addEventListener(TimerEvent.TIMER,handleTimer);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+			
+			function handleTimer(evt:TimerEvent):void
+			{
+				uploadProcess(); 
+				timer.removeEventListener(TimerEvent.TIMER,handleTimer); 
+			}
 		}
 		
 		/**
@@ -125,6 +155,7 @@ package com.renren.picUpload
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.UPLOAD_ERROR);
 			event.addParam("file", dataBlock.file.getInfoObject());
 			event.addParam("errorCode", errorCode);
+			dataBlock.dispose();//释放内存
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		

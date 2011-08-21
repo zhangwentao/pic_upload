@@ -27,6 +27,7 @@ package
 	import flash.net.FileFilter;
 	import flash.system.Security;
 	import com.adobe.serialization.json.JSON;
+	import com.renren.util.Logger;
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 
@@ -50,10 +51,10 @@ package
         
 		public function Main() 
 		{
-			Security.allowInsecureDomain("www.renren.com");
+			
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
-			
+			Security.allowInsecureDomain("*");
 			addBtn.buttonMode = true;
 			addBtn.mouseChildren = false;
 			addChild(addBtn);
@@ -74,6 +75,20 @@ package
 				init();
 			else
 				addEventListener(Event.ADDED_TO_STAGE, function() { init(); } );
+		}
+		
+		private function showLog(value:int):String
+		{
+			if (value == 1)
+			{
+				Logger.status = Logger.STATUS_ON;
+				return "log ON";
+			}
+			else
+			{
+				Logger.status = Logger.STATUS_OFF
+				return "log OFF"
+			}
 		}
 		
 		private function handle_file_zeroByte(evt:PicUploadEvent):void
@@ -145,12 +160,17 @@ package
 			ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
 			ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
 			ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
-			ExternalInterface.addCallback("jsonEncode",this.encode);
+			ExternalInterface.addCallback("jsonEncode", this.encode);
+			ExternalInterface.addCallback("showLog", this.showLog);
+			
 			
 			picUploader.init();
 			picUploader.start();
 			FileItem.id_prefix = fileIdPrifix + Math.round(Math.random() * 1000) +curTime();
-			ExternalInterface.call(Config.flashReadyDo);
+			
+			
+			
+		   ExternalInterface.call(Config.flashReadyDo);
 		}
 		
 		private function curTime():String

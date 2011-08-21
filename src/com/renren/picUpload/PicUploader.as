@@ -61,6 +61,8 @@ package com.renren.picUpload
 		 */
 		public function init():void
 		{
+			DBUploader.timer = new Timer(Config.reUploadDelayTime);
+			DBUploader.timer.start();
 			DataSlicer.block_size_limit = Config.dataBlockSizeLimit;//设置文件切片上限
 			DBqueue = new Array();//TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
 			fileItemQueue = new CirularQueue(Config.picUploadNumOnce);

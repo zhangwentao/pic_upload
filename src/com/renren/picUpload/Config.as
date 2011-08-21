@@ -18,7 +18,9 @@ package com.renren.picUpload
 		public static var DBQCheckInterval:Number = 80;			//dataBlock队列检查间隔
 		public static var UPCheckInterval:Number = 100;			//uploader对象池检查间隔
 		public static var uploadUrl:String;						//上传url
-		public static var fileFilters:Array=[["图片文件(*.jpg;*.png;*.gif;*.bmp)", "*.jpg;*.png;*.gif;*.bmp"]];//文件类型筛选
+		public static var fileFilters:Array = [["图片文件(*.jpg;*.png;*.gif;*.bmp)", "*.jpg;*.png;*.gif;*.bmp"]];//文件类型筛选
+		public static var reUploadMaxTimes:Number = 20;
+		public static var reUploadDelayTime:Number = 200;//上传错误后重传间隔
 
 		public static function setUploadUrl(url:String):Boolean
 		{
