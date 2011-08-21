@@ -171,6 +171,7 @@ package com.renren.picUpload
 					{
 						case FileItem.FILE_STATUS_QUEUED:
 						case FileItem.FILE_STATUS_SUCCESS:
+							fileItemQueuedNum--;//
 							file.status = FileItem.FILE_STATUS_CANCELLED;
 							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
 							dispatchEvent(event);
