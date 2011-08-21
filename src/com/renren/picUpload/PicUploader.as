@@ -251,6 +251,7 @@ package com.renren.picUpload
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
 			
+			
 			if (BMPValidater.validate(fileData))
 			{
 				sliceData(fileData);

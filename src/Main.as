@@ -26,6 +26,7 @@ package
 	import flash.events.IOErrorEvent;
 	import flash.net.FileFilter;
 	import flash.system.Security;
+	import com.adobe.serialization.json.JSON;
 	/**
 	 * ...
 	 * @author taowenzhang@gmail.com 
@@ -41,7 +42,8 @@ package
 		private var filesQueued:Array;
 		
 		private var fileFilters:Array = new Array();
-	
+	    
+		private var startTime:Number;
         
 		public function Main() 
 		{
@@ -103,6 +105,20 @@ package
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
+		private function encode(obj:Object):String
+		{
+			var result:String;
+			try 
+			{
+				result = JSON.encode(obj);
+			}
+			catch (err:Error)
+			{
+				ExternalInterface.call("console.log", "jsonEncodeError:", err);
+			}
+			return result;
+		}
+		
 		private function init():void
 		{
 			var cm:ContextMenu = new ContextMenu();
@@ -114,6 +130,7 @@ package
 			ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
 			ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
 			ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
+			ExternalInterface.addCallback("jsonEncode",this.encode);
 			
 			picUploader.init();
 			picUploader.start();
@@ -134,6 +151,9 @@ package
 			var resData:Object = evt.data
 			event.addParam("response", resData);
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+			
+			var endTime:Number = new Date().getTime() - startTime;
+			ExternalInterface.call("console.log", "totalTime:", endTime);
 		}
 		
 		function handle_upload_progress(evt:PicUploadEvent):void
@@ -156,6 +176,7 @@ package
 		
 		private function handle_file_selected(evt:Event):void
 		{	
+			startTime = startTime?startTime:new Date().getTime();
 			filesOverflow = new Array();
 			filesQueued = new Array();
 			
