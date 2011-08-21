@@ -21,6 +21,7 @@ package com.renren.picUpload.events
 		public static const FILE_PROCESS_START:String = "fileProcessStart";//取消一个文件的上传
 		public static const NOT_LOGIN:String = "notLogin";//用户未登录
 		public static const UPLOAD_ERROR:String = "uploadError";//后台错误上传照片失败
+		public static const QUEUED_ERROR:String = "queuedError";//文件项加入上传队列时发生的错误。
 		
 		
 		public function FileUploadEvent(type:String) 

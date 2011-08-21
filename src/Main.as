@@ -39,6 +39,9 @@ package
 		private var addBtn:AddBtn = new AddBtn();
 		
 		private var filesOverflow:Array;
+		private var filesZeroByte:Array;
+		private var filesSizeExceeded:Array;
+		
 		private var filesQueued:Array;
 		
 		private var fileFilters:Array = new Array();
@@ -60,6 +63,8 @@ package
 			picUploader.addEventListener(PicUploadEvent.START_PROCESS_FILE, handle_file_process);
 			picUploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 			picUploader.addEventListener(PicUploadEvent.QUEUE_LIMIT_EXCEEDED, handle_queue_limit_exceeded);
+			picUploader.addEventListener(PicUploadEvent.ZERO_BYTE_FILE, handle_file_zeroByte);
+			picUploader.addEventListener(PicUploadEvent.FILE_EXCEEDS_SIZE_LIMIT, handle_fileExceedsSize);
 			picUploader.addEventListener(PicUploadEvent.FILE_QUEUED, handle_file_queued);
 			
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
@@ -69,6 +74,16 @@ package
 				init();
 			else
 				addEventListener(Event.ADDED_TO_STAGE, function() { init(); } );
+		}
+		
+		private function handle_file_zeroByte(evt:PicUploadEvent):void
+		{
+			this.filesZeroByte.push(evt.fileItem.getInfoObject());
+		}
+		
+		private function handle_fileExceedsSize(evt:PicUploadEvent):void
+		{
+			this.filesSizeExceeded.push(evt.fileItem.getInfoObject());
 		}
 		
 		private function initFileFilters():void
@@ -179,6 +194,9 @@ package
 			startTime = startTime?startTime:new Date().getTime();
 			filesOverflow = new Array();
 			filesQueued = new Array();
+			filesZeroByte = new Array();
+			filesSizeExceeded = new Array();
+			
 			
 			var i:uint = 0;
 			for each(var file:FileReference in evt.target.fileList)
@@ -194,10 +212,12 @@ package
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			
 			//用户选择的图片的总数超出一次可上传图片的数目
-			if (filesOverflow.length>0)
+			if (filesOverflow.length>0 || filesZeroByte.length>0 ||filesSizeExceeded.length>0)
 			{
-				var overflowEvt:ExternalEvent = new ExternalEvent(FileUploadEvent.QUEUE_LIMIT_EXCEEDED);
-				overflowEvt.addParam("files", filesOverflow);
+				var overflowEvt:ExternalEvent = new ExternalEvent(FileUploadEvent.QUEUED_ERROR);
+				overflowEvt.addParam("overflowFiles", filesOverflow);
+				overflowEvt.addParam("zeroByteFiles", filesZeroByte);
+				overflowEvt.addParam("sizeLimitFiles", filesSizeExceeded);
 				ExternalEventDispatcher.getInstance().dispatchEvent(overflowEvt);
 			}
 		}
