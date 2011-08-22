@@ -74,7 +74,7 @@ package com.renren.picUpload
 			if (!reUpload())
 			{
 				uploadErrorDo(1000);
-				//dispatchEvent(evt);
+				dispatchEvent(evt);
 			}
 		}
 		
@@ -110,7 +110,7 @@ package com.renren.picUpload
 			}
 			catch (e)
 			{
-				ExternalInterface.call("console.log", "json error");
+				log("json error");
 			}
 			
 			switch(int(_responseData.code))

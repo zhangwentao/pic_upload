@@ -144,7 +144,7 @@ package
 			}
 			catch (err:Error)
 			{
-				ExternalInterface.call("console.log", "jsonEncodeError:", err);
+				log("jsonEncodeError:", err);
 			}
 			return result;
 		}
@@ -188,7 +188,7 @@ package
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			
 			var endTime:Number = new Date().getTime() - startTime;
-			ExternalInterface.call("console.log", "totalTime:", endTime);
+			log("totalTime:", endTime);
 		}
 		
 		function handle_upload_progress(evt:PicUploadEvent):void
