@@ -78,14 +78,14 @@ package com.renren.picUpload
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
 				jpgEncoder.encode(bitmapData);
 			}
+			
+			function handle_encode_com(evt):void
+			{
+				bitmapData.dispose();
+				_data = evt.data;
+				dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
+			}
 		}
-		
-		private function handle_encode_com(evt):void
-		{
-			_data = evt.data;
-			dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
-		}
-		
 	}
 
 }
