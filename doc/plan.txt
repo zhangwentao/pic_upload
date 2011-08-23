@@ -123,6 +123,7 @@ SupportModule:
 2.某张照片由等待上传变到开始上传。需要一个状态改变的事件（statusChange2Upload）。需要一个对象，包含该照片的id，如果可以，需要base64
 3.某张照片由上传中变到完成上传。需要一个状态改变的事件（statusChange2Uploaded）。需要一个对象，包含该照片的id，以传完照片的张数，照片总数。
 3.全部照片完成上传。需要一个完成上传的事件（finishUpload）。
-	
+
+XN.flashUpload.flashDiv.showLog(1);
 
 
