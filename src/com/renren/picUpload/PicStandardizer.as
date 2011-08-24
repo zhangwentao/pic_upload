@@ -65,8 +65,8 @@ package com.renren.picUpload
 				}
 				else//
 				{
-					loader.height = _limit;
-					loader.width = loader.content.height * aspectRatio;
+					loader.content.height = _limit;
+					loader.content.width = loader.content.height * aspectRatio;
 				}
 				trace(loader.content.width, loader.content.height);
 				
