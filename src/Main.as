@@ -189,6 +189,7 @@ package
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			
 			var endTime:Number = new Date().getTime() - startTime;
+			log(evt.fileItem.id + ":success");
 			log("totalTime:", endTime);
 		}
 		
