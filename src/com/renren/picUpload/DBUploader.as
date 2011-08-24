@@ -110,7 +110,7 @@ package com.renren.picUpload
 			}
 			catch (e)
 			{
-				log("json error");
+				log("json error:", e);
 			}
 			
 			switch(int(_responseData.code))
