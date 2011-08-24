@@ -130,6 +130,7 @@ package
 		
 		private function handle_upload_canceled(evt:PicUploadEvent):void
 		{
+			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce-picUploader.fileItemQueuedNum) + "张");
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_CANCELED);
 			event.addParam("file", evt.fileItem.getInfoObject());
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
@@ -168,7 +169,7 @@ package
 			picUploader.start();
 			FileItem.id_prefix = fileIdPrifix + Math.round(Math.random() * 1000) +curTime();
 			
-			
+			addBtn.setInfoTxt("还能添加" + Config.picUploadNumOnce + "张");
 			
 		   ExternalInterface.call(Config.flashReadyDo);
 		}
@@ -207,6 +208,7 @@ package
 		private function handle_file_queued(evt:PicUploadEvent):void
 		{
 			filesQueued.push(evt.fileItem.getInfoObject());
+			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce-picUploader.fileItemQueuedNum) + "张");
 		}
 		
 		private function handle_file_selected(evt:Event):void

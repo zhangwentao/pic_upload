@@ -12,6 +12,11 @@ package
 		{
 			this.gotoAndStop(status);
 		}
+		
+		public function setInfoTxt(txt:String):void
+		{
+			this.info_txt.text = txt;
+		}
 	}
 
 }
