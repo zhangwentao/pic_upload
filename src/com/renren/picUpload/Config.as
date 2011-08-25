@@ -21,6 +21,7 @@ package com.renren.picUpload
 		public static var fileFilters:Array = [["图片文件(*.jpg;*.png;*.gif;*.bmp)", "*.jpg;*.png;*.gif;*.bmp"]];//文件类型筛选
 		public static var reUploadMaxTimes:Number = 20;
 		public static var reUploadDelayTime:Number = 200;//上传错误后重传间隔
+		public static var playerVer:int = 0;//playerVersion
 
 		public static function setUploadUrl(url:String):Boolean
 		{

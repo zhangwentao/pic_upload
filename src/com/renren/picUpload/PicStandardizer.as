@@ -74,7 +74,15 @@ package com.renren.picUpload
 				var bitmapData:BitmapData = new BitmapData(loader.content.width, loader.content.height,false,0xFFFFFF);
 				bitmapData.draw(loader);
 				_data = new ByteArray();
-				var jpgEncoder:AsyncJPEGEncoder = new AsyncJPEGEncoder(80,500,500);
+				
+				var jpgEncoder;
+				log("playerVer:" + Config.playerVer);
+				if (Config.playerVer < 10)//如果flashPlayer版本低于10
+					jpgEncoder = new AsyncJPEGEncoderUseArray(80, 500, 500);
+				else
+					jpgEncoder = new AsyncJPEGEncoder(80, 500, 500);
+				
+				
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
 				jpgEncoder.encode(bitmapData);
 			}
