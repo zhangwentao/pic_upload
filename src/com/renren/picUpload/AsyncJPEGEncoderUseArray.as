@@ -12,7 +12,7 @@ package com.renren.picUpload
 	
 	[Event(name=EncodeCompleteEvent.COMPLETE, type="EncodeCompleteEvent")]
 	
-	class AsyncJPEGEncoder extends EventDispatcher
+	class AsyncJPEGEncoderUseArray extends EventDispatcher
 	{
 		private var width:int;
 		private var height:int;
@@ -611,7 +611,7 @@ package com.renren.picUpload
 			}
 		}
 		
-		public function AsyncJPEGEncoder(quality:int=50, run:uint=500, stop:uint=500)
+		public function AsyncJPEGEncoderUseArray(quality:int=50, run:uint=500, stop:uint=500)
 		{
 			if (quality <= 0) {
 				quality = 1;

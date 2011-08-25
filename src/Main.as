@@ -27,6 +27,7 @@ package
 	import flash.net.FileFilter;
 	import flash.system.Security;
 	import com.adobe.serialization.json.JSON;
+	import flash.system.Capabilities;
 	import com.renren.util.Logger;
 	/**
 	 * ...
@@ -48,7 +49,8 @@ package
 		private var fileFilters:Array = new Array();
 	    
 		private var startTime:Number;
-        
+        private var alertedNotLogin:Boolean = false;
+		
 		public function Main() 
 		{
 			
@@ -67,7 +69,7 @@ package
 			picUploader.addEventListener(PicUploadEvent.ZERO_BYTE_FILE, handle_file_zeroByte);
 			picUploader.addEventListener(PicUploadEvent.FILE_EXCEEDS_SIZE_LIMIT, handle_fileExceedsSize);
 			picUploader.addEventListener(PicUploadEvent.FILE_QUEUED, handle_file_queued);
-			
+			picUploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			
@@ -75,6 +77,12 @@ package
 				init();
 			else
 				addEventListener(Event.ADDED_TO_STAGE, function() { init(); } );
+		}
+		
+		private function handle_notLogin(evt:PicUploadEvent):void
+		{
+			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.NOT_LOGIN);
+			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
 		private function showLog(value:int):String
@@ -134,6 +142,11 @@ package
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_CANCELED);
 			event.addParam("file", evt.fileItem.getInfoObject());
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+			if (picUploader.fileItemQueuedNum < Config.picUploadNumOnce)
+			{
+				addBtn.buttonMode = true;
+				addBtn.mouseChildren = addBtn.mouseEnabled = true;
+			}
 		}
 		
 		private function encode(obj:Object):String
@@ -163,7 +176,7 @@ package
 			ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
 			ExternalInterface.addCallback("jsonEncode", this.encode);
 			ExternalInterface.addCallback("showLog", this.showLog);
-			
+			checkVersion();
 			
 			picUploader.init();
 			picUploader.start();
@@ -178,6 +191,13 @@ package
 		{
 			var date:Date = new Date();
 			return ''+date.getHours() + date.getMinutes() + date.getSeconds();
+		}
+		
+		private function checkVersion():void
+		{
+			var version:String = Capabilities.version;
+			log("ver:"+version);
+			Config.playerVer = int(version.split(/[ ,]/)[1]);
 		}
 		
 		private function handle_upload_success(evt:PicUploadEvent):void
@@ -209,7 +229,17 @@ package
 		private function handle_file_queued(evt:PicUploadEvent):void
 		{
 			filesQueued.push(evt.fileItem.getInfoObject());
-			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce-picUploader.fileItemQueuedNum) + "张");
+			if (picUploader.fileItemQueuedNum >= Config.picUploadNumOnce)
+			{
+				addBtn.setInfoTxt("已满"+Config.picUploadNumOnce+"张照片");
+				addBtn.buttonMode = false;
+				addBtn.mouseChildren = addBtn.mouseEnabled = false;
+			}
+			else
+			{
+				addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce-picUploader.fileItemQueuedNum) + "张");
+			}
+			
 		}
 		
 		private function handle_file_selected(evt:Event):void

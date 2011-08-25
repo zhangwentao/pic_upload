@@ -1,6 +1,7 @@
 package com.renren.picUpload 
 {
 	import com.renren.picUpload.events.DBUploaderEvent;
+	import com.renren.picUpload.events.PicUploadEvent;
 	import com.renren.util.net.ByteArrayUploader;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -10,9 +11,8 @@ package com.renren.picUpload
 	import flash.external.ExternalInterface;
 	import com.renren.external.ExternalEventDispatcher;
 	import com.renren.external.ExternalEvent;
-	import com.renren.picUpload.events.FileUploadEvent;
 	import flash.utils.Timer;
-	
+	import com.renren.picUpload.events.FileUploadEvent;
 	/**
 	 * 上传 DataBlock 至服务器
 	 * @author taowenzhang@gmail.com
@@ -120,8 +120,8 @@ package com.renren.picUpload
 				break;
 				
 				case 501:
-					var event:ExternalEvent = new ExternalEvent(FileUploadEvent.NOT_LOGIN);
-					ExternalEventDispatcher.getInstance().dispatchEvent(event);
+					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.NOT_LOGIN,dataBlock.file);
+					dispatchEvent(event);
 				break;
 				
 				case 503:

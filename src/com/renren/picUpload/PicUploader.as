@@ -15,7 +15,7 @@ package com.renren.picUpload
 	import com.renren.picUpload.events.PicUploadEvent;
 	import flash.external.ExternalInterface;
 	import flash.events.IOErrorEvent;
-	
+	import com.renren.picUpload.events.FileUploadEvent;
 	/**
 	 * 缩略图绘制完毕事件
 	 */
@@ -122,6 +122,7 @@ package com.renren.picUpload
 			
 			if (!validateFile(fileItem))
 			{
+				dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
 				return;
 			}
 			
@@ -209,8 +210,14 @@ package com.renren.picUpload
 			uploader.addEventListener(DBUploaderEvent.FILE_COMPLETE, handle_file_uploaded);
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
             uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
+			uploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
 			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_PROGRESS,dataBlock.file));
 			uploader.upload(dataBlock);
+		}
+		
+		private function handle_notLogin(evt:PicUploadEvent):void
+		{
+			dispatchEvent(evt);
 		}
 		
 		private function handle_IOError(evt:IOErrorEvent):void

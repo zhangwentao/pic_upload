@@ -78,9 +78,9 @@ package com.renren.picUpload
 				var jpgEncoder;
 				log("playerVer:" + Config.playerVer);
 				if (Config.playerVer < 10)//如果flashPlayer版本低于10
-					jpgEncoder = new AsyncJPEGEncoderUseArray(80, 500, 500);
+					jpgEncoder = new AsyncJPEGEncoderUseArray(Config.compressionQuality, 500, 500);
 				else
-					jpgEncoder = new AsyncJPEGEncoder(80, 500, 500);
+					jpgEncoder = new AsyncJPEGEncoder(Config.compressionQuality, 500, 500);
 				
 				
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
