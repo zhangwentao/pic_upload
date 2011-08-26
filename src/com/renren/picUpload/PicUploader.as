@@ -51,6 +51,7 @@ package com.renren.picUpload
 		private var curFileReference:FileReference;
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
 		
+		private var lockCheckerTimer:Timer = new Timer(4000);//
 		
 		/**
 		 * 构造函数
@@ -65,6 +66,8 @@ package com.renren.picUpload
 		 */
 		public function init():void
 		{
+			lockCheckerTimer.addEventListener(TimerEvent.TIMER, checkLock);
+			
 			DBUploader.timer = new Timer(Config.reUploadDelayTime);
 			DBUploader.timer.start();
 			DataSlicer.block_size_limit = Config.dataBlockSizeLimit;//设置文件切片上限
@@ -90,13 +93,17 @@ package com.renren.picUpload
 			}
 		}
 		
+		
+		
 		/**
 		 * 启动上传进程
 		 */
 		public function start():void
 		{
+			
 			DBQMonitorTimer.start();
 			UPMonitorTimer.start();
+			
 			log("开启上传进程");
 		}
 		
@@ -205,7 +212,6 @@ package com.renren.picUpload
 		 */
 		private function uploaderPoolMonitor():void
 		{
-			
 			log("!!!Uploader空闲数量:"+uploaderPool.length,"***上传缓冲区长度:"+DBqueue.length);
 			if (uploaderPool.isEmpty || !DBqueue.length)
 			{
@@ -264,7 +270,25 @@ package com.renren.picUpload
 			curFileReference.addEventListener(IOErrorEvent.IO_ERROR, handle_loadFile_IOError);
 			curFileReference.addEventListener(Event.OPEN, handle_load_open);
 			curFileReference.load();
+			lockCheckerTimer.start();
 			log("!!!上传缓冲区有空间,开始加载上传队列中的["+curFileReference.name+"]文件!!!DBQueue.length:"+DBqueue.length);
+		}
+		
+		
+		private function checkLock(evt:TimerEvent):void
+		{
+			lockCheckerTimer.start();
+			if (lock)
+			{
+				curFileReference.load();
+				log("load local file failed");
+				//lock = false;
+			}
+				
+			//var event:ExternalEvent = new ExternalEvent(FileUploadEvent.UPLOAD_ERROR);
+			//event.addParam("file", curProcessFile);
+			//ExternalEventDispatcher.getInstance().dispatchEvent(event);
+			
 		}
 		
 		private function handle_load_open(evt:Event):void
@@ -288,6 +312,7 @@ package com.renren.picUpload
 		 */
 		private function handle_fileData_loaded(evt:Event):void
 		{
+			lockCheckerTimer.stop();
 			log("[" + curFileReference.name + "]加载到内存");
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
@@ -338,8 +363,7 @@ package com.renren.picUpload
 		
 		private function resizePic(picData:ByteArray):void
 		{
-			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.START_PROCESS_FILE, curProcessFile);
-			dispatchEvent(event);
+			
 			
 			log("[" + curFileReference.name + "]开始标准化");
 			
@@ -362,6 +386,8 @@ package com.renren.picUpload
 		
 		private function sliceData(picData:ByteArray):void
 		{
+			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.START_PROCESS_FILE, curProcessFile);
+			dispatchEvent(event);
 			log("sliceData", "lock:" + lock);
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
