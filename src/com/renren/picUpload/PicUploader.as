@@ -1,5 +1,6 @@
 package com.renren.picUpload 
 {
+	import com.renren.external.ExternalEvent;
 	import com.renren.picUpload.events.DBUploaderEvent;
 	import com.renren.picUpload.DataSlicer;
 	import com.renren.util.CirularQueue;
@@ -17,6 +18,7 @@ package com.renren.picUpload
 	import flash.external.ExternalInterface;
 	import flash.events.IOErrorEvent;
 	import com.renren.picUpload.events.FileUploadEvent;
+	import com.renren.external.ExternalEventDispatcher;
 	/**
 	 * 缩略图绘制完毕事件
 	 */
@@ -114,6 +116,7 @@ package com.renren.picUpload
 		 */
 		public function addFileItem(fileItem:FileItem):void
 		{
+			
 			if(fileItemQueuedNum >= Config.picUploadNumOnce)
 			{
 				var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.QUEUE_LIMIT_EXCEEDED, fileItem);
@@ -124,6 +127,7 @@ package com.renren.picUpload
 			
 			if (!validateFile(fileItem))
 			{
+				log("error queue");
 				dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
 				return;
 			}
@@ -150,18 +154,21 @@ package com.renren.picUpload
 			var result:Boolean = true;
 			if (fileItem.fileReference.size == 0)
 			{
+				result = false;
 				var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.ZERO_BYTE_FILE, fileItem);
 				dispatchEvent(event);
-				result = false;
+				
 			}
 			
 			if (fileItem.fileReference.size > Config.maxSingleFileSize)
 			{
-				var event2:PicUploadEvent = new PicUploadEvent(PicUploadEvent.FILE_EXCEEDS_SIZE_LIMIT, fileItem);
-				dispatchEvent(event);
 				result = false;
+				log("big");
+				var event2:PicUploadEvent = new PicUploadEvent(PicUploadEvent.FILE_EXCEEDS_SIZE_LIMIT, fileItem);
+				dispatchEvent(event2);
+				
 			}
-			
+			log("ol");
 			return result;
 		}
 		
@@ -182,12 +189,14 @@ package com.renren.picUpload
 							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
 							dispatchEvent(event);
 						break;
-						
-						
 					}
-					return;
+					break;
 				}
 			}
+			var fileTemp:FileItem = new FileItem(null);
+			fileTemp.id = fileId;
+			var event2:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, fileTemp);
+			dispatchEvent(event2);
 		}
 		
 		/**
@@ -282,6 +291,17 @@ package com.renren.picUpload
 			log("[" + curFileReference.name + "]加载到内存");
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
+			
+			if (!IMGValidater.validate(fileData))
+			{
+				log("[" + curProcessFile.fileReference.name + "]不是有效图片文件");
+				var event:ExternalEvent = new ExternalEvent(FileUploadEvent.INVALID_IMG_FILE);
+				event.addParam("file", curProcessFile.getInfoObject());
+				ExternalEventDispatcher.getInstance().dispatchEvent(event);
+				lock = false;
+				log("开锁");
+				return;
+			}
 			
 			
 			if (BMPValidater.validate(fileData))

@@ -1,4 +1,4 @@
-package com.renren.picUpload.events 
+﻿package com.renren.picUpload.events 
 {
 	import com.renren.external.ExternalEvent
 	
@@ -22,6 +22,7 @@ package com.renren.picUpload.events
 		public static const NOT_LOGIN:String = "notLogin";//用户未登录
 		public static const UPLOAD_ERROR:String = "uploadError";//后台错误上传照片失败
 		public static const QUEUED_ERROR:String = "queuedError";//文件项加入上传队列时发生的错误。
+		public static const INVALID_IMG_FILE:String = "invalidImgFile";
 		
 		
 		public function FileUploadEvent(type:String) 

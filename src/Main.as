@@ -44,6 +44,7 @@ package
 		private var filesZeroByte:Array;
 		private var filesSizeExceeded:Array;
 		
+		private var invalidFiles:Array;
 		private var filesQueued:Array;
 		
 		private var fileFilters:Array = new Array();
@@ -66,8 +67,8 @@ package
 			picUploader.addEventListener(PicUploadEvent.START_PROCESS_FILE, handle_file_process);
 			picUploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 			picUploader.addEventListener(PicUploadEvent.QUEUE_LIMIT_EXCEEDED, handle_queue_limit_exceeded);
-			picUploader.addEventListener(PicUploadEvent.ZERO_BYTE_FILE, handle_file_zeroByte);
-			picUploader.addEventListener(PicUploadEvent.FILE_EXCEEDS_SIZE_LIMIT, handle_fileExceedsSize);
+			picUploader.addEventListener(PicUploadEvent.ZERO_BYTE_FILE, handle_invalid_files);
+			picUploader.addEventListener(PicUploadEvent.FILE_EXCEEDS_SIZE_LIMIT, handle_invalid_files);
 			picUploader.addEventListener(PicUploadEvent.FILE_QUEUED, handle_file_queued);
 			picUploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
 			addBtn.addEventListener(MouseEvent.CLICK,handle_stage_clicked);
@@ -99,15 +100,14 @@ package
 			}
 		}
 		
-		private function handle_file_zeroByte(evt:PicUploadEvent):void
+		
+		private function handle_invalid_files(evt:PicUploadEvent):void
 		{
-			this.filesZeroByte.push(evt.fileItem.getInfoObject());
+			var fileObj:Object = evt.fileItem.getInfoObject();
+			fileObj["errorType"] = evt.type;
+			invalidFiles.push(fileObj);
 		}
 		
-		private function handle_fileExceedsSize(evt:PicUploadEvent):void
-		{
-			this.filesSizeExceeded.push(evt.fileItem.getInfoObject());
-		}
 		
 		private function initFileFilters():void
 		{
@@ -138,9 +138,10 @@ package
 		
 		private function handle_upload_canceled(evt:PicUploadEvent):void
 		{
+			log("delete:" + evt.fileItem.id);
 			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce-picUploader.fileItemQueuedNum) + "张");
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_CANCELED);
-			event.addParam("file", evt.fileItem.getInfoObject());
+			event.addParam("file",{id:evt.fileItem.id});
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			if (picUploader.fileItemQueuedNum < Config.picUploadNumOnce)
 			{
@@ -265,13 +266,18 @@ package
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			
 			//用户选择的图片的总数超出一次可上传图片的数目
-			if (filesOverflow.length>0 || filesZeroByte.length>0 ||filesSizeExceeded.length>0)
+			if (filesOverflow.length>0)
 			{
-				var overflowEvt:ExternalEvent = new ExternalEvent(FileUploadEvent.QUEUED_ERROR);
-				overflowEvt.addParam("overflowFiles", filesOverflow);
-				overflowEvt.addParam("zeroByteFiles", filesZeroByte);
-				overflowEvt.addParam("sizeLimitFiles", filesSizeExceeded);
+				var overflowEvt:ExternalEvent = new ExternalEvent(FileUploadEvent.QUEUE_LIMIT_EXCEEDED);
+				overflowEvt.addParam("files", filesOverflow);
 				ExternalEventDispatcher.getInstance().dispatchEvent(overflowEvt);
+			}
+			
+			if (invalidFiles.length > 0)
+			{
+				var queueErrorEvt:ExternalEvent = new ExternalEvent(FileUploadEvent.QUEUED_ERROR);
+				queueErrorEvt.addParam("files", invalidFiles);
+				ExternalEventDispatcher.getInstance().dispatchEvent(queueErrorEvt);
 			}
 		}
 	}

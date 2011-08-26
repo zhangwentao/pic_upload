@@ -26,6 +26,8 @@ package com.renren.picUpload
 		 */
 		public function FileItem(fileReference:FileReference) 
 		{
+			if (!fileReference)
+				return;
 			this.id = id_prefix + "_" + file_id_sequence++;
 			this.fileReference = fileReference;
 		}
