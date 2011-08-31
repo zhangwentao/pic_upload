@@ -250,7 +250,7 @@ package
 			filesQueued = new Array();
 			filesZeroByte = new Array();
 			filesSizeExceeded = new Array();
-			
+			invalidFiles = new Array();
 			
 			var i:uint = 0;
 			for each(var file:FileReference in evt.target.fileList)

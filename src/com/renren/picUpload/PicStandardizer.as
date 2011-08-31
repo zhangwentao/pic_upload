@@ -68,7 +68,6 @@ package com.renren.picUpload
 					loader.content.height = _limit;
 					loader.content.width = loader.content.height * aspectRatio;
 				}
-				trace(loader.content.width, loader.content.height);
 				
 				
 				var bitmapData:BitmapData = new BitmapData(loader.content.width, loader.content.height,false,0xFFFFFF);
@@ -77,10 +76,10 @@ package com.renren.picUpload
 				
 				var jpgEncoder;
 				log("playerVer:" + Config.playerVer);
-				if (Config.playerVer < 10)//如果flashPlayer版本低于10
-					jpgEncoder = new AsyncJPEGEncoderUseArray(Config.compressionQuality, 500, 500);
-				else
-					jpgEncoder = new AsyncJPEGEncoder(Config.compressionQuality, 500, 500);
+				//if (Config.playerVer < 10)//如果flashPlayer版本低于10
+					//jpgEncoder = new AsyncJPEGEncoderUseArray(Config.compressionQuality, 500, 500);
+				//else
+				jpgEncoder = new AsyncJPEGEncoder(Config.compressionQuality, 500, 500);
 				
 				
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
