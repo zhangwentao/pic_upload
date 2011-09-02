@@ -264,6 +264,7 @@ package
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_QUEUED);
 			event.addParam("files",filesQueued);
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+			filesQueued = null;
 			
 			//用户选择的图片的总数超出一次可上传图片的数目
 			if (filesOverflow.length>0)

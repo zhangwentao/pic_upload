@@ -46,7 +46,7 @@ package com.renren.picUpload
 		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
 		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
-		public var fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
+		public var fileItemQueuedNum:uint = 0;     		//已加入上传队列的FileItem数量
 		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
 		
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
@@ -95,14 +95,11 @@ package com.renren.picUpload
 			}
 		}
 		
-		
-		
 		/**
 		 * 启动上传进程
 		 */
 		public function start():void
 		{
-			
 			DBQMonitorTimer.start();
 			UPMonitorTimer.start();
 			
@@ -195,7 +192,7 @@ package com.renren.picUpload
 							dispatchEvent(event);
 						break;
 					}
-					break;
+					return;
 				}
 			}
 			var fileTemp:FileItem = new FileItem(null);
@@ -269,6 +266,8 @@ package com.renren.picUpload
 			curProcessFile.fileReference.addEventListener(IOErrorEvent.IO_ERROR, handle_loadFile_IOError);
 			curProcessFile.fileReference.addEventListener(Event.OPEN, handle_load_open);
 			curProcessFile.fileReference.load();
+			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.START_PROCESS_FILE, curProcessFile);
+			dispatchEvent(event);
 			log("!!!上传缓冲区有空间,开始加载上传队列中的["+curProcessFile.fileReference.name+"]文件!!!DBQueue.length:"+DBqueue.length);
 		}
 		
@@ -315,7 +314,7 @@ package com.renren.picUpload
 		{
 			log("[" + evt.target.name + "] startLoad","loadCom");
 			curProcessFile.fileReference.removeEventListener(Event.COMPLETE, handle_fileData_loaded);
-			lockCheckerTimer.stop();
+			//lockCheckerTimer.stop();
 			log("[" + curProcessFile.fileReference.name + "]加载到内存");
 			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
 			var temp:ByteArray = new ByteArray();
@@ -367,7 +366,6 @@ package com.renren.picUpload
 		private function resizePic(picData:ByteArray):void
 		{
 			
-			
 			log("[" + curProcessFile.fileReference.name + "]开始标准化");
 			
 			var resizer:PicStandardizer = new PicStandardizer();
@@ -389,8 +387,7 @@ package com.renren.picUpload
 		
 		private function sliceData(picData:ByteArray):void
 		{
-			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.START_PROCESS_FILE, curProcessFile);
-			dispatchEvent(event);
+			
 			log("sliceData", "lock:" + lock);
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
