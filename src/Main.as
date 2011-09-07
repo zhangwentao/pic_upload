@@ -147,6 +147,7 @@ package
 			{
 				addBtn.buttonMode = true;
 				addBtn.mouseChildren = addBtn.mouseEnabled = true;
+				addBtn.enable();
 			}
 		}
 		
@@ -232,15 +233,15 @@ package
 			filesQueued.push(evt.fileItem.getInfoObject());
 			if (picUploader.fileItemQueuedNum >= Config.picUploadNumOnce)
 			{
-				addBtn.setInfoTxt("已满"+Config.picUploadNumOnce+"张照片");
+				//addBtn.setInfoTxt("已满"+Config.picUploadNumOnce+"张照片");
 				addBtn.buttonMode = false;
 				addBtn.mouseChildren = addBtn.mouseEnabled = false;
+				addBtn.disable();
 			}
 			else
 			{
-				addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce-picUploader.fileItemQueuedNum) + "张");
 			}
-			
+			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce-picUploader.fileItemQueuedNum) + "张");
 		}
 		
 		private function handle_file_selected(evt:Event):void
@@ -251,14 +252,34 @@ package
 			filesZeroByte = new Array();
 			filesSizeExceeded = new Array();
 			invalidFiles = new Array();
-			
+			var allSelectedFileNum:int = evt.target.fileList.length;
 			var i:uint = 0;
+			
+			var allowAddFileNum:int = Config.picUploadNumOnce - picUploader.fileItemQueuedNum;
+			
+			trace("allowAddFileNum:"+allowAddFileNum);
 			for each(var file:FileReference in evt.target.fileList)
 			{
+				if (picUploader.fileItemQueuedNum >= Config.picUploadNumOnce)
+					break;
 				var fileItem:FileItem = new FileItem(file);			
 				picUploader.addFileItem(fileItem);
 				i++;
 			}
+			
+			//for (var fileIndex:int = 0; fileIndex < ; fileIndex++)
+			//{
+				//var fr:FileReference = (evt.target.fileList)[fileIndex];
+				//var fileItem:FileItem = new FileItem(fr);			
+				//picUploader.addFileItem(fileItem);
+				//i++;
+			//}
+			
+			for (var tempi:int = i; tempi < evt.target.fileList.length; tempi++)
+			{
+				filesOverflow.push(new FileItem(evt.target.fileList[tempi]).getInfoObject());
+			}
+			
 			
 			
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_QUEUED);
@@ -270,6 +291,7 @@ package
 			if (filesOverflow.length>0)
 			{
 				var overflowEvt:ExternalEvent = new ExternalEvent(FileUploadEvent.QUEUE_LIMIT_EXCEEDED);
+				overflowEvt.addParam("selected", allSelectedFileNum);
 				overflowEvt.addParam("files", filesOverflow);
 				ExternalEventDispatcher.getInstance().dispatchEvent(overflowEvt);
 			}

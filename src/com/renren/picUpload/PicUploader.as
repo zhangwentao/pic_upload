@@ -122,14 +122,14 @@ package com.renren.picUpload
 		 */
 		public function addFileItem(fileItem:FileItem):void
 		{
-			
-			if(fileItemQueuedNum >= Config.picUploadNumOnce)
-			{
-				var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.QUEUE_LIMIT_EXCEEDED, fileItem);
-				dispatchEvent(event);
-				log("超过了一次可上传的最大数量:"+Config.picUploadNumOnce);
-				return;
-			}
+			trace("file:" + fileItem.fileReference.name);
+			//if(fileItemQueuedNum >= Config.picUploadNumOnce)
+			//{
+				//var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.QUEUE_LIMIT_EXCEEDED, fileItem);
+				//dispatchEvent(event);
+				//log("超过了一次可上传的最大数量:"+Config.picUploadNumOnce);
+				//return;
+			//}
 			
 			if (!validateFile(fileItem))
 			{
@@ -157,6 +157,7 @@ package com.renren.picUpload
 		 */
 		private function validateFile(fileItem:FileItem):Boolean
 		{
+			trace("fr:" + fileItem.fileReference.size);
 			var result:Boolean = true;
 			if (fileItem.fileReference.size == 0)
 			{
