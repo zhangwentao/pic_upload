@@ -24,6 +24,7 @@ package
 		
 		public function disable():void
 		{
+		    this.gotoAndStop(3);
 			this.infoBtn.gotoAndStop(2);
 			this.plusBtn.gotoAndStop(2);
 		}

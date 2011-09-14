@@ -369,7 +369,7 @@ package com.renren.picUpload
 			
 			log("[" + curProcessFile.fileReference.name + "]开始标准化");
 			
-			var resizer:PicStandardizer = new PicStandardizer();
+			var resizer:PicStandardizer = new PicStandardizer(Config.maxPicSize);
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
 			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
