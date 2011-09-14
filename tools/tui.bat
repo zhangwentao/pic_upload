@@ -1,0 +1,1 @@
+copy D:\wwwroot\applications\pic_upload\bin\pic_uploader.swf \\10.2.74.142\uploadPopup\pic_uploader.swf
