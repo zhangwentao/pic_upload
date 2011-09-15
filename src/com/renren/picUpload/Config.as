@@ -16,8 +16,8 @@ package com.renren.picUpload
 		public static var dataBlockSizeLimit:Number = 1024*1000/3*2;  	//文件切片大小的上限单位字节
 		public static var uploaderPoolSize:Number = 60;					//DBUploader对象池容量(uploader总数量)
 		public static var picUploadNumOnce:Number = 100;     			//一次可以上传的照片数量
-		public static var DBQCheckInterval:Number = 50;					//dataBlock队列检查间隔
-		public static var UPCheckInterval:Number = 100;					//uploader对象池检查间隔
+		public static var DBQCheckInterval:Number = 40;					//dataBlock队列检查间隔
+		public static var UPCheckInterval:Number = 90;					//uploader对象池检查间隔
 		public static var uploadUrl:String;								//上传url
 		public static var compressionQuality:Number = 80;				//压缩后的图片质量
 		public static var fileFilters:Array = [["图片文件(*.jpg;*.png;*.gif;*.bmp)", "*.jpg;*.png;*.gif;*.bmp"]];//文件类型筛选
