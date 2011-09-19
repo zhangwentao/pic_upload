@@ -2,12 +2,12 @@ package com.renren.picUpload
 {
 	import com.renren.picUpload.events.EncodeCompleteEvent;
 	import flash.events.EventDispatcher;
+	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	import flash.display.Loader;
 	import flash.display.BitmapData;
 	import flash.events.Event;
-	import cmodule.aircall.CLibInit;
-	
+	import flash.external.ExternalInterface;
 	
 	/**
 	 * 标准化图片尺寸
@@ -17,17 +17,18 @@ package com.renren.picUpload
 	
 	class PicStandardizer extends EventDispatcher
 	{
-		private var _limit:Number;//上限值
+		private var _limit:int;//上限值
 		private var _data:ByteArray;//尺寸标准化后的图片数据
 		private var _rawData:ByteArray;//原始数据
-		
+		private var temp_height:int = 0;
+		private var temp_width:int = 0;
 		
 		
 		/**
 		 * 构造函数
 		 * @param	limit	<Number>	图片宽度和高度的上限值
 		 */
-		public function PicStandardizer(limit:Number=1024) 
+		public function PicStandardizer(limit:int=1024) 
 		{
 			this._limit = limit;
 		}
@@ -60,17 +61,20 @@ package com.renren.picUpload
 			{
 				if (aspectRatio >= 1)//如果宽大于等于高
 				{
-					loader.content.width = _limit;
-					loader.content.height = loader.content.width / aspectRatio;
+					temp_width = _limit;
+					temp_height = Math.ceil(temp_width / aspectRatio);
 				}
 				else//
 				{
-					loader.content.height = _limit;
-					loader.content.width = loader.content.height * aspectRatio;
+					temp_height = _limit;
+					temp_width = Math.ceil(temp_height * aspectRatio);
 				}
+		        
+				loader.content.height = temp_height;
+				loader.content.width = temp_width;
+				//ExternalInterface.call("console.log", "fuck size:", loader.content.height, loader.content.width);
 				
-				
-				var bitmapData:BitmapData = new BitmapData(loader.content.width, loader.content.height,false,0xFFFFFF);
+				var bitmapData:BitmapData = new BitmapData(temp_width, temp_height,false,0xFFFFFF);
 				bitmapData.draw(loader);
 				_data = new ByteArray();
 				
@@ -90,6 +94,8 @@ package com.renren.picUpload
 			{
 				bitmapData.dispose();
 				_data = evt.data;
+				//var file:FileReference = new FileReference();
+				//FileReference(file).save(_data, "ok.jpg");
 				dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
 			}
 		}

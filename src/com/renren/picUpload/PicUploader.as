@@ -178,7 +178,7 @@ package com.renren.picUpload
 		
 		public function cancelAFile(fileId:String):void
 		{
-			ExternalInterface.call("console.log","waka:",fileId);
+			
 			var arr:Array = fileItemQueue.toArray();
 			
 			for each(var file:FileItem in arr)
@@ -191,7 +191,7 @@ package com.renren.picUpload
 						case FileItem.FILE_STATUS_SUCCESS:
 							fileItemQueuedNum--;//
 							file.status = FileItem.FILE_STATUS_CANCELLED;
-							ExternalInterface.call("console.log","waka2:",fileId);
+							
 							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
 							dispatchEvent(event);
 						break;
@@ -375,7 +375,7 @@ package com.renren.picUpload
 			
 			log("[" + curProcessFile.fileReference.name + "]开始标准化");
 			
-			var resizer:PicStandardizer = new PicStandardizer(Config.maxPicSize);
+			var resizer:PicStandardizer = new PicStandardizer(int(Config.maxPicSize));
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
 			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
