@@ -19,6 +19,7 @@ package com.renren.picUpload
 	import flash.events.IOErrorEvent;
 	import com.renren.picUpload.events.FileUploadEvent;
 	import com.renren.external.ExternalEventDispatcher;
+	import flash.external.ExternalInterface;
 	/**
 	 * 缩略图绘制完毕事件
 	 */
@@ -177,6 +178,7 @@ package com.renren.picUpload
 		
 		public function cancelAFile(fileId:String):void
 		{
+			ExternalInterface.call("console.log","waka:",fileId);
 			var arr:Array = fileItemQueue.toArray();
 			
 			for each(var file:FileItem in arr)
@@ -189,6 +191,7 @@ package com.renren.picUpload
 						case FileItem.FILE_STATUS_SUCCESS:
 							fileItemQueuedNum--;//
 							file.status = FileItem.FILE_STATUS_CANCELLED;
+							ExternalInterface.call("console.log","waka2:",fileId);
 							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
 							dispatchEvent(event);
 						break;
@@ -261,6 +264,9 @@ package com.renren.picUpload
 					break;
 				curProcessFile = fileItemQueue.deQueue();
 			}
+			
+			if (curProcessFile.status == FileItem.FILE_STATUS_CANCELLED)
+				return;
 			
 			log("[" + curProcessFile.fileReference.name + "]增加监听");
 			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);

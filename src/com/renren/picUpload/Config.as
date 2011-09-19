@@ -10,7 +10,7 @@ package com.renren.picUpload
 	public class Config
 	{
 		public static var flashReadyDo:String;							//flash准备好被js调用方法后，调用这个js方法
-		public static var maxSingleFileSize:Number = 1024 * 1024 * 8;		//单个上传文件的最大长度
+		public static var maxSingleFileSize:Number = 1024 * 1024 * 8;	//单个上传文件的最大长度
 		public static var maxPicSize:Number = 720;						//图片的最大尺寸
 		public static var dataBlockNumLimit:Number = 50;				//DataBlock对象的数量上限值
 		public static var dataBlockSizeLimit:Number = 1024*1000/3*2;  	//文件切片大小的上限单位字节
@@ -19,7 +19,7 @@ package com.renren.picUpload
 		public static var DBQCheckInterval:Number = 40;					//dataBlock队列检查间隔
 		public static var UPCheckInterval:Number = 90;					//uploader对象池检查间隔
 		public static var uploadUrl:String;								//上传url
-		public static var compressionQuality:Number = 80;				//压缩后的图片质量
+		public static var compressionQuality:Number = 90;				//压缩后的图片质量
 		public static var fileFilters:Array = [["图片文件(*.jpg;*.png;*.gif;*.bmp)", "*.jpg;*.png;*.gif;*.bmp"]];//文件类型筛选
 		public static var reUploadMaxTimes:Number = 20;
 		public static var reUploadDelayTime:Number = 200;//上传错误后重传间隔
