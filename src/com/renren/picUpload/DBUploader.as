@@ -24,6 +24,7 @@ package com.renren.picUpload
 		private var uploader:ByteArrayUploader;
 		private var dataBlock:DataBlock;		//上传的数据块
 		private var _responseData:Object;
+		private var _rawResponseData:String;
 		private var reUploadTimes:int = 0;//重传次数
 		
 		public function DBUploader() 
@@ -62,7 +63,7 @@ package com.renren.picUpload
 		
 		public function get responseData():Object
 		{
-			return _responseData; 
+			return _rawResponseData; 
 		}
 		
 		/**
@@ -104,6 +105,7 @@ package com.renren.picUpload
 		 */
 		private function handle_upload_complete(evt:Event):void
 		{
+			_rawResponseData = String(uploader.data);
 			try 
 			{
 				_responseData = JSON.decode(String(uploader.data));
@@ -130,6 +132,7 @@ package com.renren.picUpload
 					uploadErrorDo(uint(_responseData.code));
 				break;
 			}
+			
 		}
 		
 		private function checkFileCode():void

@@ -54,7 +54,7 @@ package
 		
 		public function Main() 
 		{
-			
+			//ExternalInterface.call("alert", "ok");
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			Security.allowInsecureDomain("*");
@@ -167,6 +167,7 @@ package
 		
 		private function init():void
 		{
+			
 			var cm:ContextMenu = new ContextMenu();
 			cm.hideBuiltInItems();
 			this.contextMenu = cm;
@@ -206,13 +207,14 @@ package
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_SUCCESS);
 			event.addParam("file", evt.fileItem.getInfoObject());
-			var resData:Object = evt.data
+			var resData:String = String(evt.data);
 			event.addParam("response", resData);
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			
 			var endTime:Number = new Date().getTime() - startTime;
 			log(evt.fileItem.id + ":success");
 			log("totalTime:", endTime);
+			//ExternalInterface.call("alert", evt.fileItem.id);
 		}
 		
 		function handle_upload_progress(evt:PicUploadEvent):void

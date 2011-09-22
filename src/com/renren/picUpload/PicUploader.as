@@ -266,7 +266,10 @@ package com.renren.picUpload
 			}
 			
 			if (curProcessFile.status == FileItem.FILE_STATUS_CANCELLED)
+			{
+				lock = false;
 				return;
+			}
 			
 			log("[" + curProcessFile.fileReference.name + "]增加监听");
 			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
