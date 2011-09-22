@@ -54,7 +54,6 @@ package
 		
 		public function Main() 
 		{
-			//ExternalInterface.call("alert", "ok");
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			Security.allowInsecureDomain("*");

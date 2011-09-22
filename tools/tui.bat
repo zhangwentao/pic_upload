@@ -1,1 +1,1 @@
-copy D:\wwwroot\applications\pic_upload\bin\pic_uploader_v2.swf \\10.2.74.142\uploadPopup\pic_uploader_v4.swf
+copy D:\wwwroot\applications\pic_upload\bin\pic_uploader_v2.swf \\10.2.74.142\uploadPopup\pic_uploader_v5.swf

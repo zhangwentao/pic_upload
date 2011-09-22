@@ -8,6 +8,7 @@ package com.renren.picUpload
 	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.external.ExternalInterface;
+	import flash.display.Bitmap;
 	
 	/**
 	 * 标准化图片尺寸
@@ -49,6 +50,7 @@ package com.renren.picUpload
 		private function handle_load_complete(evt:Event):void
 		{
 			var loader:Loader = evt.target.loader as Loader;
+			(loader.content as Bitmap).smoothing = true;//放置缩放产生锯齿
 			var aspectRatio:Number = loader.content.width / loader.content.height;//图片的宽高比
 
 			if (loader.content.width <= _limit && loader.content.height <= _limit)
@@ -74,7 +76,7 @@ package com.renren.picUpload
 				loader.content.width = temp_width;
 				//ExternalInterface.call("console.log", "fuck size:", loader.content.height, loader.content.width);
 				
-				var bitmapData:BitmapData = new BitmapData(temp_width, temp_height,false,0xFFFFFF);
+				var bitmapData:BitmapData = new BitmapData(temp_width, temp_height,true,0xFFFFFF);
 				bitmapData.draw(loader);
 				_data = new ByteArray();
 				
