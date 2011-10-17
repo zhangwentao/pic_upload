@@ -9,8 +9,9 @@ package com.renren.picUpload.events
 	 */
 	public class DBUploaderEvent extends Event 
 	{
-		public static const COMPLETE:String = "complete";//上传完毕
-		public static const FILE_COMPLETE:String = "fileComplete";//整个文件完成
+		public static const COMPLETE:String = "complete";				//上传完毕
+		public static const FILE_COMPLETE:String = "fileComplete";		//整个文件完成
+		public static const UPLOAD_CANCELED:String = "uploadCanceled";	//上传操作已取消
 		
 		public var dataBlock:DataBlock;
 	

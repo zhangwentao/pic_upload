@@ -18,7 +18,7 @@ package com.renren.picUpload
 		public var id:String;	//编号
 		public var status:int;	//状态
 		public var fileReference:FileReference;//文件引用
-		
+		public var dataBlockArr:Array = new Array(); //存放对此文件的数据块的引用
 		/**
 		 * 
 		 * @param	idPrifix		<String> id前缀

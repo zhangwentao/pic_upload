@@ -12,6 +12,7 @@ package com.renren.picUpload
 		public var index:uint;//数据块编号
 		public var count:uint;//所属文件被分成的总块数
 		public var data:ByteArray;//数据对象
+		public var uploader:DBUploader;
 		
 		public function DataBlock(file:FileItem,index:uint,count:uint,data:ByteArray) 
 		{

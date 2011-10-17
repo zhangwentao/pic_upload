@@ -20,18 +20,17 @@ package com.renren.picUpload
 	class DBUploader extends EventDispatcher
 	{
 		//"http://upload.renren.com/upload.fcgi?pagetype=addflash&hostid=200208111"
-		public static var timer:Timer;//重试上传timer
+		public static var timer:Timer;			//重试上传timer
 		private var uploader:ByteArrayUploader;
 		private var dataBlock:DataBlock;		//上传的数据块
 		private var _responseData:Object;
 		private var _rawResponseData:String;
-		private var reUploadTimes:int = 0;//重传次数
+		private var reUploadTimes:int = 0;		//重传次数
 		
 		public function DBUploader() 
 		{
 			
 		}
-		
 		
 		/**
 		 * 上传dataBlock
@@ -41,8 +40,25 @@ package com.renren.picUpload
 		{
 			reUploadTimes = 0;//重设 重传次数
 			this.dataBlock = dataBlock;
+			this.dataBlock.uploader = this;
+			
+			if (dataBlock.file.status == FileItem.FILE_STATUS_CANCELLED)
+			{
+				cancelProcess();
+				return;
+			}
+			
 			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
 			uploadProcess();
+		}
+		
+		/**
+		 * 取消当前的上传操作
+		 */
+		public function cancel():void
+		{
+			uploader.cancel();
+			cancelProcess();
 		}
 		
 		private function uploadProcess():void
@@ -178,5 +194,12 @@ package com.renren.picUpload
 			dataBlock.dispose();//释放内存
 		}
 		
+		private function cancelProcess():void
+		{
+			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.UPLOAD_CANCELED);
+			event.dataBlock = dataBlock;
+			dispatchEvent(event);
+			dataBlock.dispose();//释放内存
+		}
 	}
 }

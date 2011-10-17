@@ -20,6 +20,7 @@ package com.renren.picUpload
 	import com.renren.picUpload.events.FileUploadEvent;
 	import com.renren.external.ExternalEventDispatcher;
 	import flash.external.ExternalInterface;
+	
 	/**
 	 * 缩略图绘制完毕事件
 	 */
@@ -47,7 +48,7 @@ package com.renren.picUpload
 		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
 		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
-		public var 	fileItemQueuedNum:uint = 0;     		//已加入上传队列的FileItem数量
+		public var 	fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
 		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
 		
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
@@ -178,7 +179,6 @@ package com.renren.picUpload
 		
 		public function cancelAFile(fileId:String):void
 		{
-			
 			var arr:Array = fileItemQueue.toArray();
 			
 			for each(var file:FileItem in arr)
@@ -192,6 +192,19 @@ package com.renren.picUpload
 							fileItemQueuedNum--;//
 							file.status = FileItem.FILE_STATUS_CANCELLED;
 							
+							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
+							dispatchEvent(event);
+							break;
+						case FileItem.FILE_STATUS_IN_PROGRESS:
+							fileItemQueuedNum--;
+							file.status = FileItem.FILE_STATUS_CANCELLED;
+							for each(var db:DataBlock in file.dataBlockArr)
+							{
+								if (db.uploader != null)
+								{
+									db.uploader.cancel();
+								}
+							}
 							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
 							dispatchEvent(event);
 						break;
@@ -225,11 +238,13 @@ package com.renren.picUpload
 			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
 			uploader.addEventListener(DBUploaderEvent.FILE_COMPLETE, handle_file_uploaded);
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
+			uploader.addEventListener(DBUploaderEvent.UPLOAD_CANCELED, handle_uploade_canceled);
             uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 			uploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
 			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_PROGRESS,dataBlock.file));
 			uploader.upload(dataBlock);
 		}
+		
 		
 		private function handle_notLogin(evt:PicUploadEvent):void
 		{
@@ -408,6 +423,7 @@ package com.renren.picUpload
 				log("["+curProcessFile.fileReference.name + "]的第"+i+"块被加入上传缓存区");
 				var dataBlock:DataBlock = new DataBlock(curProcessFile,i,dataArr.length,dataArr[i]);
 				DBqueue.push(dataBlock);
+				curProcessFile.dataBlockArr.push(dataBlock);
 			}
 			lock = false;
 			log("sliceOver", "lock:" + lock);
@@ -438,8 +454,14 @@ package com.renren.picUpload
 			log("fileQueueNum:" + fileItemQueue.count);
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
-			
 		}
+		
+		private function handle_uploade_canceled(evt:DBUploaderEvent):void
+		{
+			var uploader:DBUploader = evt.target as DBUploader;
+			uploaderPool.put(uploader);
+		}
+
 	}
 
 }
