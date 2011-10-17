@@ -47,7 +47,7 @@ package com.renren.picUpload
 		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
 		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
-		public var fileItemQueuedNum:uint = 0;     		//已加入上传队列的FileItem数量
+		public var 	fileItemQueuedNum:uint = 0;     		//已加入上传队列的FileItem数量
 		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
 		
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
