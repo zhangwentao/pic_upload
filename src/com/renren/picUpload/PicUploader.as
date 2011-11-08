@@ -205,7 +205,7 @@ package com.renren.picUpload
 									db.uploader.cancel();
 								}
 							}
-							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
+							event = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
 							dispatchEvent(event);
 						break;
 					}
