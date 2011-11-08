@@ -1,6 +1,5 @@
 package
 {
-	import com.adobe.protocols.dict.Database;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.errors.IOError;

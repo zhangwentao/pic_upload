@@ -50,7 +50,7 @@ package com.renren.picUpload
 		private function handle_load_complete(evt:Event):void
 		{
 			var loader:Loader = evt.target.loader as Loader;
-			(loader.content as Bitmap).smoothing = true;//放置缩放产生锯齿
+			(loader.content as Bitmap).smoothing = true;//防止缩放产生锯齿
 			var aspectRatio:Number = loader.content.width / loader.content.height;//图片的宽高比
 
 			if (loader.content.width <= _limit && loader.content.height <= _limit)
