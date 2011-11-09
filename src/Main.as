@@ -60,6 +60,7 @@ package
 			addBtn.buttonMode = true;
 			addBtn.mouseChildren = false;
 			addChild(addBtn);
+			
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_SUCCESS, handle_upload_success);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_CANCELED, handle_upload_canceled);
@@ -70,6 +71,7 @@ package
 			picUploader.addEventListener(PicUploadEvent.FILE_EXCEEDS_SIZE_LIMIT, handle_invalid_files);
 			picUploader.addEventListener(PicUploadEvent.FILE_QUEUED, handle_file_queued);
 			picUploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
+			
 			addBtn.addEventListener(MouseEvent.CLICK, handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			
@@ -295,6 +297,7 @@ package
 			}
 			else
 			{
+				
 			}
 			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - picUploader.fileItemQueuedNum) + "张");
 		}
