@@ -1,0 +1,32 @@
+events:
+queueLimitExceeded
+queuedError (超过数量限制，超过文件大小上限)    
+fileQueued
+
+FILE_EXCEEDS_SIZE_LIMIT
+ZERO_BYTE_FILE
+INVALID_IMG_FILE
+
+
+实际加载图片文件数据之前可以获得的信息：文件大小
+
+fileReference
+size
+
+
+图片的属性：
+1.大小   	[0<x<程序运行可接受的大小上限]
+2.类型   	[需要在文件数据中查找标志位]
+3.尺寸   	[宽高]
+4.后缀名 	[属于一个集合]
+
+
+
+图片入队：
+1.图片数量
+2.图片筛选
+
+用户选择的文件
+
+满足要求的文件
+
