@@ -21,10 +21,6 @@ package com.renren.picUpload
 	import com.renren.external.ExternalEventDispatcher;
 	import flash.external.ExternalInterface;
 	
-	/**
-	 * 缩略图绘制完毕事件
-	 */
-	[Event(name = ThumbMakerEvent.THUMB_MAKED, type = "ThumbMakerEvent")]
 	
 	/**
 	 * 图片上传成功事件
@@ -48,7 +44,7 @@ package com.renren.picUpload
 		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
 		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
-		public var 	fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
+		public var  fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
 		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
 		
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
@@ -86,7 +82,7 @@ package com.renren.picUpload
 		
 		/**
 		 * 初始化uploader对象池
-		 * 1.创建对象池对象，并以 DBUploader对象填充
+		 * 1.创建对象池对象，并以DBUploader对象填充
 		 */
 		private function initUploaderPoll():void
 		{
