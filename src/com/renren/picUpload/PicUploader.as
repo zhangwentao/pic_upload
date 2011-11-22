@@ -155,7 +155,6 @@ package com.renren.picUpload
 		 */
 		private function validateFile(fileItem:FileItem):Boolean
 		{
-			trace("fr:" + fileItem.fileReference.size);
 			var result:Boolean = true;
 			if (fileItem.fileReference.size == 0)
 			{
@@ -254,7 +253,7 @@ package com.renren.picUpload
 		
 		/**
 		 * 监控DBQueue队列：
-		 * TODO:1.如果为上传的DataBlock对象数量小于上限，就去从用户选择的文件中加载文件.
+		 * 1.如果未上传的DataBlock对象数量小于上限，就去从用户选择的文件中加载文件.
 		 */
 		private function DBQueueMonitor():void
 		{
