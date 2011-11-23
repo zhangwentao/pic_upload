@@ -13,6 +13,14 @@ package com.renren.picUpload
 		public var count:uint;//所属文件被分成的总块数
 		public var data:ByteArray;//数据对象
 
+		/**
+		 * 
+		 * @param fileItem
+		 * @param index
+		 * @param count
+		 * @param data
+		 * 
+		 */		
 		public function DataBlock(fileItem:FileItem,index:uint,count:uint,data:ByteArray) 
 		{
 			this.fileItem = fileItem;

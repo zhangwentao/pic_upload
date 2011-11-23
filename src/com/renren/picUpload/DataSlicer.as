@@ -12,8 +12,8 @@ package com.renren.picUpload
 		
 		/**
 		 * 将data切割成DataBlock,不修改原始数据
-		 * @param	data	<ByteArray>	被切割的数据
-		 * @return	<Array>	DataBlock数组
+		 * @param	data	<ByteArray>		被切割的数据
+		 * @return			<Array>			DataBlock数组
 		 */
 		public function slice(data:ByteArray):Array
 		{

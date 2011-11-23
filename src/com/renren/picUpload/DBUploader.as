@@ -1,18 +1,19 @@
 package com.renren.picUpload 
 {
+	import com.adobe.serialization.json.JSON;
+	import com.renren.external.ExternalEvent;
+	import com.renren.external.ExternalEventDispatcher;
 	import com.renren.picUpload.events.DBUploaderEvent;
+	import com.renren.picUpload.events.FileUploadEvent;
 	import com.renren.picUpload.events.PicUploadEvent;
 	import com.renren.util.net.ByteArrayUploader;
 	import flash.events.Event;
-	import flash.events.IOErrorEvent;
 	import flash.events.EventDispatcher;
-	import com.adobe.serialization.json.JSON;
+	import flash.events.IOErrorEvent;
 	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
-	import com.renren.external.ExternalEventDispatcher;
-	import com.renren.external.ExternalEvent;
 	import flash.utils.Timer;
-	import com.renren.picUpload.events.FileUploadEvent;
+	
 	/**
 	 * 上传DataBlock至服务器
 	 * @author taowenzhang@gmail.com
@@ -22,10 +23,10 @@ package com.renren.picUpload
 		//"http://upload.renren.com/upload.fcgi?pagetype=addflash&hostid=200208111"
 		public static var timer:Timer;			//重试上传timer
 		private var uploader:ByteArrayUploader;
-		private var dataBlock:DataBlock;		//上传的数据块
+		private var dataBlock:DataBlock;			//上传的数据块
 		private var _responseData:Object;
 		private var _rawResponseData:String;
-		private var reUploadTimes:int = 0;		//重传次数
+		private var reUploadTimes:int = 0;			//重传次数
 		
 		public function DBUploader() 
 		{
@@ -34,7 +35,7 @@ package com.renren.picUpload
 		
 		/**
 		 * 上传dataBlock
-		 * @param	dataBlock 
+		 * @param	dataBlock 	<DataBlock>
 		 */
 		public function upload(dataBlock:DataBlock):void
 		{
@@ -49,7 +50,13 @@ package com.renren.picUpload
 			}
 			
 			dataBlock.fileItem.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
+			dataBlock.fileItem.addEventListener(FileItem.FILE_EVENT_CANCELLED,handleFileCancelled);
 			uploadProcess();
+		}
+		
+		private function handleFileCancelled(evt:Event):void
+		{
+			cancel();
 		}
 		
 		/**
@@ -95,6 +102,11 @@ package com.renren.picUpload
 			}
 		}
 		
+		/**
+		 * 网络
+		 * @return <Boolean>  
+		 * 
+		 */		
 		private function reUpload():Boolean
 		{
 			if (reUploadTimes < Config.reUploadMaxTimes)
@@ -118,9 +130,11 @@ package com.renren.picUpload
 		/**
 		 * 上传完毕服务器返回数据后调用
 		 * @param	evt		<Event>
+		 * @see http://doc.d.xiaonei.com/index.php?title=Upload_interface
 		 */
 		private function handle_upload_complete(evt:Event):void
 		{
+			
 			_rawResponseData = String(uploader.data);
 			try 
 			{
@@ -128,16 +142,18 @@ package com.renren.picUpload
 			}
 			catch (e)
 			{
-				log("json error:", e);
+				log("json string returned from server is invalidate:", e);
 			}
 			
 			switch(int(_responseData.code))
 			{
 				case 0:
+					//数据块上传成功
 					checkFileCode();
 				break;
-				
+				     
 				case 501:
+					//用户未登录
 					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.NOT_LOGIN,dataBlock.fileItem);
 					dispatchEvent(event);
 				break;
@@ -145,6 +161,7 @@ package com.renren.picUpload
 				case 503:
 				case 504:
 				case 508:
+				case 536：
 					uploadErrorDo(uint(_responseData.code));
 				break;
 			}
@@ -157,18 +174,36 @@ package com.renren.picUpload
 			switch(code)
 			{
 				case 0:
+					//此图片处理成功
 					oneFileCompleteDo();
 				break;
 				
 				case 523:
+					//仍有数据块待上传
 					oneBlockCompleteDo();
 				break;
-				
+				    
 				default:
 					uploadErrorDo(code);
 			}
 		}
 		
+		/**
+		 * 取消上传操作
+		 */		
+		private function cancelProcess():void
+		{
+			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.UPLOAD_CANCELED);
+			event.dataBlock = dataBlock;
+			dispatchEvent(event);
+			dataBlock.dispose();//释放内存
+		}
+
+		/**
+		 * 处理上传错误
+		 * @param errorCode
+		 * 
+		 */		
 		private function uploadErrorDo(errorCode:uint):void
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.UPLOAD_ERROR);
@@ -178,6 +213,10 @@ package com.renren.picUpload
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
+		/**
+		 * 一个数据块上传完成后的操作
+		 * 
+		 */		
 		private function oneBlockCompleteDo():void
 		{
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
@@ -186,6 +225,10 @@ package com.renren.picUpload
 			dataBlock.dispose();//释放内存
 		}
 		
+		/**
+		 * 一个文件上传完成后的操作
+		 * 
+		 */		
 		private function oneFileCompleteDo():void
 		{
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.FILE_COMPLETE);
@@ -194,12 +237,5 @@ package com.renren.picUpload
 			dataBlock.dispose();//释放内存
 		}
 		
-		private function cancelProcess():void
-		{
-			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.UPLOAD_CANCELED);
-			event.dataBlock = dataBlock;
-			dispatchEvent(event);
-			dataBlock.dispose();//释放内存
-		}
 	}
 }

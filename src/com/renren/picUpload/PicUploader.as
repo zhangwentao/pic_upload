@@ -1,25 +1,25 @@
 package com.renren.picUpload 
 {
 	import com.renren.external.ExternalEvent;
-	import com.renren.picUpload.events.DBUploaderEvent;
+	import com.renren.external.ExternalEventDispatcher;
 	import com.renren.picUpload.DataSlicer;
+	import com.renren.picUpload.events.DBUploaderEvent;
+	import com.renren.picUpload.events.FileUploadEvent;
+	import com.renren.picUpload.events.PicUploadEvent;
+	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.util.CirularQueue;
-	import com.renren.util.net.SimpleURLLoader;
 	import com.renren.util.ObjectPool;
+	import com.renren.util.img.ExifInjector;
+	import com.renren.util.net.SimpleURLLoader;
+	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.IOErrorEvent;
 	import flash.events.TimerEvent;
+	import flash.external.ExternalInterface;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
-	import com.renren.picUpload.events.ThumbMakerEvent;
-	import com.renren.util.img.ExifInjector;
-	import com.renren.picUpload.events.PicUploadEvent;
-	import flash.external.ExternalInterface;
-	import flash.events.IOErrorEvent;
-	import com.renren.picUpload.events.FileUploadEvent;
-	import com.renren.external.ExternalEventDispatcher;
-	import flash.external.ExternalInterface;
 	
 	
 	/**
@@ -38,7 +38,7 @@ package com.renren.picUpload
 	 */
 	public class PicUploader extends EventDispatcher
 	{
-		private var fileItemQueue:CirularQueue;		//用户选择的文件的File队列
+		private var fileItemQueue:Vector.<FileItem>;		//用户选择的文件的File队列
 		private var DBqueue:Array;						//DataBlock队列
 		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
 		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
@@ -67,12 +67,11 @@ package com.renren.picUpload
 		public function init():void
 		{
 			lockCheckerTimer.addEventListener(TimerEvent.TIMER, checkLock);
-			
 			DBUploader.timer = new Timer(Config.reUploadDelayTime);
 			DBUploader.timer.start();
 			DataSlicer.block_size_limit = Config.dataBlockSizeLimit;//设置文件切片上限
 			DBqueue = new Array();//TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
-			fileItemQueue = new CirularQueue(Config.picUploadNumOnce);
+			fileItemQueue = new Vector.<FileItem>(Config.picUploadNumOnce);//使用固定长度的Vector
 			DBQMonitorTimer = new Timer(Config.DBQCheckInterval);
 			UPMonitorTimer = new Timer(Config.UPCheckInterval);
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
@@ -137,7 +136,7 @@ package com.renren.picUpload
 			}
 			
 			
-			fileItemQueue.enQueue(fileItem);   
+			fileItemQueue.[fileItemQueuedNum-1]= fileItem;   
 			fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
 			fileItemQueuedNum++;
 			dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
@@ -172,45 +171,22 @@ package com.renren.picUpload
 			return result;
 		}
 		
-		public function cancelAFile(fileId:String):void
+		
+		public function cancelAFile(fileItemId:String):void
 		{
-			var arr:Array = fileItemQueue.toArray();
-			
-			for each(var file:FileItem in arr)
+			for(var i:int = 0; i<fileItemQueue.length;i++)
 			{
-				if (file.id == fileId)
+				var fileItem = fileItemQueue[i];
+				
+				if (fileItem.id == fileItemId)
 				{
-					switch(file.status)
-					{
-						case FileItem.FILE_STATUS_QUEUED:
-						case FileItem.FILE_STATUS_SUCCESS:
-							fileItemQueuedNum--;//
-							file.status = FileItem.FILE_STATUS_CANCELLED;
-							
-							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
-							dispatchEvent(event);
-							break;
-						case FileItem.FILE_STATUS_IN_PROGRESS:
-							fileItemQueuedNum--;
-							file.status = FileItem.FILE_STATUS_CANCELLED;
-							for each(var db:DataBlock in file.dataBlockArr)
-							{
-								if (db.uploader != null)
-								{
-									db.uploader.cancel();
-								}
-							}
-							event = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
-							dispatchEvent(event);
-						break;
-					}
+					fileItemQueue.splice(i,1);
+					fileItem.status = FileItem.FILE_STATUS_CANCELLED;
+					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, fileItem);
+					dispatchEvent(event);
 					return;
 				}
 			}
-			var fileTemp:FileItem = new FileItem(null);
-			fileTemp.id = fileId;
-			var event2:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, fileTemp);
-			dispatchEvent(event2);
 		}
 		
 		/**
