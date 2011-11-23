@@ -38,7 +38,7 @@ package com.renren.picUpload
 	 */
 	public class PicUploader extends EventDispatcher
 	{
-		private var fileItemQueue:CirularQueue;			//用户选择的文件的File队列
+		private var fileItemQueue:CirularQueue;		//用户选择的文件的File队列
 		private var DBqueue:Array;						//DataBlock队列
 		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
 		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
@@ -230,13 +230,13 @@ package com.renren.picUpload
 			var uploader:DBUploader = uploaderPool.fetch() as DBUploader;
 			var dataBlock:DataBlock = DBqueue.shift() as DataBlock;
 			log("***上传缓冲区长度:"+DBqueue.length);
-			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
+			log("开始上传 [" + dataBlock.fileItem.fileReference.name + "] 的第" + dataBlock.index + "块数据");
 			uploader.addEventListener(DBUploaderEvent.FILE_COMPLETE, handle_file_uploaded);
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
 			uploader.addEventListener(DBUploaderEvent.UPLOAD_CANCELED, handle_uploade_canceled);
             uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 			uploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
-			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_PROGRESS,dataBlock.file));
+			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_PROGRESS,dataBlock.fileItem));
 			uploader.upload(dataBlock);
 		}
 		
@@ -433,19 +433,19 @@ package com.renren.picUpload
 		 */
 		private function handle_file_uploaded(evt:DBUploaderEvent):void
 		{
-			log("[" + evt.dataBlock.file.fileReference.name + "]上传完毕");
+			log("[" + evt.dataBlock.fileItem.fileReference.name + "]上传完毕");
 			log("fileQueueNum:" + fileItemQueue.count);
-			evt.dataBlock.file.status = FileItem.FILE_STATUS_SUCCESS;
+			evt.dataBlock.fileItem.status = FileItem.FILE_STATUS_SUCCESS;
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
-			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_SUCCESS, evt.dataBlock.file);
+			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_SUCCESS, evt.dataBlock.fileItem);
 			event.data = evt.target.responseData;
 			dispatchEvent(event);
 		}
 		
 		private function handle_dataBlock_uploaded(evt:DBUploaderEvent):void
 		{
-			log("[" + evt.dataBlock.file.fileReference.name + "]的第" + evt.dataBlock.index + "块上传完毕，释放空间");
+			log("[" + evt.dataBlock.fileItem.fileReference.name + "]的第" + evt.dataBlock.index + "块上传完毕，释放空间");
 			log("fileQueueNum:" + fileItemQueue.count);
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);

@@ -14,7 +14,7 @@ package com.renren.picUpload
 	import flash.utils.Timer;
 	import com.renren.picUpload.events.FileUploadEvent;
 	/**
-	 * 上传 DataBlock 至服务器
+	 * 上传DataBlock至服务器
 	 * @author taowenzhang@gmail.com
 	 */
 	class DBUploader extends EventDispatcher
@@ -39,16 +39,16 @@ package com.renren.picUpload
 		public function upload(dataBlock:DataBlock):void
 		{
 			reUploadTimes = 0;//重设 重传次数
-			this.dataBlock = dataBlock;
-			this.dataBlock.uploader = this;
 			
-			if (dataBlock.file.status == FileItem.FILE_STATUS_CANCELLED)
+			this.dataBlock = dataBlock;
+
+			if (dataBlock.fileItem.status == FileItem.FILE_STATUS_CANCELLED)
 			{
 				cancelProcess();
 				return;
 			}
 			
-			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
+			dataBlock.fileItem.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
 			uploadProcess();
 		}
 		
@@ -72,7 +72,7 @@ package com.renren.picUpload
 			
 			urlVar["block_index"] = dataBlock.index;
 			urlVar["block_count"] = dataBlock.count;
-			urlVar["uploadid"] = dataBlock.file.id;
+			urlVar["uploadid"] = dataBlock.fileItem.id;
 			
 			uploader.upLoad(dataBlock.data);
 		}
@@ -99,7 +99,7 @@ package com.renren.picUpload
 		{
 			if (reUploadTimes < Config.reUploadMaxTimes)
 			{   
-				log("开始重传" + dataBlock.file.fileReference.name + "的第" + dataBlock.index + "块","第"+(++reUploadTimes)+"次");
+				log("开始重传" + dataBlock.fileItem.fileReference.name + "的第" + dataBlock.index + "块","第"+(++reUploadTimes)+"次");
 				timer.addEventListener(TimerEvent.TIMER,handleTimer);
 				return true;
 			}
@@ -138,7 +138,7 @@ package com.renren.picUpload
 				break;
 				
 				case 501:
-					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.NOT_LOGIN,dataBlock.file);
+					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.NOT_LOGIN,dataBlock.fileItem);
 					dispatchEvent(event);
 				break;
 				
@@ -172,7 +172,7 @@ package com.renren.picUpload
 		private function uploadErrorDo(errorCode:uint):void
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.UPLOAD_ERROR);
-			event.addParam("file", dataBlock.file.getInfoObject());
+			event.addParam("file", dataBlock.fileItem.getInfoObject());
 			event.addParam("errorCode", errorCode);
 			dataBlock.dispose();//释放内存
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
