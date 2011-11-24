@@ -71,7 +71,7 @@ package com.renren.picUpload
 			DBUploader.timer.start();
 			DataSlicer.block_size_limit = Config.dataBlockSizeLimit;//设置文件切片上限
 			DBqueue = new Array();//TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
-			fileItemQueue = new Vector.<FileItem>(Config.picUploadNumOnce);//使用固定长度的Vector
+			fileItemQueue = new Vector.<FileItem>();//
 			DBQMonitorTimer = new Timer(Config.DBQCheckInterval);
 			UPMonitorTimer = new Timer(Config.UPCheckInterval);
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
@@ -117,35 +117,20 @@ package com.renren.picUpload
 		 * 添加FileItem对象
 		 * @param	fileItem	<FileItem>	
 		 */
-		public function addFileItem(fileItem:FileItem):void
+		public function addFileItem(fileReferences:Array):void
 		{
-			trace("file:" + fileItem.fileReference.name);
-			//if(fileItemQueuedNum >= Config.picUploadNumOnce)
-			//{
-				//var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.QUEUE_LIMIT_EXCEEDED, fileItem);
-				//dispatchEvent(event);
-				//log("超过了一次可上传的最大数量:"+Config.picUploadNumOnce);
-				//return;
-			//}
-			
-			if (!validateFile(fileItem))
+			for(var i:int = 0;i<fileReferences.length;i++)
 			{
-				log("error queue");
-				dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
-				return;
+				if(fileItemQueue.length>=Config.picUploadNumOnce)
+					break;
+				var fileItem:FileItem = new FileItem(fileReferences[i]);
+				fileItemQueue.push(fileItem);   
+				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
 			}
 			
-			
-			fileItemQueue.[fileItemQueuedNum-1]= fileItem;   
-			fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
-			fileItemQueuedNum++;
 			dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
-			
-			
-			log("fileQueuelength:"+fileItemQueue.count)
 		}
 	
-		
 		/**
 		 * 验证文件是否合法
 		 * 1.文件是否为空文件
@@ -233,13 +218,13 @@ package com.renren.picUpload
 		 */
 		private function DBQueueMonitor():void
 		{
-			log("fileQueueNum:"+fileItemQueue.count,"lock:"+lock,"dbqueuelength:"+DBqueue.length);
-			if (DBqueue.length >= Config.dataBlockNumLimit || fileItemQueue.isEmpty || lock)
+			if (DBqueue.length >= Config.dataBlockNumLimit || !fileItemQueue.length || lock)
 			{
 				/*如果DBQueue中的DataBlock数量大于等于的上限或者。。就什么都不做*/
 				return;
 			}
-			tttttt = 0;
+			
+			
 			lock = true;//上锁
 			log("上锁");
 			curProcessFile = fileItemQueue.deQueue();
