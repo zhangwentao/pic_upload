@@ -1,6 +1,7 @@
 package com.renren.picUpload 
 {
-	import com.renren.picUpload.events.EncodeCompleteEvent;
+	import com.renren.asyncJPEGEncode.AsyncJPEGEncoder;
+	import com.renren.asyncJPEGEncode.EncodeCompleteEvent;
 	import flash.events.EventDispatcher;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;

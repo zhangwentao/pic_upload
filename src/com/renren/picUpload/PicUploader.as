@@ -4,6 +4,7 @@ package com.renren.picUpload
 	import com.renren.external.ExternalEventDispatcher;
 	import com.renren.picUpload.DataSlicer;
 	import com.renren.picUpload.events.DBUploaderEvent;
+	import com.renren.picUpload.events.FileItemEvent;
 	import com.renren.picUpload.events.FileUploadEvent;
 	import com.renren.picUpload.events.PicUploadEvent;
 	import com.renren.picUpload.events.ThumbMakerEvent;
@@ -117,18 +118,19 @@ package com.renren.picUpload
 		 * 添加FileItem对象
 		 * @param	fileItem	<FileItem>	
 		 */
-		public function addFileItem(fileReferences:Array):void
+		public function addFiles(fileItem:FileItem):void
 		{
-			for(var i:int = 0;i<fileReferences.length;i++)
+			if(fileItemQueue.length<Config.picUploadNumOnce)
 			{
-				if(fileItemQueue.length>=Config.picUploadNumOnce)
-					break;
-				var fileItem:FileItem = new FileItem(fileReferences[i]);
 				fileItemQueue.push(fileItem);   
 				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
+				dispatchEvent(new FileItemEvent(FileItemEvent.FILE_QUEUED,fileItem));
+			}
+			else
+			{
+				
 			}
 			
-			dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
 		}
 	
 		/**
@@ -167,8 +169,7 @@ package com.renren.picUpload
 				{
 					fileItemQueue.splice(i,1);
 					fileItem.status = FileItem.FILE_STATUS_CANCELLED;
-					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, fileItem);
-					dispatchEvent(event);
+					dispatchEvent(new FileItemEvent(FileItemEvent.UPLOAD_CANCELED,fileItem));
 					return;
 				}
 			}

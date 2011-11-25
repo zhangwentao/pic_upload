@@ -1,5 +1,6 @@
 package com.renren.picUpload 
 {
+	import com.renren.picUpload.events.FileItemEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.net.FileReference;
@@ -10,19 +11,16 @@ package com.renren.picUpload
 	 */
 	public class FileItem extends EventDispatcher
 	{
-		public static const FILE_EVENT_CANCELLED:String = "fileCancelled";
-		
 		public static const FILE_STATUS_QUEUED:int 		= -1;//已加入上传队列
 		public static const FILE_STATUS_IN_PROGRESS:int	= -2;//正在上传
-		public static const FILE_STATUS_ERROR:int		= -3;//发生错误
+		public static const FILE_STATUS_ERROR:int			= -3;//发生错误
 		public static const FILE_STATUS_SUCCESS:int		= -4;//上传完毕
-		public static const FILE_STATUS_CANCELLED:int	= -5;//已取消
+		public static const FILE_STATUS_CANCELLED:int		= -5;//已取消
 		
 		private static var file_id_sequence:Number = 0;		// tracks the file id sequence
+		private var _status:int;	//状态
 		
 		public static var id_prefix:String;
-		
-		private var _status:int;	//状态
 		public var id:String;	//编号
 		public var fileReference:FileReference;//文件引用
 		public var dataBlockArr:Array = new Array(); //存放对此文件的数据块的引用
@@ -41,7 +39,7 @@ package com.renren.picUpload
 		
 		/**
 		 * 获取文件的属性
-		 * @return	<Object>
+		 * @return	
 		 */
 		public function getInfoObject():Object
 		{
@@ -62,8 +60,10 @@ package com.renren.picUpload
 		public function set status(value:int):void
 		{
 			_status = value;
-			dispatchEvent(new Event(FileItem.FILE_EVENT_CANCELLED));
+			if(_status == FileItem.FILE_STATUS_CANCELLED)
+			{
+				dispatchEvent(new FileItemEvent(FileItemEvent.UPLOAD_CANCELED,this));
+			}
 		}
-
 	}
 }
