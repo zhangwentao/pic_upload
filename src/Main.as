@@ -195,11 +195,11 @@ package
 		private function handle_upload_canceled(evt:PicUploadEvent):void
 		{
 			log("delete:" + evt.fileItem.id);
-			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - picUploader.fileItemQueuedNum) + "张");
+			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - picUploader._fileItemQueuedNum) + "张");
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_CANCELED);
 			event.addParam("file", {id: evt.fileItem.id});
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
-			if (picUploader.fileItemQueuedNum < Config.picUploadNumOnce)
+			if (picUploader._fileItemQueuedNum < Config.picUploadNumOnce)
 			{
 				addBtn.buttonMode = true;
 				addBtn.mouseChildren = addBtn.mouseEnabled = true;
@@ -288,7 +288,7 @@ package
 		private function handle_file_queued(evt:PicUploadEvent):void
 		{
 			filesQueued.push(evt.fileItem.getInfoObject());
-			if (picUploader.fileItemQueuedNum >= Config.picUploadNumOnce)
+			if (picUploader._fileItemQueuedNum >= Config.picUploadNumOnce)
 			{
 				//addBtn.setInfoTxt("已满"+Config.picUploadNumOnce+"张照片");
 				addBtn.buttonMode = false;
@@ -299,7 +299,7 @@ package
 			{
 				
 			}
-			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - picUploader.fileItemQueuedNum) + "张");
+			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - picUploader._fileItemQueuedNum) + "张");
 		}
 		
 		private function handle_file_selected(evt:Event):void
@@ -313,12 +313,12 @@ package
 			var allSelectedFileNum:int = evt.target.fileList.length;
 			var i:uint = 0;
 			
-			var allowAddFileNum:int = Config.picUploadNumOnce - picUploader.fileItemQueuedNum;
+			var allowAddFileNum:int = Config.picUploadNumOnce - picUploader._fileItemQueuedNum;
 			
 			trace("allowAddFileNum:" + allowAddFileNum);
 			for each (var file:FileReference in evt.target.fileList)
 			{
-				if (picUploader.fileItemQueuedNum >= Config.picUploadNumOnce)
+				if (picUploader._fileItemQueuedNum >= Config.picUploadNumOnce)
 					break;
 				var fileItem:FileItem = new FileItem(file);
 				picUploader.addFileItem(fileItem);

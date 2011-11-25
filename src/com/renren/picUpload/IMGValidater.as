@@ -7,18 +7,32 @@ package com.renren.picUpload
 	 */
 	public class IMGValidater 
 	{
-		public static function validate(imgData:ByteArray):Boolean
+		public static const IMG_TYPE_JPG:String = "jpg";
+		public static const IMG_TYPE_BMP:String = "bmp";
+		public static const IMG_TYPE_PNG:String = "png";
+		public static const IMG_TYPE_GIF:String = "gif";
+		public static const INVALIDATE_IMG_TYPE:String = "invalidate";
+		public static function validate(imgData:ByteArray):String
 		{
-			return (validateBMP(imgData)||validateGIF(imgData)||validateJPG(imgData)||validatePNG(imgData))
+			var imgType:String;
+			
+			if(validateJPG(imgData))
+				imgType = IMG_TYPE_JPG;
+			else if(validateBMP(imgData))
+				imgType = IMG_TYPE_BMP;
+			else if(validateGIF(imgData))
+				imgType = IMG_TYPE_GIF;
+			else if(validatePNG(imgData))
+				imgType = IMG_TYPE_PNG;
+			
+			return imgType;
 		}
 		
 		private static function validateJPG(imgData:ByteArray):Boolean
 		{
 			imgData.position = 0;
 			if (imgData.readUnsignedShort() == 0xFFD8)
-			{
 				return true;
-			}
 			else
 				return false;
 		}

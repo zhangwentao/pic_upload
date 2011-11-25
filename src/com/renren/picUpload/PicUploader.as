@@ -42,17 +42,16 @@ package com.renren.picUpload
 		private var fileItemQueue:Vector.<FileItem>;		//用户选择的文件的File队列
 		private var DBqueue:Array;						//DataBlock队列
 		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
-		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
+		private var loadFileLock:Boolean;				//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载且处理完毕,才能加载下一个)
 		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
-		public var  fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
+		private var  _fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
 		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
 		
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
 		
 		private var lockCheckerTimer:Timer = new Timer(4000);//
 		
-		var tttttt:uint = 0;
 		
 		/**
 		 * 构造函数
@@ -118,12 +117,13 @@ package com.renren.picUpload
 		 * 添加FileItem对象
 		 * @param	fileItem	<FileItem>	
 		 */
-		public function addFiles(fileItem:FileItem):void
+		public function addFileItem(fileItem:FileItem):void
 		{
-			if(fileItemQueue.length<Config.picUploadNumOnce)
+			if(_fileItemQueuedNum<Config.picUploadNumOnce)
 			{
-				fileItemQueue.push(fileItem);   
 				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
+				fileItemQueue.push(fileItem);   
+				_fileItemQueuedNum++;
 				dispatchEvent(new FileItemEvent(FileItemEvent.FILE_QUEUED,fileItem));
 			}
 			else
@@ -159,7 +159,7 @@ package com.renren.picUpload
 		}
 		
 		
-		public function cancelAFile(fileItemId:String):void
+		public function cancelUpload(fileItemId:String):void
 		{
 			for(var i:int = 0; i<fileItemQueue.length;i++)
 			{
@@ -168,6 +168,7 @@ package com.renren.picUpload
 				if (fileItem.id == fileItemId)
 				{
 					fileItemQueue.splice(i,1);
+					_fileItemQueuedNum--;
 					fileItem.status = FileItem.FILE_STATUS_CANCELLED;
 					dispatchEvent(new FileItemEvent(FileItemEvent.UPLOAD_CANCELED,fileItem));
 					return;
@@ -219,69 +220,45 @@ package com.renren.picUpload
 		 */
 		private function DBQueueMonitor():void
 		{
-			if (DBqueue.length >= Config.dataBlockNumLimit || !fileItemQueue.length || lock)
+			if (DBqueue.length >= Config.dataBlockNumLimit || !fileItemQueue.length || loadFileLock)
 			{
 				/*如果DBQueue中的DataBlock数量大于等于的上限或者。。就什么都不做*/
 				return;
 			}
 			
-			
-			lock = true;//上锁
-			log("上锁");
-			curProcessFile = fileItemQueue.deQueue();
-			
-			while (curProcessFile.status == FileItem.FILE_STATUS_CANCELLED)
-			{
-			    if (fileItemQueue.count == 0)
+			loadFileLock = true;//上锁log("上锁");
+		
+			do{
+				curProcessFile = fileItemQueue.shift();
+			    if (fileItemQueue.length == 0)
 					break;
-				curProcessFile = fileItemQueue.deQueue();
-			}
+				
+			}while (curProcessFile.status == FileItem.FILE_STATUS_CANCELLED)
 			
 			if (curProcessFile.status == FileItem.FILE_STATUS_CANCELLED)
 			{
-				lock = false;
+				loadFileLock = false;
 				return;
 			}
 			
 			log("[" + curProcessFile.fileReference.name + "]增加监听");
+			
 			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
 			curProcessFile.fileReference.addEventListener(IOErrorEvent.IO_ERROR, handle_loadFile_IOError);
-			curProcessFile.fileReference.addEventListener(Event.OPEN, handle_load_open);
+			
 			curProcessFile.fileReference.load();
-			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.START_PROCESS_FILE, curProcessFile);
-			dispatchEvent(event);
+			dispatchEvent(new FileItemEvent(FileItemEvent.START_PROCESS_FILE,curProcessFile));
+			
 			log("!!!上传缓冲区有空间,开始加载上传队列中的["+curProcessFile.fileReference.name+"]文件!!!DBQueue.length:"+DBqueue.length);
 		}
 		
 		
-		private function checkLock(evt:TimerEvent):void
-		{
-			if (lock)
-			{
-				lockCheckerTimer.start();
-				log("reload local file ["+curProcessFile.fileReference.name+"]");
-				curProcessFile.fileReference.load();
-				log("reload start");
-				
-				lock = false;
-			}
-				
-			//var event:ExternalEvent = new ExternalEvent(FileUploadEvent.UPLOAD_ERROR);
-			//event.addParam("file", curProcessFile);
-			//ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			
-		}
-		
-		private function handle_load_open(evt:Event):void
-		{
-			log("[" + evt.target.name + "] startLoad","temp:" + tttttt);
-			tttttt++;
-		}
-		
 		private function handle_loadFile_IOError(evt:IOErrorEvent):void
 		{
 			log("load [" + curProcessFile.fileReference.name + "] Error");
-			lock = false;
+			loadFileLock = false;
+			dispatchEvent(new FileItemEvent(FileItemEvent.LOAD_LOCAL_FILE_IO_ERROR,curProcessFile));
 			log("开锁");
 		}
 		
@@ -294,72 +271,48 @@ package com.renren.picUpload
 		 */
 		private function handle_fileData_loaded(evt:Event):void
 		{
-			log("[" + evt.target.name + "] startLoad","loadCom");
-			curProcessFile.fileReference.removeEventListener(Event.COMPLETE, handle_fileData_loaded);
-			//lockCheckerTimer.stop();
 			log("[" + curProcessFile.fileReference.name + "]加载到内存");
-			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
-			var temp:ByteArray = new ByteArray();
+			curProcessFile.fileReference.removeEventListener(Event.COMPLETE, handle_fileData_loaded);
 			
-			if (!IMGValidater.validate(fileData))
+			var fileData:ByteArray = evt.target.data as ByteArray;//从本地加载的图片数据
+			
+			var imgType:String = IMGValidater.validate(fileData);
+			
+			if (imgType == IMGValidater.INVALIDATE_IMG_TYPE)
 			{
 				log("[" + curProcessFile.fileReference.name + "]不是有效图片文件");
-				var event:ExternalEvent = new ExternalEvent(FileUploadEvent.INVALID_IMG_FILE);
-				event.addParam("file", curProcessFile.getInfoObject());
-				ExternalEventDispatcher.getInstance().dispatchEvent(event);
-				lock = false;
+				dispatchEvent(new FileItemEvent(FileItemEvent.INVALIDATE_IMG_TYPE,curProcessFile));
+				loadFileLock = false;
 				log("开锁");
 				return;
 			}
 			
-			
-			if (BMPValidater.validate(fileData))
+			if (imgType == IMGValidater.IMG_TYPE_BMP)
 			{
 				sliceData(fileData);
 				return;
 			}
 			
-			fileData.position = 0;
-			fileData.readBytes(temp, 0, fileData.length);
-			resizePic(temp);
-			fileData.clear();//释放内存
+			if(imgType == IMGValidater.IMG_TYPE_JPG)
+			{
+				curProcessFileExif = ExifInjector.extract(picData);//提取Exif
+				log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
+			}
+			
+			resizePic(fileData);
 		}
 		
-		/**
-		 * 获取缩略图
-		 * @param	picData	<ByteArray>	
-		 * @param	file	<FileItem>
-		 */
-		private function makeThumb(picData:ByteArray,file:FileItem):void
-		{
-			log("[" + curProcessFile.fileReference.name + "]开始缩略图制作");
-			var thumbMaker:ThumbMaker = new ThumbMaker();
-			thumbMaker.addEventListener(ThumbMakerEvent.THUMB_MAKED, handle_thumb_maked);
-			thumbMaker.make(picData,file);
-			dispatchEvent(new ThumbMakerEvent(ThumbMakerEvent.THUMB_MAKE_PROGRESS,null, file));//制作缩略图中
-			function handle_thumb_maked(evt:Event):void
-			{
-				dispatchEvent(evt);
-				log("[" + curProcessFile.fileReference.name + "]的缩略图制作完成");
-				//TODO:调度事件，通知截图已经完成
-			}
-		}
 		
 		private function resizePic(picData:ByteArray):void
 		{
-			
 			log("[" + curProcessFile.fileReference.name + "]开始标准化");
-			
 			var resizer:PicStandardizer = new PicStandardizer(int(Config.maxPicSize));
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
-			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
-			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			resizer.standardize(picData);
 		}
 		
 		private function handle_pic_resized(evt:Event):void
 		{
-			
 			log("["+curProcessFile.fileReference.name+"]标准化完毕");
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
 			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
@@ -369,8 +322,7 @@ package com.renren.picUpload
 		
 		private function sliceData(picData:ByteArray):void
 		{
-			
-			log("sliceData", "lock:" + lock);
+			log("sliceData", "lock:" + loadFileLock);
 			var fileSlicer:DataSlicer = new DataSlicer();
 			var dataArr:Array = fileSlicer.slice(picData);
 		    log("["+curProcessFile.fileReference.name + "]被分成了" + dataArr.length + "块");
@@ -382,8 +334,8 @@ package com.renren.picUpload
 				DBqueue.push(dataBlock);
 				curProcessFile.dataBlockArr.push(dataBlock);
 			}
-			lock = false;
-			log("sliceOver", "lock:" + lock);
+			loadFileLock = false;
+			log("sliceOver", "lock:" + loadFileLock);
 			log("开锁");
 		}
 		
