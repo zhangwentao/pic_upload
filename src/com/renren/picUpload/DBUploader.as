@@ -39,8 +39,7 @@ package com.renren.picUpload
 		 */
 		public function upload(dataBlock:DataBlock):void
 		{
-			reUploadTimes = 0;//重设 重传次数
-			
+			reUploadTimes = 0;//重设重传次数
 			this.dataBlock = dataBlock;
 
 			if (dataBlock.fileItem.status == FileItem.FILE_STATUS_CANCELLED)
@@ -50,7 +49,9 @@ package com.renren.picUpload
 			}
 			
 			dataBlock.fileItem.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
+			
 			dataBlock.fileItem.addEventListener(FileItem.FILE_EVENT_CANCELLED,handleFileCancelled);
+			
 			uploadProcess();
 		}
 		
@@ -177,6 +178,7 @@ package com.renren.picUpload
 					//此图片处理成功
 					oneFileCompleteDo();
 				break;
+				
 				
 				case 523:
 					//仍有数据块待上传

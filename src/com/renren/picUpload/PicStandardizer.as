@@ -25,7 +25,6 @@ package com.renren.picUpload
 		private var temp_height:int = 0;
 		private var temp_width:int = 0;
 		
-		
 		/**
 		 * 构造函数
 		 * @param	limit	<Number>	图片宽度和高度的上限值
@@ -53,7 +52,6 @@ package com.renren.picUpload
 			var loader:Loader = evt.target.loader as Loader;
 			(loader.content as Bitmap).smoothing = true;//防止缩放产生锯齿
 			var aspectRatio:Number = loader.content.width / loader.content.height;//图片的宽高比
-
 			if (loader.content.width <= _limit && loader.content.height <= _limit)
 			{
 				//如果图片的宽高均在上限值以下
@@ -67,28 +65,19 @@ package com.renren.picUpload
 					temp_width = _limit;
 					temp_height = Math.ceil(temp_width / aspectRatio);
 				}
-				else//
+				else
 				{
 					temp_height = _limit;
 					temp_width = Math.ceil(temp_height * aspectRatio);
 				}
-		        
 				loader.content.height = temp_height;
 				loader.content.width = temp_width;
-				//ExternalInterface.call("console.log", "fuck size:", loader.content.height, loader.content.width);
-				
 				var bitmapData:BitmapData = new BitmapData(temp_width, temp_height,true,0xFFFFFF);
 				bitmapData.draw(loader);
 				_data = new ByteArray();
-				
 				var jpgEncoder;
-				log("playerVer:" + Config.playerVer);
-				//if (Config.playerVer < 10)//如果flashPlayer版本低于10
-					//jpgEncoder = new AsyncJPEGEncoderUseArray(Config.compressionQuality, 500, 500);
-				//else
+				log("playerVer:" + Config.playerVer);	
 				jpgEncoder = new AsyncJPEGEncoder(Config.compressionQuality, 500, 500);
-				
-				
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
 				jpgEncoder.encode(bitmapData);
 			}
@@ -97,8 +86,6 @@ package com.renren.picUpload
 			{
 				bitmapData.dispose();
 				_data = evt.data;
-				//var file:FileReference = new FileReference();
-				//FileReference(file).save(_data, "ok.jpg");
 				dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
 			}
 		}

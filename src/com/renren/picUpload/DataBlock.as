@@ -19,7 +19,6 @@ package com.renren.picUpload
 		 * @param index
 		 * @param count
 		 * @param data
-		 * 
 		 */		
 		public function DataBlock(fileItem:FileItem,index:uint,count:uint,data:ByteArray) 
 		{

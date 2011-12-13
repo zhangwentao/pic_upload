@@ -11,9 +11,8 @@ package com.renren.picUpload.events
 	{
 		
 	    public static const QUEUE_LIMIT_EXCEEDED:String = "queueLimitExceeded";//上传队列以达到长度已达到上限
-		
-		
 		public static const NOT_LOGIN:String = "notLogin";
+		
 		private var _fileItem:FileItem;
 		public var data:*;
 		

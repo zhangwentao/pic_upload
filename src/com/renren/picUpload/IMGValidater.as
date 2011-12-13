@@ -67,5 +67,4 @@ package com.renren.picUpload
 				return false;
 		}
 	}
-
 }

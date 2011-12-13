@@ -325,13 +325,7 @@ package
 				i++;
 			}
 			
-			//for (var fileIndex:int = 0; fileIndex < ; fileIndex++)
-			//{
-			//var fr:FileReference = (evt.target.fileList)[fileIndex];
-			//var fileItem:FileItem = new FileItem(fr);			
-			//picUploader.addFileItem(fileItem);
-			//i++;
-			//}
+			
 			
 			for (var tempi:int = i; tempi < evt.target.fileList.length; tempi++)
 			{
