@@ -24,7 +24,6 @@
 		public static const QUEUED_ERROR:String = "queuedError";//文件项加入上传队列时发生的错误。
 		public static const INVALID_IMG_FILE:String = "invalidImgFile";//非法的文件格式
 		
-		
 		public function FileUploadEvent(type:String) 
 		{
 			super(type);

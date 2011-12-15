@@ -6,12 +6,13 @@ package com.renren.picUpload
 	import com.renren.picUpload.events.DBUploaderEvent;
 	import com.renren.picUpload.events.FileItemEvent;
 	import com.renren.picUpload.events.FileUploadEvent;
+	import com.renren.picUpload.events.PicUploadEvent;
 	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.util.CirularQueue;
 	import com.renren.util.ObjectPool;
 	import com.renren.util.img.ExifInjector;
 	import com.renren.util.net.SimpleURLLoader;
-	import com.renren.picUpload.events.PicUploadEvent;
+	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -43,7 +44,7 @@ package com.renren.picUpload
 		private var loadFileLock:Boolean;				//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载且处理完毕,才能加载下一个)
 		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
-		private var  _fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
+		private var _fileItemQueuedNum:uint = 0;     	//已加入上传队列的FileItem数量
 		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
 		
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
@@ -119,7 +120,7 @@ package com.renren.picUpload
 		{
 			if(_fileItemQueuedNum<Config.picUploadNumOnce)
 			{
-				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
+				fileItem.status = FileItem.FILE_STATUS_QUEUED; //修改文件状态为:已加入上传队列
 				fileItemQueue.push(fileItem);   
 				_fileItemQueuedNum++;
 			}
@@ -128,7 +129,18 @@ package com.renren.picUpload
 				
 			}
 		}
-	
+	    
+		public function addFileItems(fileItemArr:Array):void
+		{
+			
+		}
+		
+		
+		/**
+		 * 取消指定id的文件的上传 
+		 * @param fileItemId 
+		 * 
+		 */		
 		public function cancelUpload(fileItemId:String):void
 		{
 			for(var i:int = 0; i<fileItemQueue.length;i++)
@@ -139,8 +151,7 @@ package com.renren.picUpload
 				{
 					fileItemQueue.splice(i,1);
 					_fileItemQueuedNum--;
-					fileItem.status = FileItem.FILE_STATUS_CANCELLED;
-					dispatchEvent(new FileItemEvent(FileItemEvent.UPLOAD_CANCELED,fileItem));
+					fileItem.status = FileItem.FILE_STATUS_CANCELLED;//修改文件状态为:已取消
 					return;
 				}
 			}
@@ -175,8 +186,8 @@ package com.renren.picUpload
 			
 			function addEventListenerForUploader():void
 			{
-				uploader.addEventListener(DBUploaderEvent.FILE_COMPLETE, handle_file_uploaded);
-				uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
+				uploader.addEventListener(DBUploaderEvent.UPLOAD_FILE_COMPLETE, handle_file_uploaded);
+				uploader.addEventListener(DBUploaderEvent.UPLOAD_BLOCK_COMPLETE, handle_dataBlock_uploaded);
 				uploader.addEventListener(DBUploaderEvent.UPLOAD_CANCELED, handle_uploade_canceled);
 				uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 				uploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
@@ -228,11 +239,16 @@ package com.renren.picUpload
 			curProcessFile.fileReference.addEventListener(IOErrorEvent.IO_ERROR, handle_loadFile_IOError);
 			
 			curProcessFile.fileReference.load();
-			dispatchEvent(new FileItemEvent(FileItemEvent.START_PROCESS_FILE,curProcessFile));
+			curProcessFile.status = FileItem.FILE_STATUS_START_PROCESS;//设置文件状态为 开始处理
 			
 			log("!!!上传缓冲区有空间,开始加载上传队列中的["+curProcessFile.fileReference.name+"]文件!!!DBQueue.length:"+DBqueue.length);
 		}
 		
+		/**
+		 * 处理:加载本地文件出错 
+		 * @param evt
+		 * 
+		 */		
 		private function handle_loadFile_IOError(evt:IOErrorEvent):void
 		{
 			log("load [" + curProcessFile.fileReference.name + "] Error");
@@ -261,7 +277,7 @@ package com.renren.picUpload
 			if (imgType == IMGValidater.INVALIDATE_IMG_TYPE)
 			{
 				log("[" + curProcessFile.fileReference.name + "]不是有效图片文件");
-				curProcessFile.status = FileItem.FILE_STATUS_ERROR_INVALIDATE_IMG_TYPE;
+				curProcessFile.status = FileItem.FILE_STATUS_ERROR_INVALIDATE_IMG_TYPE;//设置文件状态：非正确图片类型
 				loadFileLock = false;
 				log("开锁");
 				return;
@@ -269,7 +285,7 @@ package com.renren.picUpload
 			
 			if (imgType == IMGValidater.IMG_TYPE_BMP)
 			{
-				sliceData(fileData);
+				sliceData(fileData);//图片分块
 				return;
 			}
 			
@@ -278,7 +294,6 @@ package com.renren.picUpload
 				curProcessFileExif = ExifInjector.extract(picData);//提取Exif
 				log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			}
-			
 			resizePic(fileData);
 		}
 		
@@ -349,7 +364,5 @@ package com.renren.picUpload
 			var uploader:DBUploader = evt.target as DBUploader;
 			uploaderPool.put(uploader);
 		}
-
 	}
-
 }

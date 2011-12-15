@@ -221,7 +221,7 @@ package com.renren.picUpload
 		 */		
 		private function oneBlockCompleteDo():void
 		{
-			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
+			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.UPLOAD_BLOCK_COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
 			dataBlock.dispose();//释放内存
@@ -233,7 +233,7 @@ package com.renren.picUpload
 		 */		
 		private function oneFileCompleteDo():void
 		{
-			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.FILE_COMPLETE);
+			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.UPLOAD_FILE_COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
 			dataBlock.dispose();//释放内存
