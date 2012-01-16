@@ -1,4 +1,7 @@
 .svn/
 git.bat
 *.lnk
-
+.actionScriptProperties
+.project
+.settings/
+html-template/
