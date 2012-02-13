@@ -38,7 +38,7 @@ package com.renren.picUpload
 	 */
 	public class PicUploader extends EventDispatcher
 	{
-		private var fileItemQueue:Vector.<FileItem>;		//用户选择的文件的File队列
+		private var fileItemQueue:Vector.<FileItem>;	//用户选择的文件的File队列
 		private var DBqueue:Array;						//DataBlock队列
 		private var uploaderPool:ObjectPool;			//DataBlockUploader对象池
 		private var loadFileLock:Boolean;				//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载且处理完毕,才能加载下一个)

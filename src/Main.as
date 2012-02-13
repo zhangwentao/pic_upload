@@ -40,9 +40,6 @@ package
 		private var fileList:FileReferenceList = new FileReferenceList();
 		private var addBtn:AddBtn = new AddBtn();
 		
-
-
-		
 		private var filesQueued:Array;
 		
 		private var fileFilters:Array = new Array();
