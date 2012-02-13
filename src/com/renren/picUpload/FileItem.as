@@ -1,7 +1,6 @@
 package com.renren.picUpload 
 {
 	import com.renren.picUpload.events.FileItemEvent;
-	
 	import flash.events.EventDispatcher;
 	import flash.net.FileReference;
 	
@@ -18,9 +17,9 @@ package com.renren.picUpload
 		public static const FILE_STATUS_START_PROCESS;int 	= 5;//文件开始被处理
 		
 		public static const FILE_STATUS_ERROR_ZERO_BYTE:int			= 11;//文件0字节
-		public static const FILE_STATUS_ERROR_EXCEEDS_SIZE_LIMIT:int	= 12;
-		public static const FILE_STATUS_ERROR_FAIL_TO_LOAD_LOCAL:int	= 13;
-		public static const FILE_STATUS_ERROR_INVALIDATE_IMG_TYPE:int = 14;
+		public static const FILE_STATUS_ERROR_EXCEEDS_SIZE_LIMIT:int	= 12;//超过文件大小限制
+		public static const FILE_STATUS_ERROR_FAIL_TO_LOAD_LOCAL:int	= 13;//从本地加载图片文件失败
+		public static const FILE_STATUS_ERROR_INVALIDATE_IMG_TYPE:int = 14;//不是有效的图片类型（通过文件标志位判断）
 		
 		private static var file_id_sequence:Number = 0;		// tracks the file id sequence
 		private var _status:int;	//状态

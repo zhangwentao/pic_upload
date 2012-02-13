@@ -143,8 +143,6 @@ package
 		
 		private function initFileFilters():void
 		{
-			
-			
 			for each (var fileterInfo:Array in Config.fileFilters)
 			{
 				var fileTypeArray:Array = [];
@@ -238,7 +236,7 @@ package
 			
 			addBtn.setInfoTxt("还能添加" + Config.picUploadNumOnce + "张");
 			
-			ExternalInterface.call(Config.flashReadyDo);
+			ExternalInterface.call(Config.flashReadyDo);//通知js flash上传组建已经
 		}
 		
 		private function curTime():String

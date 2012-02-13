@@ -116,22 +116,29 @@ package com.renren.picUpload
 		 * 添加FileItem对象
 		 * @param	fileItem	<FileItem>	
 		 */
-		public function addFileItem(fileItem:FileItem):void
+		public function addFileItem(fileItem:FileItem):Boolean
 		{
-			if(_fileItemQueuedNum<Config.picUploadNumOnce)
+			if(fileItemQueue.length < Config.picUploadNumOnce)
 			{
 				fileItem.status = FileItem.FILE_STATUS_QUEUED; //修改文件状态为:已加入上传队列
 				fileItemQueue.push(fileItem);   
-				_fileItemQueuedNum++;
+				return true;
 			}
 			else
 			{
-				
+				return false;
 			}
 		}
 	    
 		public function addFileItems(fileItemArr:Array):void
 		{
+			var length:int = fileItemArr.length;
+			var count:int = 0;
+			for(;count < length;count++)
+			{
+				if(!addFileItem(fileItemArr[count]))
+					break;
+			}
 			
 		}
 		
@@ -221,9 +228,9 @@ package com.renren.picUpload
 			loadFileLock = true;//上锁log("上锁");
 		
 			do{
-				curProcessFile = fileItemQueue.shift();
 			    if (fileItemQueue.length == 0)
 					break;
+				curProcessFile = fileItemQueue.shift();
 				
 			}while (curProcessFile.status == FileItem.FILE_STATUS_CANCELLED)
 			
