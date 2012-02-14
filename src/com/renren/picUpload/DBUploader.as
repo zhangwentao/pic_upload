@@ -13,6 +13,7 @@ package com.renren.picUpload
 	import com.renren.external.ExternalEvent;
 	import flash.utils.Timer;
 	import com.renren.picUpload.events.FileUploadEvent;
+	import com.renren.util.Logger;
 	/**
 	 * 上传 DataBlock 至服务器
 	 * @author taowenzhang@gmail.com
