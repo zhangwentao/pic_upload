@@ -18,6 +18,7 @@ package com.renren.picUpload
 		public var id:String;	//编号
 		public var status:int;	//状态
 		public var fileReference:FileReference;//文件引用
+		public var statistics:StatisticsData = new StatisticsData();
 		
 		/**
 		 * 
@@ -30,6 +31,8 @@ package com.renren.picUpload
 				return;
 			this.id = id_prefix + "_" + file_id_sequence++;
 			this.fileReference = fileReference;
+			this.statistics.id = this.id;
+			log(this.id,this.statistics.id);
 		}
 		
 		/**

@@ -1,25 +1,26 @@
 package com.renren.picUpload 
 {
 	import com.renren.external.ExternalEvent;
-	import com.renren.picUpload.events.DBUploaderEvent;
+	import com.renren.external.ExternalEventDispatcher;
 	import com.renren.picUpload.DataSlicer;
+	import com.renren.picUpload.StatisticsCollector;
+	import com.renren.picUpload.events.DBUploaderEvent;
+	import com.renren.picUpload.events.FileUploadEvent;
+	import com.renren.picUpload.events.PicUploadEvent;
+	import com.renren.picUpload.events.ThumbMakerEvent;
 	import com.renren.util.CirularQueue;
-	import com.renren.util.net.SimpleURLLoader;
 	import com.renren.util.ObjectPool;
+	import com.renren.util.img.ExifInjector;
+	import com.renren.util.net.SimpleURLLoader;
+	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.IOErrorEvent;
 	import flash.events.TimerEvent;
+	import flash.external.ExternalInterface;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
-	import com.renren.picUpload.events.ThumbMakerEvent;
-	import com.renren.util.img.ExifInjector;
-	import com.renren.picUpload.events.PicUploadEvent;
-	import flash.external.ExternalInterface;
-	import flash.events.IOErrorEvent;
-	import com.renren.picUpload.events.FileUploadEvent;
-	import com.renren.external.ExternalEventDispatcher;
-	import flash.external.ExternalInterface;
 	/**
 	 * 缩略图绘制完毕事件
 	 */
@@ -53,7 +54,7 @@ package com.renren.picUpload
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
 		
 		private var lockCheckerTimer:Timer = new Timer(4000);//
-		
+		public var statistics:StatisticsCollector = new StatisticsCollector();
 		var tttttt:uint = 0;
 		
 		/**
@@ -185,6 +186,7 @@ package com.renren.picUpload
 			{
 				if (file.id == fileId)
 				{
+					statistics.del(fileId);
 					switch(file.status)
 					{
 						case FileItem.FILE_STATUS_QUEUED:
@@ -225,6 +227,7 @@ package com.renren.picUpload
 			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
 			uploader.addEventListener(DBUploaderEvent.FILE_COMPLETE, handle_file_uploaded);
 			uploader.addEventListener(DBUploaderEvent.COMPLETE, handle_dataBlock_uploaded);
+	
             uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_IOError);
 			uploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
 			dispatchEvent(new PicUploadEvent(PicUploadEvent.UPLOAD_PROGRESS,dataBlock.file));
@@ -280,6 +283,8 @@ package com.renren.picUpload
 			dispatchEvent(event);
 			log("!!!上传缓冲区有空间,开始加载上传队列中的["+curProcessFile.fileReference.name+"]文件!!!DBQueue.length:"+DBqueue.length);
 		}
+		
+		
 		
 		
 		private function checkLock(evt:TimerEvent):void
@@ -387,7 +392,8 @@ package com.renren.picUpload
 		
 		private function handle_pic_resized(evt:Event):void
 		{
-			
+			curProcessFile.statistics.compressTime = (evt.target as PicStandardizer).compressTime;
+			log("compress:"+(evt.target as PicStandardizer).compressTime);
 			log("["+curProcessFile.fileReference.name+"]标准化完毕");
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
 			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
@@ -422,6 +428,8 @@ package com.renren.picUpload
 		 */
 		private function handle_file_uploaded(evt:DBUploaderEvent):void
 		{
+			log("curProcessFile:"+evt.dataBlock.file.id);
+			this.statistics.add(evt.dataBlock.file.id,evt.dataBlock.file.statistics);
 			log("[" + evt.dataBlock.file.fileReference.name + "]上传完毕");
 			log("fileQueueNum:" + fileItemQueue.count);
 			evt.dataBlock.file.status = FileItem.FILE_STATUS_SUCCESS;

@@ -1,14 +1,16 @@
 package com.renren.picUpload 
 {
 	import com.renren.picUpload.events.EncodeCompleteEvent;
+	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import flash.display.Loader;
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.external.ExternalInterface;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
-	import flash.display.Loader;
-	import flash.display.BitmapData;
-	import flash.events.Event;
-	import flash.external.ExternalInterface;
-	import flash.display.Bitmap;
+	import com.renren.util.Logger;
 	
 	/**
 	 * 标准化图片尺寸
@@ -23,14 +25,16 @@ package com.renren.picUpload
 		private var _rawData:ByteArray;//原始数据
 		private var temp_height:int = 0;
 		private var temp_width:int = 0;
-		
-		
+		private var compressStartTime:Number=0;//开始对图片进行处理的时刻
+		public var compressTime:Number = 0;//对图片进行处理的总时间
+		private var bitmapData:BitmapData;
 		/**
 		 * 构造函数
 		 * @param	limit	<Number>	图片宽度和高度的上限值
 		 */
 		public function PicStandardizer(limit:int=1024) 
 		{
+			log('--------------------');
 			this._limit = limit;
 		}
 		
@@ -76,7 +80,7 @@ package com.renren.picUpload
 				loader.content.width = temp_width;
 				//ExternalInterface.call("console.log", "fuck size:", loader.content.height, loader.content.width);
 				
-				var bitmapData:BitmapData = new BitmapData(temp_width, temp_height,true,0xFFFFFF);
+				bitmapData = new BitmapData(temp_width, temp_height,true,0xFFFFFF);
 				bitmapData.draw(loader);
 				_data = new ByteArray();
 				
@@ -86,20 +90,27 @@ package com.renren.picUpload
 					//jpgEncoder = new AsyncJPEGEncoderUseArray(Config.compressionQuality, 500, 500);
 				//else
 				jpgEncoder = new AsyncJPEGEncoder(Config.compressionQuality, 500, 500);
-				
-				
 				jpgEncoder.addEventListener(EncodeCompleteEvent.COMPLETE, handle_encode_com);
+				compressStartTime = new Date().getTime();
 				jpgEncoder.encode(bitmapData);
 			}
 			
-			function handle_encode_com(evt):void
-			{
-				bitmapData.dispose();
-				_data = evt.data;
-				//var file:FileReference = new FileReference();
-				//FileReference(file).save(_data, "ok.jpg");
-				dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
-			}
+			
+		}
+		
+		private function handle_encode_com(evt):void
+		{
+			log("compress ok");
+			var endTime:Number = new Date().getTime();
+			compressTime = endTime - compressStartTime;
+			
+			log('start',compressStartTime,'end',endTime,'compress',compressTime);
+			
+			bitmapData.dispose();
+			_data = evt.data;
+			//var file:FileReference = new FileReference();
+			//FileReference(file).save(_data, "ok.jpg");
+			dispatchEvent(new Event(Event.COMPLETE));//标准化后完毕后通知
 		}
 	}
 

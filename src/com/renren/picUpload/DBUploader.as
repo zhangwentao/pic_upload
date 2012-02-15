@@ -1,19 +1,20 @@
 package com.renren.picUpload 
 {
-	import com.renren.picUpload.events.DBUploaderEvent;
-	import com.renren.picUpload.events.PicUploadEvent;
-	import com.renren.util.net.ByteArrayUploader;
-	import flash.events.Event;
-	import flash.events.IOErrorEvent;
-	import flash.events.EventDispatcher;
 	import com.adobe.serialization.json.JSON;
+	import com.renren.external.ExternalEvent;
+	import com.renren.external.ExternalEventDispatcher;
+	import com.renren.picUpload.events.DBUploaderEvent;
+	import com.renren.picUpload.events.FileUploadEvent;
+	import com.renren.picUpload.events.PicUploadEvent;
+	import com.renren.util.Logger;
+	import com.renren.util.net.ByteArrayUploader;
+	
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.events.IOErrorEvent;
 	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
-	import com.renren.external.ExternalEventDispatcher;
-	import com.renren.external.ExternalEvent;
 	import flash.utils.Timer;
-	import com.renren.picUpload.events.FileUploadEvent;
-	import com.renren.util.Logger;
 	/**
 	 * 上传 DataBlock 至服务器
 	 * @author taowenzhang@gmail.com
@@ -27,7 +28,7 @@ package com.renren.picUpload
 		private var _responseData:Object;
 		private var _rawResponseData:String;
 		private var reUploadTimes:int = 0;//重传次数
-		
+		private var uploadStartTime:Number;//上传开始的时刻
 		public function DBUploader() 
 		{
 			
@@ -40,6 +41,7 @@ package com.renren.picUpload
 		 */
 		public function upload(dataBlock:DataBlock):void
 		{
+			
 			reUploadTimes = 0;//重设 重传次数
 			this.dataBlock = dataBlock;
 			dataBlock.file.status = FileItem.FILE_STATUS_IN_PROGRESS;//设置图片状态为:正在上传
@@ -48,6 +50,7 @@ package com.renren.picUpload
 		
 		private function uploadProcess():void
 		{
+			
 			uploader= new ByteArrayUploader();//用于上传二进制数据
 			uploader.url = Config.uploadUrl;//上传cgiurl
 			uploader.addEventListener(IOErrorEvent.IO_ERROR, handle_ioError);
@@ -58,7 +61,7 @@ package com.renren.picUpload
 			urlVar["block_index"] = dataBlock.index;
 			urlVar["block_count"] = dataBlock.count;
 			urlVar["uploadid"] = dataBlock.file.id;
-			
+			uploadStartTime = new Date().getTime();
 			uploader.upLoad(dataBlock.data);
 		}
 		
@@ -82,6 +85,7 @@ package com.renren.picUpload
 		
 		private function reUpload():Boolean
 		{
+			
 			if (reUploadTimes < Config.reUploadMaxTimes)
 			{   
 				log("开始重传" + dataBlock.file.fileReference.name + "的第" + dataBlock.index + "块","第"+(++reUploadTimes)+"次");
@@ -165,6 +169,9 @@ package com.renren.picUpload
 		
 		private function oneBlockCompleteDo():void
 		{
+			var time:Number = new Date().getTime()-uploadStartTime;
+			
+			dataBlock.file.statistics.uploadTimeArr.push(time);
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
@@ -173,6 +180,9 @@ package com.renren.picUpload
 		
 		private function oneFileCompleteDo():void
 		{
+			var time:Number = new Date().getTime()-uploadStartTime;
+			
+			dataBlock.file.statistics.uploadTimeArr.push(time);
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.FILE_COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
