@@ -29,6 +29,7 @@ package com.renren.picUpload
 		private var _rawResponseData:String;
 		private var reUploadTimes:int = 0;//重传次数
 		private var uploadStartTime:Number;//上传开始的时刻
+		private var uploadTime:Number;
 		public function DBUploader() 
 		{
 			
@@ -110,6 +111,7 @@ package com.renren.picUpload
 		 */
 		private function handle_upload_complete(evt:Event):void
 		{
+			uploadTime = new Date().getTime()-uploadStartTime;//统计上传数据花费的时间
 			_rawResponseData = String(uploader.data);
 			try 
 			{
@@ -169,9 +171,7 @@ package com.renren.picUpload
 		
 		private function oneBlockCompleteDo():void
 		{
-			var time:Number = new Date().getTime()-uploadStartTime;
-			
-			dataBlock.file.statistics.uploadTimeArr.push(time);
+			dataBlock.file.statistics.uploadTimeArr.push(uploadTime);
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
@@ -180,9 +180,7 @@ package com.renren.picUpload
 		
 		private function oneFileCompleteDo():void
 		{
-			var time:Number = new Date().getTime()-uploadStartTime;
-			
-			dataBlock.file.statistics.uploadTimeArr.push(time);
+			dataBlock.file.statistics.uploadTimeArr.push(uploadTime);
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.FILE_COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);

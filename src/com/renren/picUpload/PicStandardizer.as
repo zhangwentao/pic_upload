@@ -34,7 +34,6 @@ package com.renren.picUpload
 		 */
 		public function PicStandardizer(limit:int=1024) 
 		{
-			log('--------------------');
 			this._limit = limit;
 		}
 		
@@ -100,12 +99,8 @@ package com.renren.picUpload
 		
 		private function handle_encode_com(evt):void
 		{
-			log("compress ok");
 			var endTime:Number = new Date().getTime();
 			compressTime = endTime - compressStartTime;
-			
-			log('start',compressStartTime,'end',endTime,'compress',compressTime);
-			
 			bitmapData.dispose();
 			_data = evt.data;
 			//var file:FileReference = new FileReference();
