@@ -346,9 +346,10 @@ package com.renren.picUpload
 			}
 			
 			
-			if (BMPValidater.validate(fileData))
+			if (BMPValidater.validate(fileData)||GIFValidater.validateGIF(fileData))//如果图片是bmp或者gif格式不进行压缩jpg转码
 			{
 				sliceData(fileData);
+				log("bmp or gif");
 				return;
 			}
 			
