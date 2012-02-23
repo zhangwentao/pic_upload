@@ -1,34 +1,35 @@
 package
 {
 	import com.adobe.protocols.dict.Database;
-	import flash.display.MovieClip;
-	import flash.display.Sprite;
-	import flash.errors.IOError;
-	import flash.events.Event;
-	import flash.filters.BevelFilter;
-	import flash.net.FileReference;
-	import flash.net.FileReferenceList;
-	import com.renren.picUpload.PicUploader;
-	import flash.events.MouseEvent;
-	import com.renren.picUpload.FileItem;
-	import com.renren.picUpload.events.ThumbMakerEvent;
-	import com.renren.picUpload.log;
-	import flash.ui.ContextMenu;
-	import flash.utils.Dictionary;
-	import com.renren.picUpload.events.PicUploadEvent;
+	import com.adobe.serialization.json.JSON;
 	import com.renren.external.ExternalEvent;
 	import com.renren.external.ExternalEventDispatcher;
-	import com.renren.picUpload.events.FileUploadEvent;
-	import flash.external.ExternalInterface;
-	import flash.display.StageScaleMode;
 	import com.renren.picUpload.Config;
-	import flash.display.StageAlign;
-	import flash.events.IOErrorEvent;
-	import flash.net.FileFilter;
-	import flash.system.Security;
-	import com.adobe.serialization.json.JSON;
-	import flash.system.Capabilities;
+	import com.renren.picUpload.FileItem;
+	import com.renren.picUpload.PicUploader;
+	import com.renren.picUpload.events.FileUploadEvent;
+	import com.renren.picUpload.events.PicUploadEvent;
+	import com.renren.picUpload.events.ThumbMakerEvent;
+	import com.renren.picUpload.log;
 	import com.renren.util.Logger;
+	
+	import flash.display.MovieClip;
+	import flash.display.Sprite;
+	import flash.display.StageAlign;
+	import flash.display.StageScaleMode;
+	import flash.errors.IOError;
+	import flash.events.Event;
+	import flash.events.IOErrorEvent;
+	import flash.events.MouseEvent;
+	import flash.external.ExternalInterface;
+	import flash.filters.BevelFilter;
+	import flash.net.FileFilter;
+	import flash.net.FileReference;
+	import flash.net.FileReferenceList;
+	import flash.system.Capabilities;
+	import flash.system.Security;
+	import flash.ui.ContextMenu;
+	import flash.utils.Dictionary;
 	
 	/**
 	 * ...
@@ -234,6 +235,7 @@ package
 			ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
 			ExternalInterface.addCallback("jsonEncode", this.encode);
 			ExternalInterface.addCallback("showLog", this.showLog);
+			ExternalInterface.addCallback("setUploadNumOnce",this.setUploadNumOnce);
 			checkVersion();
 			
 			picUploader.init();
@@ -243,6 +245,11 @@ package
 			addBtn.setInfoTxt("还能添加" + Config.picUploadNumOnce + "张");
 			
 			ExternalInterface.call(Config.flashReadyDo);
+		}
+		
+		private function setUploadNumOnce(num:int):void
+		{
+			Config.picUploadNumOnce = num;
 		}
 		
 		private function curTime():String
