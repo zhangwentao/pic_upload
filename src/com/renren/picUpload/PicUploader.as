@@ -178,31 +178,33 @@ package com.renren.picUpload
 		
 		public function cancelAFile(fileId:String):void
 		{
-			
-			var arr:Array = fileItemQueue.toArray();
-			
-			for each(var file:FileItem in arr)
-			{
-				if (file.id == fileId)
-				{
-					switch(file.status)
-					{
-						case FileItem.FILE_STATUS_QUEUED:
-						case FileItem.FILE_STATUS_SUCCESS:
-							fileItemQueuedNum--;//
-							file.status = FileItem.FILE_STATUS_CANCELLED;
-							
-							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
-							dispatchEvent(event);
-						break;
-					}
-					return;
-				}
-			}
+			fileItemQueuedNum--;//
 			var fileTemp:FileItem = new FileItem(null);
 			fileTemp.id = fileId;
 			var event2:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, fileTemp);
 			dispatchEvent(event2);
+			
+//			var arr:Array = fileItemQueue.toArray();
+//			
+//			for each(var file:FileItem in arr)
+//			{
+//				if (file.id == fileId)
+//				{
+//					switch(file.status)
+//					{
+//						case FileItem.FILE_STATUS_QUEUED:
+//						case FileItem.FILE_STATUS_SUCCESS:
+//							fileItemQueuedNum--;//
+//							file.status = FileItem.FILE_STATUS_CANCELLED;
+//							
+//							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
+//							dispatchEvent(event);
+//						break;
+//					}
+//					return;
+//				}
+//			}
+			
 		}
 		
 		/**

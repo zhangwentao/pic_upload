@@ -148,8 +148,6 @@ package
 		
 		private function initFileFilters():void
 		{
-			
-			
 			for each (var fileterInfo:Array in Config.fileFilters)
 			{
 				var fileTypeArray:Array = [];
@@ -203,8 +201,14 @@ package
 			{
 				addBtn.buttonMode = true;
 				addBtn.mouseChildren = addBtn.mouseEnabled = true;
-				addBtn.enable();
+//				addBtn.enable();
 			}
+		}
+		
+		private function setEnable(value:Boolean):void
+		{
+			addBtn.buttonMode = value;
+			addBtn.mouseChildren = addBtn.mouseEnabled = value;
 		}
 		
 		private function encode(obj:Object):String
@@ -236,6 +240,8 @@ package
 			ExternalInterface.addCallback("jsonEncode", this.encode);
 			ExternalInterface.addCallback("showLog", this.showLog);
 			ExternalInterface.addCallback("setUploadNumOnce",this.setUploadNumOnce);
+			ExternalInterface.addCallback("setBtnEnabled",this.setEnable);
+			ExternalInterface.addCallback("show",this.show);
 			checkVersion();
 			
 			picUploader.init();
@@ -247,9 +253,27 @@ package
 			ExternalInterface.call(Config.flashReadyDo);
 		}
 		
-		private function setUploadNumOnce(num:int):void
+		private function setUploadNumOnce(num:int):Boolean
 		{
 			Config.picUploadNumOnce = num;
+			Logger.log("num:"+num,"fileItme:"+picUploader.fileItemQueuedNum);
+			if (picUploader.fileItemQueuedNum < Config.picUploadNumOnce)
+			{
+				setEnable(true);
+				return true;
+			}
+			else
+			{
+				setEnable(false);
+				return false;
+			}
+				
+			
+		}
+		
+		private function show():void
+		{
+			Logger.log("num:"+Config.picUploadNumOnce,"fileItme:"+picUploader.fileItemQueuedNum);
 		}
 		
 		private function curTime():String
@@ -299,7 +323,7 @@ package
 				//addBtn.setInfoTxt("已满"+Config.picUploadNumOnce+"张照片");
 				addBtn.buttonMode = false;
 				addBtn.mouseChildren = addBtn.mouseEnabled = false;
-				addBtn.disable();
+//				addBtn.disable();
 			}
 			else
 			{
