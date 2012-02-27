@@ -47,7 +47,7 @@ package com.renren.picUpload
 		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
 		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
-		public var 	fileItemQueuedNum:uint = 0;     		//已加入上传队列的FileItem数量
+		public var  fileItemQueuedNum:uint = 0;     		//已加入上传队列的FileItem数量
 		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
 		
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
@@ -75,7 +75,7 @@ package com.renren.picUpload
 			DBUploader.timer.start();
 			DataSlicer.block_size_limit = Config.dataBlockSizeLimit;//设置文件切片上限
 			DBqueue = new Array();//TODO:应该是一个不限长度的队列,因为这里存在一种'超支'的情况。
-			fileItemQueue = new CirularQueue(Config.picUploadNumOnce);
+			fileItemQueue = new CirularQueue(100);
 			DBQMonitorTimer = new Timer(Config.DBQCheckInterval);
 			UPMonitorTimer = new Timer(Config.UPCheckInterval);
 			DBQMonitorTimer.addEventListener(TimerEvent.TIMER, function() { DBQueueMonitor(); } );
@@ -272,7 +272,6 @@ package com.renren.picUpload
 				lock = false;
 				return;
 			}
-			
 			log("[" + curProcessFile.fileReference.name + "]增加监听");
 			curProcessFile.fileReference.addEventListener(Event.COMPLETE, handle_fileData_loaded);
 			curProcessFile.fileReference.addEventListener(IOErrorEvent.IO_ERROR, handle_loadFile_IOError);
