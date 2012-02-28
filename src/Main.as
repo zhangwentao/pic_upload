@@ -225,28 +225,36 @@ package
 		
 		private function init():void
 		{
-			
-			var cm:ContextMenu = new ContextMenu();
-			cm.hideBuiltInItems();
-			this.contextMenu = cm;
-			Config.getFlashVars(stage);
-			initFileFilters();
-			ExternalEventDispatcher.getInstance().addExternalCall();
-			ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
-			ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
-			ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
-			ExternalInterface.addCallback("jsonEncode", this.encode);
-			ExternalInterface.addCallback("showLog", this.showLog);
-			ExternalInterface.addCallback("getStatistics",picUploader.statistics.getJSONformate);
-			checkVersion();
-			
-			picUploader.init();
-			picUploader.start();
-			FileItem.id_prefix = fileIdPrifix + Math.round(Math.random() * 1000) + curTime();
-			
-			addBtn.setInfoTxt("还能添加" + Config.picUploadNumOnce + "张");
-			
-			ExternalInterface.call(Config.flashReadyDo);
+			try
+			{
+				var cm:ContextMenu = new ContextMenu();
+				cm.hideBuiltInItems();
+				this.contextMenu = cm;
+				Config.getFlashVars(stage);
+				initFileFilters();
+				
+				
+				ExternalInterface.addCallback("setBtnStatus", addBtn.setStatus);
+				ExternalInterface.addCallback("cancelFile", picUploader.cancelAFile);
+				ExternalInterface.addCallback("setUploadUrl", Config.setUploadUrl);
+				ExternalInterface.addCallback("jsonEncode", this.encode);
+				ExternalInterface.addCallback("showLog", this.showLog);
+				ExternalInterface.addCallback("getStatistics",picUploader.statistics.getJSONformate);
+				ExternalEventDispatcher.getInstance().addExternalCall();
+				checkVersion();
+				
+				picUploader.init();
+				picUploader.start();
+				FileItem.id_prefix = fileIdPrifix + Math.round(Math.random() * 1000) + curTime();
+				
+				addBtn.setInfoTxt("还能添加" + Config.picUploadNumOnce + "张");
+				
+				ExternalInterface.call(Config.flashReadyDo);
+			}
+			catch(e:SecurityError)
+			{
+				
+			}
 		}
 		
 		private function curTime():String
