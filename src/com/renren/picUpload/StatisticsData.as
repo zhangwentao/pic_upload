@@ -5,5 +5,6 @@ package com.renren.picUpload
 		public var id:String;
 		public var compressTime:Number;
 		public var uploadTimeArr:Array= new Array();
+		public var dataSizeArr:Array = new Array();
 	}
 }

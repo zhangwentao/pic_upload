@@ -172,6 +172,7 @@ package com.renren.picUpload
 		private function oneBlockCompleteDo():void
 		{
 			dataBlock.file.statistics.uploadTimeArr.push(uploadTime);
+			dataBlock.file.statistics.dataSizeArr.push(dataBlock.data.length);
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
@@ -181,6 +182,7 @@ package com.renren.picUpload
 		private function oneFileCompleteDo():void
 		{
 			dataBlock.file.statistics.uploadTimeArr.push(uploadTime);
+			dataBlock.file.statistics.dataSizeArr.push(dataBlock.data.length);
 			var event:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.FILE_COMPLETE);
 			event.dataBlock = dataBlock;
 			dispatchEvent(event);
