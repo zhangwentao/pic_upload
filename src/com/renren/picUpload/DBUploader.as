@@ -63,7 +63,7 @@ package com.renren.picUpload
 		
 		public function get responseData():Object
 		{
-			return _rawResponseData; 
+			return encodeURIComponent(_rawResponseData); 
 		}
 		
 		/**
