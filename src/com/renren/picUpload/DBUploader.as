@@ -68,7 +68,7 @@ package com.renren.picUpload
 		
 		public function get responseData():Object
 		{
-			return _rawResponseData; 
+			return encodeURIComponent(_rawResponseData); 
 		}
 		
 		/**
@@ -116,6 +116,8 @@ package com.renren.picUpload
 			try 
 			{
 				_responseData = JSON.decode(String(uploader.data));
+				log("json:\n");
+				ExternalInterface.call("console.log",_responseData);
 			}
 			catch (e)
 			{
