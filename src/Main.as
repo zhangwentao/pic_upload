@@ -57,7 +57,7 @@ package
 		public function Main()
 		{
 		
-			Logger.status = Logger.STATUS_ON;
+			Logger.status = Logger.STATUS_OFF;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			Security.allowInsecureDomain("*");

@@ -117,7 +117,6 @@ package com.renren.picUpload
 			{
 				_responseData = JSON.decode(String(uploader.data));
 				log("json:\n");
-				ExternalInterface.call("console.log",_responseData);
 			}
 			catch (e)
 			{

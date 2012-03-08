@@ -10,7 +10,7 @@ package com.renren.picUpload
 	 */
 	public class Config
 	{
-		public static var flashReadyDo:String;							//flash准备好被js调用方法后，调用这个js方法
+		public static var flashReadyDo:String;						//flash准备好被js调用方法后，调用这个js方法
 		public static var maxSingleFileSize:Number = 1024 * 1024 * 8;	//单个上传文件的最大长度
 		public static var maxPicSize:Number = 1024;						//图片的最大尺寸
 		public static var dataBlockNumLimit:Number = 50;				//DataBlock对象的数量上限值
