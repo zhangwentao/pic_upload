@@ -54,6 +54,8 @@ package
 		private var startTime:Number;
 		private var alertedNotLogin:Boolean = false;
 		
+		private var uploadType:int = 1;
+		
 		public function Main()
 		{
 		
@@ -293,6 +295,14 @@ package
 		
 		function handle_stage_clicked(evt:MouseEvent):void
 		{
+			if(evt.target == addBtn.upload_btn)
+			{
+				uploadType = 1;
+			}
+			else if(evt.target == addBtn.send_btn)
+			{
+				uploadType = 2;
+			}
 			fileList.browse(fileFilters);
 		}
 		
@@ -350,6 +360,7 @@ package
 			
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_QUEUED);
 			event.addParam("files", filesQueued);
+			event.addParam("type",uploadType);
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			filesQueued = null;
 			
