@@ -360,7 +360,7 @@ package
 			
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_QUEUED);
 			event.addParam("files", filesQueued);
-			event.addParam("type",uploadType);
+			event.addParam("uploadType",uploadType);
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			filesQueued = null;
 			
