@@ -116,6 +116,7 @@ package com.renren.picUpload
 			try 
 			{
 				_responseData = JSON.decode(String(uploader.data));
+				
 			}
 			catch (e)
 			{
@@ -136,6 +137,7 @@ package com.renren.picUpload
 				case 503:
 				case 504:
 				case 508:
+				case 536:
 					uploadErrorDo(uint(_responseData.code));
 				break;
 			}
@@ -163,6 +165,11 @@ package com.renren.picUpload
 		private function uploadErrorDo(errorCode:uint):void
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.UPLOAD_ERROR);
+			var evt:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
+			evt.dataBlock = dataBlock;
+			dataBlock.file.status = FileItem.FILE_STATUS_CANCELLED;
+			log("---------------------:");
+			dispatchEvent(evt);
 			event.addParam("file", dataBlock.file.getInfoObject());
 			event.addParam("errorCode", errorCode);
 			dataBlock.dispose();//释放内存
