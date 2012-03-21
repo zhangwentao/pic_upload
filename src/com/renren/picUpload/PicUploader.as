@@ -48,7 +48,7 @@ package com.renren.picUpload
 		private var lock:Boolean;						//加载本地文件到内存锁(目的:逐个加载本地文件,一个加载完,才能加载下一个)
 		private var UPMonitorTimer:Timer;				//uploader对象池监控timer
 		private var DBQMonitorTimer:Timer;				//DataBlock队列监控timer
-		public var 	fileItemQueuedNum:uint = 0;     		//已加入上传队列的FileItem数量
+		public var fileItemQueuedNum:uint = 0;     		//已加入上传队列的FileItem数量
 		private var curProcessFile:FileItem;			//当前从本地加载的图片文件
 		
 		private var curProcessFileExif:ByteArray;		//当前处理的文件的EXIF信息
@@ -223,6 +223,11 @@ package com.renren.picUpload
 			/*用一个uploader上传一个dataBlock*/
 			var uploader:DBUploader = uploaderPool.fetch() as DBUploader;
 			var dataBlock:DataBlock = DBqueue.shift() as DataBlock;
+			if(dataBlock.file.status==FileItem.FILE_STATUS_CANCELLED)
+			{
+				uploaderPool.put(uploader);
+				return;
+			}
 			log("***上传缓冲区长度:"+DBqueue.length);
 			log("开始上传 [" + dataBlock.file.fileReference.name + "] 的第" + dataBlock.index + "块数据");
 			uploader.addEventListener(DBUploaderEvent.FILE_COMPLETE, handle_file_uploaded);
@@ -250,7 +255,7 @@ package com.renren.picUpload
 		 */
 		private function DBQueueMonitor():void
 		{
-			log("fileQueueNum:"+fileItemQueue.count,"lock:"+lock,"dbqueuelength:"+DBqueue.length);
+			log("fileQueueNum:"+fileItemQueue.count,"lock:"+lock,"dbqueuelength:"+DBqueue.length,"FreeUploader:"+uploaderPool.length);
 			if (DBqueue.length >= Config.dataBlockNumLimit || fileItemQueue.isEmpty || lock)
 			{
 				/*如果DBQueue中的DataBlock数量大于等于的上限或者。。就什么都不做*/

@@ -18,6 +18,7 @@ package com.renren.picUpload.events
 		public static const ZERO_BYTE_FILE:String = "zeroByteFile";//文件为长度为0
 		public static const FILE_EXCEEDS_SIZE_LIMIT:String = "fileExceedsSizeLimit";//上传的文件超出文件尺寸上限
 		public static const NOT_LOGIN:String = "notLogin";
+		
 		private var _fileItem:FileItem;
 		public var data:*;
 		public function PicUploadEvent(type:String, fileItem:FileItem, bubbles:Boolean = false, cancelable:Boolean = false)
