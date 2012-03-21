@@ -223,10 +223,8 @@ package com.renren.picUpload
 			/*用一个uploader上传一个dataBlock*/
 			var uploader:DBUploader = uploaderPool.fetch() as DBUploader;
 			var dataBlock:DataBlock = DBqueue.shift() as DataBlock;
-			log("++++++++++:"+dataBlock.file.status);
 			if(dataBlock.file.status==FileItem.FILE_STATUS_CANCELLED)
 			{
-				log("--------------------cancel-------------");
 				uploaderPool.put(uploader);
 				return;
 			}
@@ -257,7 +255,7 @@ package com.renren.picUpload
 		 */
 		private function DBQueueMonitor():void
 		{
-			log("fileQueueNum:"+fileItemQueue.count,"lock:"+lock,"dbqueuelength:"+DBqueue.length,"pool:"+uploaderPool.length);
+			log("fileQueueNum:"+fileItemQueue.count,"lock:"+lock,"dbqueuelength:"+DBqueue.length,"FreeUploader:"+uploaderPool.length);
 			if (DBqueue.length >= Config.dataBlockNumLimit || fileItemQueue.isEmpty || lock)
 			{
 				/*如果DBQueue中的DataBlock数量大于等于的上限或者。。就什么都不做*/

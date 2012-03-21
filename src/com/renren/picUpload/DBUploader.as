@@ -168,7 +168,6 @@ package com.renren.picUpload
 			var evt:DBUploaderEvent = new DBUploaderEvent(DBUploaderEvent.COMPLETE);
 			evt.dataBlock = dataBlock;
 			dataBlock.file.status = FileItem.FILE_STATUS_CANCELLED;
-			log("---------------------:");
 			dispatchEvent(evt);
 			event.addParam("file", dataBlock.file.getInfoObject());
 			event.addParam("errorCode", errorCode);
