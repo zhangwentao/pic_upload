@@ -54,7 +54,7 @@ package
 		private var startTime:Number;
 		private var alertedNotLogin:Boolean = false;
 		
-		private var uploadType:int = 1;
+		private var uploadType:int = 1;//1:传给自己相册，2：传给好友
 		
 		public function Main()
 		{
@@ -64,7 +64,8 @@ package
 			stage.align = StageAlign.TOP_LEFT;
 			Security.allowInsecureDomain("*");
 			addBtn.buttonMode = true;
-			addBtn.mouseChildren = false;
+			
+			addBtn.mouseChildren = true;
 			addChild(addBtn);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_SUCCESS, handle_upload_success);
@@ -295,6 +296,7 @@ package
 		
 		function handle_stage_clicked(evt:MouseEvent):void
 		{
+			
 			if(evt.target == addBtn.upload_btn)
 			{
 				uploadType = 1;
@@ -303,6 +305,7 @@ package
 			{
 				uploadType = 2;
 			}
+			
 			fileList.browse(fileFilters);
 		}
 		
