@@ -54,6 +54,8 @@ package
 		private var startTime:Number;
 		private var alertedNotLogin:Boolean = false;
 		
+		
+		
 		public function Main()
 		{
 		
@@ -62,7 +64,8 @@ package
 			stage.align = StageAlign.TOP_LEFT;
 			Security.allowInsecureDomain("*");
 			addBtn.buttonMode = true;
-			addBtn.mouseChildren = false;
+			
+			addBtn.mouseChildren = true;
 			addChild(addBtn);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_PROGRESS, handle_upload_progress);
 			picUploader.addEventListener(PicUploadEvent.UPLOAD_SUCCESS, handle_upload_success);

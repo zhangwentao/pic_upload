@@ -10,6 +10,7 @@ package
 	{
 		public function AddBtn()
 		{
+			this.disableBtn.visible = false;
 			this.mouseChildren = false;
 		}
 		public function setStatus(status:uint):void
@@ -24,15 +25,17 @@ package
 		
 		public function disable():void
 		{
-		    this.gotoAndStop(3);
-			this.infoBtn.gotoAndStop(2);
-			this.plusBtn.gotoAndStop(2);
+			this.disableBtn.visible = true;
+		    //this.gotoAndStop(3);
+			//this.infoBtn.gotoAndStop(2);
+			//this.plusBtn.gotoAndStop(2);
 		}
 		
 		public function enable():void
 		{
-			this.infoBtn.gotoAndStop(1);
-			this.plusBtn.gotoAndStop(1);
+			this.disableBtn.visible = false;
+			//this.infoBtn.gotoAndStop(1);
+			//this.plusBtn.gotoAndStop(1);
 		}
 	}
 
