@@ -20,6 +20,7 @@ package com.renren.picUpload
 	
 	class PicStandardizer extends EventDispatcher
 	{
+		public static const OVER_DIMENTION_EVENT:String = "overDimention";
 		private var _limit:int;//上限值
 		private var _data:ByteArray;//尺寸标准化后的图片数据
 		private var _rawData:ByteArray;//原始数据
@@ -53,10 +54,14 @@ package com.renren.picUpload
 		private function handle_load_complete(evt:Event):void
 		{
 			var loader:Loader = evt.target.loader as Loader;
-			(loader.content as Bitmap).smoothing = true;//放置缩放产生锯齿
+			if(!picSizeTest(loader.content as Bitmap))
+			{
+				dispatchEvent(new Event(PicStandardizer.OVER_DIMENTION_EVENT));
+				return;
+			}
+			(loader.content as Bitmap).smoothing = true;//防止缩放产生锯齿
 			var aspectRatio:Number = loader.content.width / loader.content.height;//图片的宽高比
-
-			if (loader.content.width <= _limit && loader.content.height <= _limit)
+			if (loader.content.width <= _limit)
 			{
 				//如果图片的宽高均在上限值以下
 				_data = _rawData;
@@ -64,17 +69,9 @@ package com.renren.picUpload
 			}
 			else
 			{
-				if (aspectRatio >= 1)//如果宽大于等于高
-				{
-					temp_width = _limit;
-					temp_height = Math.ceil(temp_width / aspectRatio);
-				}
-				else//
-				{
-					temp_height = _limit;
-					temp_width = Math.ceil(temp_height * aspectRatio);
-				}
-		        
+				temp_width = _limit;
+				temp_height = Math.ceil(temp_width / aspectRatio);
+				
 				loader.content.height = temp_height;
 				loader.content.width = temp_width;
 				//ExternalInterface.call("console.log", "fuck size:", loader.content.height, loader.content.width);
@@ -96,6 +93,16 @@ package com.renren.picUpload
 			
 			
 		}
+		
+		private function picSizeTest(pic:Bitmap):Boolean
+		{
+			if(pic.width*pic.height>16777215)
+				return false;
+			if(pic.width>8191 || pic.height > 8191)
+				return false;
+			return true
+		}
+		
 		
 		private function handle_encode_com(evt):void
 		{

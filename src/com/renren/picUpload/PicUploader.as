@@ -391,9 +391,19 @@ package com.renren.picUpload
 			
 			var resizer:PicStandardizer = new PicStandardizer(int(Config.maxPicSize));
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
+			resizer.addEventListener(PicStandardizer.OVER_DIMENTION_EVENT,handle_over_dimention);
 			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			resizer.standardize(picData);
+		}
+		
+		private function handle_over_dimention(evt:Event):void
+		{
+			
+			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.OVER_DIMENTION, curProcessFile);
+			dispatchEvent(event);
+			lock = false;
+			log("开锁");
 		}
 		
 		private function handle_pic_resized(evt:Event):void

@@ -116,7 +116,6 @@ package com.renren.picUpload
 			try 
 			{
 				_responseData = JSON.decode(String(uploader.data));
-				
 			}
 			catch (e)
 			{
