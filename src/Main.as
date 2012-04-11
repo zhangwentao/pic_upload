@@ -292,7 +292,6 @@ package
 			var endTime:Number = new Date().getTime() - startTime;
 			log(evt.fileItem.id + ":success");
 			log("totalTime:", endTime);
-			ExternalInterface.call("alert", evt.fileItem.id);
 		}
 		
 		function handle_upload_progress(evt:PicUploadEvent):void

@@ -386,7 +386,7 @@ package com.renren.picUpload
 		
 		private function resizePic(picData:ByteArray):void
 		{
-			
+			ExternalInterface.call("console.log","ok")
 			log("[" + curProcessFile.fileReference.name + "]开始标准化");
 			
 			var resizer:PicStandardizer = new PicStandardizer(int(Config.maxPicSize));
