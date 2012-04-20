@@ -1,5 +1,6 @@
 package com.renren.picUpload 
 {
+	import com.renren.picUpload.PicUploader;
 	import com.adobe.serialization.json.JSON;
 	import com.renren.external.ExternalEvent;
 	import com.renren.external.ExternalEventDispatcher;
@@ -170,8 +171,10 @@ package com.renren.picUpload
 			dispatchEvent(evt);
 			event.addParam("file", dataBlock.file.getInfoObject());
 			event.addParam("errorCode", errorCode);
+			event.addParam("space",Config.picUploadNumOnce - (--PicUploader.fileItemQueuedNum));
 			dataBlock.dispose();//释放内存
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+			
 		}
 		
 		private function oneBlockCompleteDo():void

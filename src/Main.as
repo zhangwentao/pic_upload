@@ -1,4 +1,4 @@
-package
+﻿package
 {
 	import com.adobe.protocols.dict.Database;
 	import com.adobe.serialization.json.JSON;
@@ -30,6 +30,8 @@ package
 	import flash.system.Security;
 	import flash.ui.ContextMenu;
 	import flash.utils.Dictionary;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
 	
 	/**
 	 * ...
@@ -55,7 +57,7 @@ package
 		private var alertedNotLogin:Boolean = false;
 		
 		private var uploadType:int = 1;//1:传给自己相册，2：传给好友
-		
+		private var timer:Timer= new Timer(200);
 		public function Main()
 		{
 		
@@ -81,13 +83,8 @@ package
 			addBtn.addEventListener(MouseEvent.CLICK, handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			
-			if (stage)
-				init();
-			else
-				addEventListener(Event.ADDED_TO_STAGE, function()
-					{
-						init();
-					});
+			timer.addEventListener(TimerEvent.TIMER,init);
+			timer.start();
 		}
 		
 		function getWordGroup(src:String):Array
@@ -156,6 +153,7 @@ package
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.OVER_DIMENTION);
 			event.addParam("file", evt.fileItem.getInfoObject());
+			event.addParam("space",Config.picUploadNumOnce - (--PicUploader.fileItemQueuedNum));
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 		}
 		
@@ -208,11 +206,12 @@ package
 		private function handle_upload_canceled(evt:PicUploadEvent):void
 		{
 			log("delete:" + evt.fileItem.id);
-			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - picUploader.fileItemQueuedNum) + "张");
+			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - PicUploader.fileItemQueuedNum) + "张");
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_UPLOAD_CANCELED);
 			event.addParam("file", {id: evt.fileItem.id});
+			event.addParam("space",Config.picUploadNumOnce - PicUploader.fileItemQueuedNum);
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
-			if (picUploader.fileItemQueuedNum < Config.picUploadNumOnce)
+			if (PicUploader.fileItemQueuedNum < Config.picUploadNumOnce)
 			{
 				addBtn.buttonMode = true;
 				addBtn.mouseChildren = addBtn.mouseEnabled = true;
@@ -234,8 +233,13 @@ package
 			return result;
 		}
 		
-		private function init():void
+		private function init(evt:Event=null):void
 		{
+			if(stage == null)
+			{
+				return;
+			}
+			timer.removeEventListener(TimerEvent.TIMER,init);
 			try
 			{
 				var cm:ContextMenu = new ContextMenu();
@@ -320,7 +324,7 @@ package
 		private function handle_file_queued(evt:PicUploadEvent):void
 		{
 			filesQueued.push(evt.fileItem.getInfoObject());
-			if (picUploader.fileItemQueuedNum >= Config.picUploadNumOnce)
+			if (PicUploader.fileItemQueuedNum >= Config.picUploadNumOnce)
 			{
 				//addBtn.setInfoTxt("已满"+Config.picUploadNumOnce+"张照片");
 				addBtn.buttonMode = false;
@@ -330,7 +334,7 @@ package
 			else
 			{
 			}
-			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - picUploader.fileItemQueuedNum) + "张");
+			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - PicUploader.fileItemQueuedNum) + "张");
 		}
 		
 		private function handle_file_selected(evt:Event):void
@@ -344,12 +348,12 @@ package
 			var allSelectedFileNum:int = evt.target.fileList.length;
 			var i:uint = 0;
 			
-			var allowAddFileNum:int = Config.picUploadNumOnce - picUploader.fileItemQueuedNum;
+			var allowAddFileNum:int = Config.picUploadNumOnce - PicUploader.fileItemQueuedNum;
 			
 			trace("allowAddFileNum:" + allowAddFileNum);
 			for each (var file:FileReference in evt.target.fileList)
 			{
-				if (picUploader.fileItemQueuedNum >= Config.picUploadNumOnce)
+				if (PicUploader.fileItemQueuedNum >= Config.picUploadNumOnce)
 					break;
 				var fileItem:FileItem = new FileItem(file);
 				picUploader.addFileItem(fileItem);
@@ -371,6 +375,7 @@ package
 			
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.FILE_QUEUED);
 			event.addParam("files", filesQueued);
+			event.addParam("space", Config.picUploadNumOnce - PicUploader.fileItemQueuedNum);
 			event.addParam("uploadType",uploadType);
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			filesQueued = null;
