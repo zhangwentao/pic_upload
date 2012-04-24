@@ -30,6 +30,9 @@ package
 	import flash.system.Security;
 	import flash.ui.ContextMenu;
 	import flash.utils.Dictionary;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
+	
 	
 	/**
 	 * ...
@@ -53,7 +56,7 @@ package
 		
 		private var startTime:Number;
 		private var alertedNotLogin:Boolean = false;
-		
+		private var timer:Timer= new Timer(200);
 		
 		
 		public function Main()
@@ -81,13 +84,8 @@ package
 			addBtn.addEventListener(MouseEvent.CLICK, handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			
-			if (stage)
-				init();
-			else
-				addEventListener(Event.ADDED_TO_STAGE, function()
-					{
-						init();
-					});
+			timer.addEventListener(TimerEvent.TIMER,init);
+			timer.start();
 		}
 		
 		function getWordGroup(src:String):Array
@@ -234,8 +232,14 @@ package
 			return result;
 		}
 		
-		private function init():void
+		private function init(evt=null):void
 		{
+			if(stage == null)
+			{
+				return;
+			}
+			timer.stop();
+			timer.removeEventListener(TimerEvent.TIMER,init);
 			try
 			{
 				var cm:ContextMenu = new ContextMenu();
