@@ -180,24 +180,24 @@ package com.renren.picUpload
 		public function cancelAFile(fileId:String):void
 		{
 			
-			var arr:Array = fileItemQueue.toArray();
-			
+			var arr:Array = fileItemQueue.toArray();	
 			for each(var file:FileItem in arr)
 			{
 				if (file.id == fileId)
-				{
+				{ 
+					
 					statistics.del(fileId);
 					switch(file.status)
 					{
 						case FileItem.FILE_STATUS_QUEUED:
 						case FileItem.FILE_STATUS_SUCCESS:
 							fileItemQueuedNum--;//
-							file.status = FileItem.FILE_STATUS_CANCELLED;
-							
-							var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
-							dispatchEvent(event);
 						break;
 					}
+					file.status = FileItem.FILE_STATUS_CANCELLED;
+					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
+					dispatchEvent(event);
+					
 					return;
 				}
 			}
@@ -205,6 +205,8 @@ package com.renren.picUpload
 			fileTemp.id = fileId;
 			var event2:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, fileTemp);
 			dispatchEvent(event2);
+			
+			
 		}
 		
 		/**
@@ -400,7 +402,7 @@ package com.renren.picUpload
 		
 		private function handle_over_dimention(evt:Event):void
 		{
-			
+			curProcessFile.status = FileItem.FILE_STATUS_ERROR;
 			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.OVER_DIMENTION, curProcessFile);
 			dispatchEvent(event);
 			lock = false;
