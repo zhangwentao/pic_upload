@@ -88,6 +88,11 @@ package com.renren.picUpload
 			return this._data;
 		}
 		
+		public function get rawData():ByteArray
+		{
+			return this._rawData;
+		}
+		
 		private function handle_load_complete(evt:Event):void
 		{
 			timer.stop();

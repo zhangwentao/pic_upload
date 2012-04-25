@@ -402,11 +402,11 @@ package com.renren.picUpload
 		
 		private function handle_over_dimention(evt:Event):void
 		{
-			curProcessFile.status = FileItem.FILE_STATUS_ERROR;
-			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.OVER_DIMENTION, curProcessFile);
-			dispatchEvent(event);
-			lock = false;
-			log("开锁");
+			log("["+curProcessFile.fileReference.name+"]标准化完毕");
+			var picData:ByteArray = (evt.target as PicStandardizer).rawData;
+			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
+			log("[" + curProcessFile.fileReference.name + "]EXIF 装入完毕");
+			sliceData(picData);
 		}
 		
 		private function handle_pic_resized(evt:Event):void
