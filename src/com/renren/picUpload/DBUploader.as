@@ -172,6 +172,7 @@ package com.renren.picUpload
 			event.addParam("file", dataBlock.file.getInfoObject());
 			event.addParam("errorCode", errorCode);
 			event.addParam("space",Config.picUploadNumOnce - (--PicUploader.fileItemQueuedNum));
+			Main.freshAddBtn()
 			dataBlock.dispose();//释放内存
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
 			

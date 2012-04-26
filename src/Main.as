@@ -58,9 +58,11 @@
 		
 		private var uploadType:int = 1;//1:传给自己相册，2：传给好友
 		private var timer:Timer= new Timer(200);
+		public static var freshAddBtn:Function;
 		public function Main()
 		{
 		
+			freshAddBtn = refreshAddBtn;
 			Logger.status = Logger.STATUS_OFF;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
@@ -155,6 +157,17 @@
 			event.addParam("file", evt.fileItem.getInfoObject());
 			event.addParam("space",Config.picUploadNumOnce - (--PicUploader.fileItemQueuedNum));
 			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+			refreshAddBtn();
+		}
+		
+		private function refreshAddBtn():void
+		{
+			if (PicUploader.fileItemQueuedNum < Config.picUploadNumOnce)
+			{
+				addBtn.buttonMode = true;
+				addBtn.mouseChildren = addBtn.mouseEnabled = true;
+				addBtn.enable();
+			}
 		}
 		
 		private function initFileFilters():void

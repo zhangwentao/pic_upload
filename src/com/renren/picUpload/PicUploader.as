@@ -344,10 +344,12 @@ package com.renren.picUpload
 			if (!IMGValidater.validate(fileData))
 			{
 				log("[" + curProcessFile.fileReference.name + "]不是有效图片文件");
+				curProcessFile.status = FileItem.FILE_STATUS_ERROR;
 				var event:ExternalEvent = new ExternalEvent(FileUploadEvent.INVALID_IMG_FILE);
 				event.addParam("file", curProcessFile.getInfoObject());
 				event.addParam("space",Config.picUploadNumOnce - (--PicUploader.fileItemQueuedNum));
 				ExternalEventDispatcher.getInstance().dispatchEvent(event);
+				Main.freshAddBtn();
 				lock = false;
 				log("开锁");
 				return;
