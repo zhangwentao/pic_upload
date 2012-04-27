@@ -46,6 +46,7 @@ package com.renren.picUpload
 		
 		public function standardize(pic_data:ByteArray):void
 		{
+//			ExternalInterface.call("alert","JPG")
 			//ExternalInterface.call("console.log","resize")
 			var loader:Loader = new Loader();
 			timer.addEventListener(TimerEvent.TIMER,handleTimeout);
@@ -61,27 +62,27 @@ package com.renren.picUpload
 		private function handleTimeout(evt:TimerEvent):void
 		{
 			timer.stop();
-			dispatchEvent(new Event(PicStandardizer.OVER_DIMENTION_EVENT));
+			dispatchEvent(new Event(PicStandardizer.OVER_SERVER_DIMENTION_EVENT));
 		}
 		
 		private function handle_init(evt:Event):void
 		{
-			//ExternalInterface.call("console.log","init")
+//			ExternalInterface.call("console.log","init")
 		}
 		
 		private function handle_progress(evt:ProgressEvent):void
 		{
-			//ExternalInterface.call("console.log","pro:",evt.bytesLoaded,evt.bytesTotal);
+//			ExternalInterface.call("console.log","pro:",evt.bytesLoaded,evt.bytesTotal);
 			if(evt.bytesLoaded==evt.bytesTotal)
 			{
-				//ExternalInterface.call("console.log","com");
+//				ExternalInterface.call("console.log","com");
 				timer.start();
 			}
 		}
 		
 		private function handle_load_io_error(evt:IOErrorEvent):void
 		{
-			//ExternalInterface.call("console.log","ioerror")
+//			ExternalInterface.call("console.log","ioerror")
 		}
 		
 		public function get dataBeenStandaized():ByteArray
@@ -97,10 +98,11 @@ package com.renren.picUpload
 		private function handle_load_complete(evt:Event):void
 		{
 			timer.stop();
-			//ExternalInterface.call("console.log","resize2")
+			
 			var loader:Loader = evt.target.loader as Loader;
 			if(!picSizeTestForServer(loader.content as Bitmap))
 			{
+//				ExternalInterface.call("alert","big");
 				dispatchEvent(new Event(PicStandardizer.OVER_SERVER_DIMENTION_EVENT));
 				return;
 			}
@@ -146,6 +148,8 @@ package com.renren.picUpload
 		
 		private function picSizeTestForServer(pic:Bitmap):Boolean
 		{
+//			ExternalInterface.call("alert","test");
+			
 			if(pic.width*pic.height>104857600)
 				return false;
 			else

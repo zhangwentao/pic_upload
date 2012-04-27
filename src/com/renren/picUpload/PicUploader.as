@@ -356,6 +356,7 @@ package com.renren.picUpload
 			
 			if (GIFValidater.validateGIF(fileData))//如果图片是bmp或者gif格式不进行压缩jpg转码
 			{
+//				ExternalInterface.call("alert","GIF");
 				var loader:Loader = new Loader();
 				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,handleError);
 				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,handleLoaded);
@@ -365,6 +366,8 @@ package com.renren.picUpload
 			
 			if(BMPValidater.validate(fileData))
 			{
+//				ExternalInterface.call("alert","BMP");
+				
 				sliceData(fileData);
 				return;
 			}
@@ -377,6 +380,7 @@ package com.renren.picUpload
 			function handleLoaded(evt:Event):void
 			{
 				var pic = evt.target.loader;
+//				ExternalInterface.call("alert",pic.width,pic.height);
 				if(pic.width*pic.height>104857600)
 				{
 					curProcessFile.status = FileItem.FILE_STATUS_ERROR;
