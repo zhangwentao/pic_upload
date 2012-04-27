@@ -12,7 +12,7 @@ package com.renren.picUpload
 	import com.renren.util.ObjectPool;
 	import com.renren.util.img.ExifInjector;
 	import com.renren.util.net.SimpleURLLoader;
-	
+	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -354,11 +354,41 @@ package com.renren.picUpload
 			}
 			
 			
-			if (BMPValidater.validate(fileData)||GIFValidater.validateGIF(fileData))//如果图片是bmp或者gif格式不进行压缩jpg转码
+			if (GIFValidater.validateGIF(fileData))//如果图片是bmp或者gif格式不进行压缩jpg转码
+			{
+				var loader:Loader = new Loader();
+				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,handleError);
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,handleLoaded);
+				loader.loadBytes(fileData);
+				return;
+			}
+			
+			if(BMPValidater.validate(fileData))
 			{
 				sliceData(fileData);
-				log("bmp or gif");
 				return;
+			}
+			
+			function handleError(evt:IOErrorEvent):void
+			{
+				
+			}
+			
+			function handleLoaded(evt:Event):void
+			{
+				var pic = evt.target.loader;
+				if(pic.width*pic.height>104857600)
+				{
+					curProcessFile.status = FileItem.FILE_STATUS_ERROR;
+					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.OVER_DIMENTION, curProcessFile);
+					dispatchEvent(event);
+					lock = false;
+				}
+				else
+				{
+					sliceData(fileData);
+				}
+				log("bmp or gif");
 			}
 			
 			fileData.position = 0;
@@ -395,9 +425,18 @@ package com.renren.picUpload
 			var resizer:PicStandardizer = new PicStandardizer(int(Config.maxPicSize));
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
 			resizer.addEventListener(PicStandardizer.OVER_DIMENTION_EVENT,handle_over_dimention);
+			resizer.addEventListener(PicStandardizer.OVER_SERVER_DIMENTION_EVENT,handle_over_server_dimention);
 			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			resizer.standardize(picData);
+		}
+		
+		private function handle_over_server_dimention(evt:Event):void
+		{
+			curProcessFile.status = FileItem.FILE_STATUS_ERROR;
+			var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.OVER_DIMENTION, curProcessFile);
+			dispatchEvent(event);
+			lock = false;
 		}
 		
 		private function handle_over_dimention(evt:Event):void

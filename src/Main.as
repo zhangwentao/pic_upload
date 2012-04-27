@@ -79,7 +79,7 @@
 			picUploader.addEventListener(PicUploadEvent.FILE_EXCEEDS_SIZE_LIMIT, handle_invalid_files);
 			picUploader.addEventListener(PicUploadEvent.FILE_QUEUED, handle_file_queued);
 			picUploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
-			picUploader.addEventListener(PicUploadEvent.OVER_DIMENTION,handle_over_dimention);
+			picUploader.addEventListener(PicUploadEvent.OVER_DIMENTION,handle_over_server_dimention);
 			addBtn.addEventListener(MouseEvent.CLICK, handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			
@@ -149,7 +149,7 @@
 			invalidFiles.push(fileObj);
 		}
 		
-		private function handle_over_dimention(evt:PicUploadEvent):void
+		private function handle_over_server_dimention(evt:PicUploadEvent):void
 		{
 			var event:ExternalEvent = new ExternalEvent(FileUploadEvent.OVER_DIMENTION);
 			event.addParam("file", evt.fileItem.getInfoObject());

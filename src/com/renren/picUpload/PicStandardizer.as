@@ -25,6 +25,7 @@ package com.renren.picUpload
 	class PicStandardizer extends EventDispatcher
 	{
 		public static const OVER_DIMENTION_EVENT:String = "overDimention";
+		public static const OVER_SERVER_DIMENTION_EVENT:String = "overServerDimention";
 		private var _limit:int;//上限值
 		private var _data:ByteArray;//尺寸标准化后的图片数据
 		private var _rawData:ByteArray;//原始数据
@@ -98,6 +99,11 @@ package com.renren.picUpload
 			timer.stop();
 			//ExternalInterface.call("console.log","resize2")
 			var loader:Loader = evt.target.loader as Loader;
+			if(!picSizeTestForServer(loader.content as Bitmap))
+			{
+				dispatchEvent(new Event(PicStandardizer.OVER_SERVER_DIMENTION_EVENT));
+				return;
+			}
 			if(!picSizeTest(loader.content as Bitmap))
 			{
 				dispatchEvent(new Event(PicStandardizer.OVER_DIMENTION_EVENT));
@@ -136,6 +142,14 @@ package com.renren.picUpload
 			}
 			
 			
+		}
+		
+		private function picSizeTestForServer(pic:Bitmap):Boolean
+		{
+			if(pic.width*pic.height>104857600)
+				return false;
+			else
+				return true;
 		}
 		
 		private function picSizeTest(pic:Bitmap):Boolean
