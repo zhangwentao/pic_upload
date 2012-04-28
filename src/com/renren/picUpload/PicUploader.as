@@ -21,6 +21,7 @@ package com.renren.picUpload
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
+	import flash.utils.Endian;
 	/**
 	 * 缩略图绘制完毕事件
 	 */
@@ -366,11 +367,43 @@ package com.renren.picUpload
 			
 			if(BMPValidater.validate(fileData))
 			{
-//				ExternalInterface.call("alert","BMP");
 				
-				sliceData(fileData);
+				var size:Object = getBMPsize(fileData);
+				
+			//	ExternalInterface.call("alert",size.width+";"+size.height);
+				if(size.width*size.height>104857600)
+				{
+					curProcessFile.status = FileItem.FILE_STATUS_ERROR;
+					var event1:PicUploadEvent = new PicUploadEvent(PicUploadEvent.OVER_DIMENTION, curProcessFile);
+					dispatchEvent(event1);
+					lock = false;
+				}
+				else
+				{
+					sliceData(fileData);
+				}
+				
 				return;
 			}
+			
+			function getBMPsize(fileData:ByteArray):Object
+			{
+				var sizeObj={};
+				var widthByte:ByteArray = new ByteArray();
+				widthByte.writeBytes(fileData,0x12,4);
+				widthByte.position = 0;
+				widthByte.endian = Endian.LITTLE_ENDIAN;
+				sizeObj["width"] = widthByte.readUnsignedInt();
+				widthByte.clear();
+				var heightByte:ByteArray = new ByteArray();
+				heightByte.writeBytes(fileData,0x16,4);
+				heightByte.position = 0;
+				heightByte.endian = Endian.LITTLE_ENDIAN;
+				sizeObj["height"] = heightByte.readUnsignedInt();
+				heightByte.clear();
+				return sizeObj;
+			}
+			
 			
 			function handleError(evt:IOErrorEvent):void
 			{
