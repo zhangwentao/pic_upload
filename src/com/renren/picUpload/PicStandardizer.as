@@ -33,7 +33,7 @@ package com.renren.picUpload
 		private var temp_width:int = 0;
 		private var compressStartTime:Number=0;//开始对图片进行处理的时刻
 		public var compressTime:Number = 0;//对图片进行处理的总时间
-		private var timer:Timer = new Timer(500);
+		private var timer:Timer = new Timer(1000);
 		private var bitmapData:BitmapData;
 		/**
 		 * 构造函数
@@ -48,13 +48,29 @@ package com.renren.picUpload
 		{
 //			ExternalInterface.call("alert","JPG")
 			//ExternalInterface.call("console.log","resize")
+			_rawData = pic_data;
+			ImagePreParser.parse(pic_data);
+//			ExternalInterface.call("alert",ImagePreParser.contentWidth+","+ImagePreParser.contentHeight);
+			if(!picSizeTestForServer())
+			{
+				//				ExternalInterface.call("alert","big");
+				dispatchEvent(new Event(PicStandardizer.OVER_SERVER_DIMENTION_EVENT));
+				return;
+			}
+			
+			if(!picSizeTest())
+			{
+				dispatchEvent(new Event(PicStandardizer.OVER_DIMENTION_EVENT));
+				return;
+			}
+			
 			var loader:Loader = new Loader();
 			timer.addEventListener(TimerEvent.TIMER,handleTimeout);
 			loader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, handle_progress);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, handle_load_io_error);
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handle_load_complete);
 			loader.contentLoaderInfo.addEventListener(Event.INIT, handle_init);
-			_rawData = pic_data;
+			
 			//ExternalInterface.call("console.log","resize4")
 			loader.loadBytes(pic_data);
 		}
@@ -75,8 +91,11 @@ package com.renren.picUpload
 //			ExternalInterface.call("console.log","pro:",evt.bytesLoaded,evt.bytesTotal);
 			if(evt.bytesLoaded==evt.bytesTotal)
 			{
-//				ExternalInterface.call("console.log","com");
-				timer.start();
+				
+				ExternalInterface.call("console.log","com");
+				var loader:Loader = evt.target.loader as Loader;
+				ExternalInterface.call("console.log",loader.width,loader.height);
+				//timer.start();
 			}
 		}
 		
@@ -100,17 +119,7 @@ package com.renren.picUpload
 			timer.stop();
 			
 			var loader:Loader = evt.target.loader as Loader;
-			if(!picSizeTestForServer(loader.content as Bitmap))
-			{
-//				ExternalInterface.call("alert","big");
-				dispatchEvent(new Event(PicStandardizer.OVER_SERVER_DIMENTION_EVENT));
-				return;
-			}
-			if(!picSizeTest(loader.content as Bitmap))
-			{
-				dispatchEvent(new Event(PicStandardizer.OVER_DIMENTION_EVENT));
-				return;
-			}
+			
 			(loader.content as Bitmap).smoothing = true;//防止缩放产生锯齿
 			var aspectRatio:Number = loader.content.width / loader.content.height;//图片的宽高比
 			if (loader.content.width <= _limit)
@@ -146,22 +155,22 @@ package com.renren.picUpload
 			
 		}
 		
-		private function picSizeTestForServer(pic:Bitmap):Boolean
+		private function picSizeTestForServer():Boolean
 		{
 //			ExternalInterface.call("alert","test");
 			
-			if(pic.width*pic.height>104857600)
+			if(ImagePreParser.contentWidth*ImagePreParser.contentHeight>104857600)
 				return false;
 			else
 				return true;
 		}
 		
-		private function picSizeTest(pic:Bitmap):Boolean
+		private function picSizeTest():Boolean
 		{
 			//ExternalInterface.call("console.log",pic.width,pic.height);
-			if(pic.width*pic.height>16777215)
+			if(ImagePreParser.contentWidth*ImagePreParser.contentHeight>16777215)
 				return false;
-			if(pic.width > 8191 || pic.height > 8191)
+			if(ImagePreParser.contentWidth > 8191 || ImagePreParser.contentHeight > 8191)
 				return false;
 			return true
 		}
