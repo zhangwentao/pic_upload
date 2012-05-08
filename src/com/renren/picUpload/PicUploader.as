@@ -1,5 +1,7 @@
 package com.renren.picUpload 
 {
+	import com.mxi.image.ExifParser;
+	import com.mxi.image.JPEG;
 	import com.renren.external.ExternalEvent;
 	import com.renren.external.ExternalEventDispatcher;
 	import com.renren.picUpload.DataSlicer;
@@ -12,6 +14,7 @@ package com.renren.picUpload
 	import com.renren.util.ObjectPool;
 	import com.renren.util.img.ExifInjector;
 	import com.renren.util.net.SimpleURLLoader;
+	
 	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -20,8 +23,9 @@ package com.renren.picUpload
 	import flash.external.ExternalInterface;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
-	import flash.utils.Timer;
 	import flash.utils.Endian;
+	import flash.utils.Timer;
+	
 	/**
 	 * 缩略图绘制完毕事件
 	 */
@@ -56,6 +60,7 @@ package com.renren.picUpload
 		
 		private var lockCheckerTimer:Timer = new Timer(4000);//
 		public var statistics:StatisticsCollector = new StatisticsCollector();
+		private var exifExtractor:ExifParser= new ExifParser();
 		var tttttt:uint = 0;
 		
 		/**
@@ -463,7 +468,11 @@ package com.renren.picUpload
 			resizer.addEventListener(Event.COMPLETE, handle_pic_resized);
 			resizer.addEventListener(PicStandardizer.OVER_DIMENTION_EVENT,handle_over_dimention);
 			resizer.addEventListener(PicStandardizer.OVER_SERVER_DIMENTION_EVENT,handle_over_server_dimention);
-			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
+//			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
+			
+			exifExtractor.init(new JPEG(picData).getHeaders("EXIF")[0]);//提取Exif
+			curProcessFileExif = exifExtractor.getBinary();
+			ExternalInterface.call("console.log",curProcessFileExif);
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			resizer.standardize(picData);
 		}
