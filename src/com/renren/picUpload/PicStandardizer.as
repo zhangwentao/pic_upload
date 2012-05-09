@@ -92,9 +92,9 @@ package com.renren.picUpload
 			if(evt.bytesLoaded==evt.bytesTotal)
 			{
 				
-				ExternalInterface.call("console.log","com");
+//				ExternalInterface.call("console.log","com");
 				var loader:Loader = evt.target.loader as Loader;
-				ExternalInterface.call("console.log",loader.width,loader.height);
+//				ExternalInterface.call("console.log",loader.width,loader.height);
 				//timer.start();
 			}
 		}

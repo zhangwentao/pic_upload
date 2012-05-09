@@ -472,7 +472,7 @@ package com.renren.picUpload
 			
 			exifExtractor.init(new JPEG(picData).getHeaders("EXIF")[0]);//提取Exif
 			curProcessFileExif = exifExtractor.getBinary();
-			ExternalInterface.call("console.log",curProcessFileExif);
+//			ExternalInterface.call("console.log",curProcessFileExif);
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			resizer.standardize(picData);
 		}
