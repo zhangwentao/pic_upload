@@ -469,9 +469,13 @@ package com.renren.picUpload
 			resizer.addEventListener(PicStandardizer.OVER_DIMENTION_EVENT,handle_over_dimention);
 			resizer.addEventListener(PicStandardizer.OVER_SERVER_DIMENTION_EVENT,handle_over_server_dimention);
 //			curProcessFileExif = ExifInjector.extract(picData);//提取Exif
+			curProcessFileExif = null;
+			if(IMGValidater.validateJPG(picData))
+			{
+				exifExtractor.init(new JPEG(picData).getHeaders("EXIF")[0]);//提取Exif
+				curProcessFileExif = exifExtractor.getBinary();
+			}
 			
-			exifExtractor.init(new JPEG(picData).getHeaders("EXIF")[0]);//提取Exif
-			curProcessFileExif = exifExtractor.getBinary();
 //			ExternalInterface.call("console.log",curProcessFileExif);
 			log("[" + curProcessFile.fileReference.name + "]EXIF 提取完毕");
 			resizer.standardize(picData);
@@ -501,7 +505,9 @@ package com.renren.picUpload
 			log("["+curProcessFile.fileReference.name+"]标准化完毕");
 			var picData:ByteArray = (evt.target as PicStandardizer).dataBeenStandaized;
 			picData = ExifInjector.inject(curProcessFileExif, picData);//插入exif
+			
 			log("[" + curProcessFile.fileReference.name + "]EXIF 装入完毕");
+			
 			sliceData(picData);
 		}
 		

@@ -12,7 +12,7 @@ package com.renren.picUpload
 			return (validateBMP(imgData)||validateGIF(imgData)||validateJPG(imgData)||validatePNG(imgData))
 		}
 		
-		private static function validateJPG(imgData:ByteArray):Boolean
+		public static function validateJPG(imgData:ByteArray):Boolean
 		{
 			imgData.position = 0;
 			if (imgData.readUnsignedShort() == 0xFFD8)
