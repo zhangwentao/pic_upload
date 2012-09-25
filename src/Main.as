@@ -166,11 +166,17 @@
 				var fileTypeArray:Array = [];
 				var typeSrc:Array =  String(fileterInfo[1]).split(",");
 				var result:String = '';
+//				for ( var i:int = 0; i < typeSrc.length; i++)
+//				{
+//					fileTypeArray = fileTypeArray.concat(getWordGroup(typeSrc[i]));
+//					
+//				}
 				for ( var i:int = 0; i < typeSrc.length; i++)
 				{
-					fileTypeArray = fileTypeArray.concat(getWordGroup(typeSrc[i]));
+					fileTypeArray.push(typeSrc[i]);
 					
 				}
+				i = 0;
 				result += "*." + fileTypeArray[i];
 				for (i = 1; i < fileTypeArray.length; i++)
 				{
@@ -178,7 +184,7 @@
 				}
 				//var fileType:String = fileterInfo[1] + ";" + String(fileterInfo[1]).toLocaleUpperCase();
 				var fileType:String = result;
-				trace("fileTypeArray:",fileTypeArray);
+				trace("fileTypeArray:",fileType);
 				var filter:FileFilter = new FileFilter(fileterInfo[0], fileType);
 			
 				fileFilters.push(filter);
