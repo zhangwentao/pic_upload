@@ -1,4 +1,8 @@
 .svn/
+bin-debug
+.flexProperties
+doc/Picupload.txt
+html-template/
 git.bat
 *.lnk
 .actionScriptProperties
