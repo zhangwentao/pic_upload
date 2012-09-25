@@ -138,22 +138,28 @@ package com.renren.picUpload
 				//log("超过了一次可上传的最大数量:"+Config.picUploadNumOnce);
 				//return;
 			//}
-			
-			if (!validateFile(fileItem))
+			if(fileItem.status == FileItem.FILE_STATUS_PRETEND)
+			{
+				fileItemQueue.enQueue(fileItem);   
+				fileItem.status = FileItem.FILE_STATUS_SUCCESS;//修改文件状态为:已加入上传队列
+				fileItemQueuedNum++;
+				dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_PRETEND_QUEUED, fileItem));
+			}
+			else if (!validateFile(fileItem))
 			{
 				log("error queue");
 				dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
 				return;
 			}
+			else 
+			{
+				fileItemQueue.enQueue(fileItem);   
+				fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
+				fileItemQueuedNum++;
+				dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
+				log("fileQueuelength:"+fileItemQueue.count)
+			}
 			
-			
-			fileItemQueue.enQueue(fileItem);   
-			fileItem.status = FileItem.FILE_STATUS_QUEUED;//修改文件状态为:已加入上传队列
-			fileItemQueuedNum++;
-			dispatchEvent(new PicUploadEvent(PicUploadEvent.FILE_QUEUED, fileItem));
-			
-			
-			log("fileQueuelength:"+fileItemQueue.count)
 		}
 	
 		
@@ -203,7 +209,6 @@ package com.renren.picUpload
 					file.status = FileItem.FILE_STATUS_CANCELLED;
 					var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.UPLOAD_CANCELED, file);
 					dispatchEvent(event);
-					
 					return;
 				}
 			}
@@ -274,14 +279,14 @@ package com.renren.picUpload
 			log("上锁");
 			curProcessFile = fileItemQueue.deQueue();
 			
-			while (curProcessFile.status == FileItem.FILE_STATUS_CANCELLED)
+			while (curProcessFile.status != FileItem.FILE_STATUS_QUEUED)
 			{
 			    if (fileItemQueue.count == 0)
 					break;
 				curProcessFile = fileItemQueue.deQueue();
 			}
 			
-			if (curProcessFile.status == FileItem.FILE_STATUS_CANCELLED)
+			if (curProcessFile.status != FileItem.FILE_STATUS_QUEUED)
 			{
 				lock = false;
 				return;

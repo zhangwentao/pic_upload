@@ -12,7 +12,8 @@ package com.renren.picUpload
 		public static var FILE_STATUS_ERROR:int			= -3;//发生错误
 		public static var FILE_STATUS_SUCCESS:int		= -4;//上传完毕
 		public static var FILE_STATUS_CANCELLED:int		= -5;//已取消
-		
+		public static var FILE_STATUS_PRETEND:int     = -6//虚拟的占位数据
+			
 		private static var file_id_sequence:Number = 0;		// tracks the file id sequence
 		public static var id_prefix:String;
 		public var id:String;	//编号
@@ -25,11 +26,11 @@ package com.renren.picUpload
 		 * @param	idPrifix		<String> id前缀
 		 * @param	fileReference	<FileReference> 文件引用
 		 */
-		public function FileItem(fileReference:FileReference) 
+		public function FileItem(fileReference:FileReference=null) 
 		{
+			this.id = id_prefix + "_" + file_id_sequence++;
 			if (!fileReference)
 				return;
-			this.id = id_prefix + "_" + file_id_sequence++;
 			this.fileReference = fileReference;
 			this.statistics.id = this.id;
 			log(this.id,this.statistics.id);

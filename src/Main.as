@@ -21,6 +21,7 @@
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
 	import flash.filters.BevelFilter;
 	import flash.net.FileFilter;
@@ -31,7 +32,6 @@
 	import flash.ui.ContextMenu;
 	import flash.utils.Dictionary;
 	import flash.utils.Timer;
-	import flash.events.TimerEvent;
 	
 	/**
 	 * ...
@@ -261,6 +261,7 @@
 				ExternalInterface.addCallback("jsonEncode", this.encode);
 				ExternalInterface.addCallback("showLog", this.showLog);
 				ExternalInterface.addCallback("getStatistics",picUploader.statistics.getJSONformate);
+				ExternalInterface.addCallback("pretendAddFile",pretendAddFileItem);
 				ExternalEventDispatcher.getInstance().addExternalCall();
 				checkVersion();
 				
@@ -341,6 +342,16 @@
 			{
 			}
 			addBtn.setInfoTxt("还能添加" + (Config.picUploadNumOnce - PicUploader.fileItemQueuedNum) + "张");
+		}
+		
+		private function pretendAddFileItem(num:int):void
+		{
+			for(var i:int = 0;i<num;i++)
+			{
+				var fileItem:FileItem = new FileItem();
+				fileItem.status = FileItem.FILE_STATUS_PRETEND;
+				picUploader.addFileItem(fileItem);
+			}
 		}
 		
 		private function handle_file_selected(evt:Event):void
