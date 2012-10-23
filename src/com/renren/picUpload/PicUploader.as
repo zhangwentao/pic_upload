@@ -130,7 +130,7 @@ package com.renren.picUpload
 		 */
 		public function addFileItem(fileItem:FileItem):void
 		{
-			trace("file:" + fileItem.fileReference.name);
+//			trace("file:" + fileItem.fileReference.name);
 			//if(fileItemQueuedNum >= Config.picUploadNumOnce)
 			//{
 				//var event:PicUploadEvent = new PicUploadEvent(PicUploadEvent.QUEUE_LIMIT_EXCEEDED, fileItem);

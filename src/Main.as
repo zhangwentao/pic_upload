@@ -80,12 +80,21 @@
 			picUploader.addEventListener(PicUploadEvent.FILE_QUEUED, handle_file_queued);
 			picUploader.addEventListener(PicUploadEvent.NOT_LOGIN, handle_notLogin);
 			picUploader.addEventListener(PicUploadEvent.OVER_DIMENTION,handle_over_server_dimention);
+			picUploader.addEventListener(PicUploadEvent.FILE_PRETEND_QUEUED, handlePretendQueued);
 			addBtn.addEventListener(MouseEvent.CLICK, handle_stage_clicked);
 			fileList.addEventListener(Event.SELECT, handle_file_selected);
 			
 			timer.addEventListener(TimerEvent.TIMER,init);
 			timer.start();
 		}
+		
+		private function handlePretendQueued(evt:PicUploadEvent):void
+		{
+			var event:ExternalEvent = new ExternalEvent(PicUploadEvent.FILE_PRETEND_QUEUED);
+			event.addParam("file", evt.fileItem.id);
+			ExternalEventDispatcher.getInstance().dispatchEvent(event);
+		} 
+
 		
 		function getWordGroup(src:String):Array
 		{
